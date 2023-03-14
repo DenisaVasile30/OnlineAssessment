@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`users`')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -21,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $email;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    private $roles = ["ROLE_STUDENT"];
 
     /**
      * @var string The hashed password
@@ -29,11 +30,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private string $password;
 
-    #[ORM\OneToOne(mappedBy: 'user' ,targetEntity: UserProfile::class ,cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserProfile::class, cascade: ['persist', 'remove'])]
     private $userProfile;
 
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Student::class, cascade: ['persist', 'remove'])]
+    private $student;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Teacher::class, cascade: ['persist', 'remove'])]
+    private $teacher;
 
     public function getId(): int
     {
@@ -77,6 +84,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+//        only for testing
+//        $this->roles = 'ROLE_STUDENT';
 
         return $this;
     }
@@ -132,5 +141,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    public function getStudent(): ?Student
+    {
+        return $this->student;
+    }
+
+    public function setStudent(Student $student): self
+    {
+        // set the owning side of the relation if necessary
+        if ($student->getUserId() !== $this) {
+            $student->setUserId($this);
+        }
+
+        $this->student = $student;
+
+        return $this;
+    }
+
+    public function getTeacher(): Student
+    {
+        return $this->teacher;
+    }
+
+    public function setTeacher(Teacher $teacher): self
+    {
+        // set the owning side of the relation if necessary
+        if ($this->teacher->getUserId() !== $this) {
+            $teacher->setUserId($this);
+        }
+
+        $this->teacher = $teacher;
+
+        return $this;
+    }
+
+    public function getIdentifierId(): int
+    {
+        return $this->getId();
     }
 }

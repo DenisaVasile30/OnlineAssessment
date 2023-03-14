@@ -23,9 +23,9 @@
 <body class="bg-gray-100 text-gray-800 m-10 dark:bg-gray-800 dark:text-white">
     <div class="w-full md:w-2/3 mx-auto mb-4 flex justify-between items-center">
         <div class="text-4xl">
-{#            <a href="{{ path('app_micro_post') }}">#}
+            <a href="{{ path('app_home') }}">
                 Home
-{#            </a>#}
+            </a>
             {% block bread %}
 
             {% endblock %}
@@ -33,7 +33,7 @@
 
         <div class="text-right">
             <div class="text-sm text-gray-500 dark:text-gray-400 flex">
-{#                {% if is_granted('IS_AUTHENTICATED_FULLY') %}#}
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <div class="ml-2">
 {#                        <a href="{{ path('app_settings_profile') }}">#}
                             Profile Settings
@@ -42,7 +42,7 @@
                     <div class="ml-2">
                         <a href="{{ path('app_logout') }}">Logout</a>
                     </div>
-{#                {% else %}#}
+                {% else %}
                     <div>
                         <a href="{{ path('app_login') }}">Login</a>
                     </div>
@@ -51,7 +51,7 @@
                             Register
                         </a>
                     </div>
-{#                {% endif %}#}
+                {% endif %}
             </div>
         </div>
     </div>

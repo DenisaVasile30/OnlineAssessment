@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div style="width: 80%; margin: 0 auto;">
+        <h1>Table from Database</h1>
+        <div style="">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student in studentsList %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.email }}</td>
+{#                        <td>{{ row.age }}</td>#}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
