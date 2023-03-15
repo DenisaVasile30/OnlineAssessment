@@ -40,6 +40,16 @@ class TeacherRepository extends ServiceEntityRepository
         }
     }
 
+    public function getTeacher(int $userId): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.user = :teacherId')
+            ->setParameter('teacherId', $userId)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Student[] Returns an array of Student objects
 //     */

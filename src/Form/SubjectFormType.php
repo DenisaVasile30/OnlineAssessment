@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Subject;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +15,13 @@ class SubjectFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('subject')
+            ->add('description')
+            ->add('subject', ChoiceType::class, [
+                'choices'  => [
+                    'SDD' => 'SDD',
+                    'POO' => 'POO',
+                ]]
+            )
             ->add('content', FileType::class, [
                 'label' => 'Subject content file (TXT or PDF file)',
                 'mapped' => false,

@@ -30,9 +30,13 @@ class Teacher
     #[ORM\OneToMany(mappedBy: 'issuedBy', targetEntity: Subject::class)]
     private Collection $subjects;
 
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Assessment::class)]
+    private Collection $assessments;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
+        $this->assessments = new ArrayCollection();
     }
 
     public function getId(): int
@@ -100,6 +104,36 @@ class Teacher
             // set the owning side to null (unless already changed)
             if ($subject->getIssuedBy() === $this) {
                 $subject->setIssuedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Assessment>
+     */
+    public function getAssessments(): Collection
+    {
+        return $this->assessments;
+    }
+
+    public function addAssessment(Assessment $assessment): self
+    {
+        if (!$this->assessments->contains($assessment)) {
+            $this->assessments->add($assessment);
+            $assessment->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssessment(Assessment $assessment): self
+    {
+        if ($this->assessments->removeElement($assessment)) {
+            // set the owning side to null (unless already changed)
+            if ($assessment->getTeacher() === $this) {
+                $assessment->setTeacher(null);
             }
         }
 

@@ -11,7 +11,13 @@
     </div>
 
     <div>
-        {{ form_label(addSubjectForm.subject, 'Subject', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_label(addSubjectForm.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(addSubjectForm.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(addSubjectForm.description) }}
+    </div>
+
+    <div>
+        {{ form_label(addSubjectForm.subject, 'Discipline', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
         {{ form_widget(addSubjectForm.subject, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
         {{ form_errors(addSubjectForm.subject) }}
     </div>
