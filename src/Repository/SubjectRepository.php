@@ -39,6 +39,16 @@ class SubjectRepository extends ServiceEntityRepository
         }
     }
 
+    public function getSubjectsByIssuer(int $issuerId): array
+    {
+        return $this->createQueryBuilder('sb')
+            ->andWhere('sb.issuedBy = :teacherId')
+            ->setParameter('teacherId', $issuerId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    /**
 //     * @return Subject[] Returns an array of Subject objects
 //     */

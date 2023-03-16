@@ -14,7 +14,7 @@ class GroupController extends AbstractController
     {
         $studentsList = $groups->getStudentsFromGroup();
 //        dd($studentsList);
-        return $this->render('groups/assessment.html.twig', [
+        return $this->render('groups/index.html.twig', [
             'studentsList' => $studentsList,
         ]);
     }

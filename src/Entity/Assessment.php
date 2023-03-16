@@ -35,7 +35,7 @@ class Assessment
 
     #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]
-    private Subject $subject;
+    private $subject;
 
     #[ORM\ManyToOne(targetEntity: Teacher::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]

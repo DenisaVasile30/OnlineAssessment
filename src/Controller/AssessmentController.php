@@ -4,22 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Assessment;
 use App\Entity\Subject;
-use App\Entity\Teacher;
-use App\Entity\User;
 use App\Form\AssessmentFormType;
-use App\Form\RegistrationFormType;
 use App\Form\SubjectFormType;
 use App\Repository\AssessmentRepository;
+use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
-use Doctrine\DBAL\Types\DateType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 
 class AssessmentController extends AbstractController
 {
@@ -64,29 +58,46 @@ class AssessmentController extends AbstractController
     public function scheduleAssessment(
         Request $request,
         EntityManagerInterface $entityManager,
-        AssessmentRepository $assessmentRepository
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository
     ): Response
     {
         $assessment = new Assessment();
-        $form = $this->createForm(AssessmentFormType::class, $assessment);
+        $userId = $this->getUser()->getIdentifierId();
+        $teacher = $teacherRepository->getTeacher($userId);
+        $teacherAssignedGroups = $teacher[0]->getAssignedGroups();
+        $subjectsArray = $subjectRepository->getSubjectsByIssuer($teacher[0]->getId());
+        $subjects = [];
+        foreach ($subjectsArray as $item) {
+            $subjects[$item->getId()] = $item->getDescription();
+        }
+        $form = $this->createForm(
+            AssessmentFormType::class,
+            $assessment,
+            [
+                'teacherAssignedGroups' => $teacherAssignedGroups,
+                'subjects' => $subjects
+            ]);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-//            $userId = $this->getUser()->getIdentifierId();
-//            $teacher = $assessmentRepository->getTeacher($userId);
-//            $subject->setCreatedAt(new \DateTime());
-//            $subject->setIssuedBy($teacher[0]);
-//
-//
-//            $entityManager->persist($subject);
-//            $entityManager->flush();
+            $assessment->setCreatedAt(new \DateTime());
+            $assessment->setCreatedBy($teacher[0]);
+//            if the teacher selected multiple subjects we will extract one random at launch
+            $selectedSubjects = $assessment->getSubjectList();
+            $isSingleSubject = count($selectedSubjects) > 1;
+            foreach ($subjectsArray as $key => $value) {
+//                if ($isSingleSubject) {
+                    if ($value->getDescription() == $selectedSubjects[0]) {
+                        // TO DO: Do not allow subject have id 0
+                        $assessment->setSubject(
+                            $subjectRepository->find($key)
+                        );
+                    }
+//                }
+            }
 
-//            ->add('description')
-//                ->add('createdAt')
-//                ->add('assigneeGroup')
-//                ->add('startAt')
-//                ->add('endAt')
-//                ->add('subject') + issuedBy
+            $entityManager->persist($assessment);
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_assessment');
         }
