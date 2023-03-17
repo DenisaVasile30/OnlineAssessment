@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block bread %}
+    → Assessments
+
+{%  endblock %}
 
 {% block body %}
 
@@ -13,6 +17,10 @@
         <a href="{{ path('app_schedule_assessment') }}">
             Schedule assessment
         </a>
+    </div>
+
+    <div>
+        <a href="{{ path('app_show_assessments') }}">Assessments</a>
     </div>
 
 {% endblock %}

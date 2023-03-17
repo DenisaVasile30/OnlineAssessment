@@ -67,6 +67,16 @@ class GroupRepository extends ServiceEntityRepository
 
     }
 
+    public function getGroupNo(int $groupId): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.id = :groupId')
+            ->setParameter('groupId', $groupId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 
 //    /**
 //     * @return Group[] Returns an array of Group objects

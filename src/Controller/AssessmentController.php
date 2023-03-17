@@ -7,6 +7,8 @@ use App\Entity\Subject;
 use App\Form\AssessmentFormType;
 use App\Form\SubjectFormType;
 use App\Repository\AssessmentRepository;
+use App\Repository\GroupRepository;
+use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -104,6 +106,37 @@ class AssessmentController extends AbstractController
 
         return $this->render('assessment/schedule_assessment.html.twig', [
             'scheduleAssessmentForm' => $form->createView()
+        ]);
+    }
+
+    #[Route('/home/assessments/show', name: 'app_show_assessments')]
+    public function showAssessments(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        AssessmentRepository $assessmentRepository,
+        StudentRepository $studentRepository,
+        TeacherRepository $teacherRepository,
+        GroupRepository $groupRepository
+    ): Response
+    {
+        $userId = $this->getUser()->getIdentifierId();
+        if (in_array('ROLE_STUDENT', $this->getUser()->getRoles())) {
+            $isStudent = true;
+            $groupId = ($studentRepository->getGroupByUserId($userId))[0]->getGroupId();
+            $groupNo = $groupRepository->getGroupNo($groupId)[0]->getGroupNo();
+            $assessments = $assessmentRepository->getAssessmentsByGroupNo($groupNo);
+            dd($assessments);
+        } elseif (in_array('ROLE_TEACHER', $this->getUser()->getRoles())) {
+            $isStudent = false;
+            $teacher = $teacherRepository->getGroupByUserId($userId)[0];
+            $groupId = $teacher->getAssignedGroups();
+            $assessments = $assessmentRepository->getAssessmentsByIssuerId($teacher->getId());
+//            dd($assessments);
+//            TO DO implement functionality
+        }
+
+        return $this->render('assessment/assessments_list.html.twig', [
+
         ]);
     }
 }

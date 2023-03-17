@@ -39,6 +39,16 @@ class StudentRepository extends ServiceEntityRepository
         }
     }
 
+    public function getGroupByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.user = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Student[] Returns an array of Student objects
 //     */

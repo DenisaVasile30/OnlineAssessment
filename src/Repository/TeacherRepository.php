@@ -50,6 +50,16 @@ class TeacherRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getGroupByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.user = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    /**
 //     * @return Student[] Returns an array of Student objects
 //     */

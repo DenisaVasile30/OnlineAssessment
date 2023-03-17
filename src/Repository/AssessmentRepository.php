@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Assessment;
+use App\Entity\Group;
+use App\Entity\Student;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +40,32 @@ class AssessmentRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getAssessmentsByGroupNo(int $groupNo): array
+    {
+        $groupNo = json_encode($groupNo);
+        return $this->createQueryBuilder('a')
+            ->andWhere("a.status = 'Active'")
+            ->andWhere("JSON_CONTAINS(a.assigneeGroup, :groupNo) = 1")
+            ->setParameter('groupNo', $groupNo)
+            ->orderBy('a.startAt', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getAssessmentsByIssuerId(int $issuerId, string $status = 'Active'): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.createdBy = :issuerId')
+            ->setParameter('issuerId', $issuerId)
+            ->andWhere('a.status = :status')
+            ->setParameter('status', $status)
+            ->orderBy('a.startAt', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
     }
 
 //    /**

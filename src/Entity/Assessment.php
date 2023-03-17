@@ -33,6 +33,9 @@ class Assessment
     #[ORM\Column(type: 'json', nullable: false)]
     private array $subjectList;
 
+    #[ORM\Column(type: 'string', nullable: false)]
+    private string $status;
+
     #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]
     private $subject;
@@ -138,5 +141,21 @@ class Assessment
     public function setSubjectList(array $subjectList): void
     {
         $this->subjectList = $subjectList;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
     }
 }
