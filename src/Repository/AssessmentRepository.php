@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Assessment;
 use App\Entity\Group;
 use App\Entity\Student;
+use App\Entity\Subject;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;

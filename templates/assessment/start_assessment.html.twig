@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{#    to do: timer for startAt and EndAt, if the time has passed stop assessment#}
+    <div>
+        <div>
+            {{ requiredAssessment.description }}
+        </div>
+        <div>
+            {{ requiredSubject.subject }}
+        </div>
+        <div>
+{#            TO DO: add programming language in assessment#}
+            <label>Programming language to use: C++ </label>
+        </div>
+        <div>
+            {% if (requiredSubject.subjectRequirements)|length != 0 %}
+                <label>Requirements:</label>
+                <span>{{ requiredSubject.subjectRequirements }}</span>
+            {% else %}
+                <label>No specific requirements</label>
+            {% endif %}
+        </div>
+        <div>
+            {% if (requiredSubject.subjectContent)|length != 0 %}
+                <label>Resolve the following:</label>
+                <div>
+                    <span>{{ requiredSubject.subjectContent }}</span>
+                </div>
+            {% endif %}
+            {% if (contentFileExist) %}
+                <div>
+                    <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <label>Write below the solution</label>
+            <div>
+                <button onclick="saveAssessment()">Submit</button>
+            </div>
+{#            <textarea style="background-color: #DDDDDD; width: 100%; color: black" rows="100" cols="40">#}
+
+{#            </textarea>#}
+            <div data-pym-src='https://www.jdoodle.com/plugin' data-language="cpp" data-version-index="5">
+                Write your solution in here
+            </div>
+            <script src="https://www.jdoodle.com/assets/jdoodle-pym.min.js" type="text/javascript"></script>
+        </div>
+
+    </div>
+
+    <script>
+        function saveAssessment()
+        {
+            console.log('here');
+            const data = document.getElementById("code");
+            console.log(data);
+        }
+    </script>
+
+{% endblock %}

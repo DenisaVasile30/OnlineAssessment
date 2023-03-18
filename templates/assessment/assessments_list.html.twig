@@ -7,6 +7,47 @@
 
 {% block body %}
 
+    <div>
+        <table style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Description</th>
+                    <th>Start At</th>
+                    <th>End At</th>
+                    {% if is_granted('ROLE_TEACHER') %}
+                        <th>Assignee Group</th>
+                        <th>Status</th>
+                    {% endif %}
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assessment in assessmentsList %}
+                    <td>{{ assessment.id }}</td>
+                    <td>{{ assessment.description }}</td>
+                    <td>{{ assessment.startAt|date('d/m/Y') }}</td>
+                    <td>{{ assessment.endAt|date('d/m/Y') }}</td>
+                    {% if is_granted('ROLE_TEACHER') %}
+                        <td>{{ assessment.assigneeGroup|join(', ') }}</td>
+                        <td>{{ assessment.status }}</td>
+{#                        implement this#}
+                        <td>
+                            <a href="#">
+                                Disable
+                            </a>
+                        </td>
+                    {% elseif is_granted('ROLE_STUDENT') %}
+                        <td>
+                            <a href="{{ path('app_start_assessment', { assessment: assessment.id }) }}">
+                                Start
+                            </a>
+                        </td>
+                    {% endif %}
 
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}

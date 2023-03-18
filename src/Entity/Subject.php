@@ -33,6 +33,9 @@ class Subject
     #[ORM\Column(type: Types::BLOB, nullable: true)]
     private $content;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private $fileName;
+
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
     private string $subjectContent;
 
@@ -188,5 +191,21 @@ class Subject
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param mixed $fileName
+     */
+    public function setFileName(string $fileName): void
+    {
+        $this->fileName = $fileName;
     }
 }

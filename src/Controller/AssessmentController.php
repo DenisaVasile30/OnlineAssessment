@@ -13,9 +13,15 @@ use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Stream;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AssessmentController extends AbstractController
 {
@@ -31,22 +37,31 @@ class AssessmentController extends AbstractController
     public function addSubject(
         Request $request,
         EntityManagerInterface $entityManager,
-        TeacherRepository $teacherRepository
+        TeacherRepository $teacherRepository,
+        SluggerInterface $slugger
     ): Response
     {
         $subject = new Subject();
         $form = $this->createForm(SubjectFormType::class, $subject);
         $form->handleRequest($request);
-
+//        to do: check the file uploading
         if ($form->isSubmitted() && $form->isValid()) {
             $userId = $this->getUser()->getIdentifierId();
             $teacher = $teacherRepository->getTeacher($userId);
             $subject->setCreatedAt(new \DateTime());
             $subject->setIssuedBy($teacher[0]);
+            $subjectFile = $form->get('content')->getData();
 
+            if ($subjectFile) {
+                $originalFilename = pathinfo($subjectFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$subjectFile->guessExtension();
 
-            $entityManager->persist($subject);
-            $entityManager->flush();
+                $subject->setFileName($newFilename);
+                $subject->setContent($subjectFile);
+                $entityManager->persist($subject);
+                $entityManager->flush();
+            }
 
             return $this->redirectToRoute('app_assessment');
         }
@@ -125,7 +140,7 @@ class AssessmentController extends AbstractController
             $groupId = ($studentRepository->getGroupByUserId($userId))[0]->getGroupId();
             $groupNo = $groupRepository->getGroupNo($groupId)[0]->getGroupNo();
             $assessments = $assessmentRepository->getAssessmentsByGroupNo($groupNo);
-            dd($assessments);
+//            dd($assessments);
         } elseif (in_array('ROLE_TEACHER', $this->getUser()->getRoles())) {
             $isStudent = false;
             $teacher = $teacherRepository->getGroupByUserId($userId)[0];
@@ -136,7 +151,51 @@ class AssessmentController extends AbstractController
         }
 
         return $this->render('assessment/assessments_list.html.twig', [
-
+            'assessmentsList' => $assessments
         ]);
+    }
+
+    #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
+    public function startAssessment(
+        Request $request,
+        int $assessment,
+        AssessmentRepository $assessmentRepository,
+        SubjectRepository $subjectRepository
+    ): Response
+    {
+        $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
+        $requiredSubject = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+
+        return $this->render('assessment/start_assessment.html.twig', [
+            'requiredAssessment' => $requiredAssessment,
+            'requiredSubject' => $requiredSubject,
+            'contentFileExist' => (bool)$requiredSubject->getContent()
+        ]);
+    }
+
+    #[Route('/home/assessments/startAssessment/download/{subject}', name: 'app_download_subject_content')]
+    public function downloadSubjectContent(
+        Request $request,
+        int $subject,
+        SubjectRepository $subjectRepository
+    ): Response
+    {
+        $file = $subjectRepository->findOneBy(
+            ['id' => $subject]
+        )->getContent();
+//        dd($file);
+        if (!$file) {
+            throw $this->createNotFoundException('The file does not exist.');
+        }
+
+        $fileName = 'subject';
+        $contentType = '.txt';
+
+        $response = new BinaryFileResponse($file);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $fileName);
+        $response->headers->set('Content-Type', $contentType);
+        $response->setAutoEtag();
+
+        return $response;
     }
 }

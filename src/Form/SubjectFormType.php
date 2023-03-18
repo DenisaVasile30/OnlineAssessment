@@ -30,7 +30,7 @@ class SubjectFormType extends AbstractType
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [
-                            'application/txt',
+                            'text/plain',
                             'application/pdf'
                         ],
                         'mimeTypesMessage' => 'Please upload a valid TXT/PDF file!',
