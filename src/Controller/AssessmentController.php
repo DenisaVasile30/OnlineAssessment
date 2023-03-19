@@ -6,6 +6,8 @@ use App\Entity\Assessment;
 use App\Entity\Subject;
 use App\Form\AssessmentFormType;
 use App\Form\SubjectFormType;
+use App\Form\SubmittedCodeFormType;
+use App\Helper\CompilerHelper;
 use App\Repository\AssessmentRepository;
 use App\Repository\GroupRepository;
 use App\Repository\StudentRepository;
@@ -13,6 +15,7 @@ use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Stream;
@@ -163,13 +166,29 @@ class AssessmentController extends AbstractController
         SubjectRepository $subjectRepository
     ): Response
     {
+        $responseMessage = '';
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
         $requiredSubject = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+
+        $form = $this->createForm(SubmittedCodeFormType::class);
+        $form->handleRequest($request);
+//        dd('h');
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->get('run')->isClicked()) {
+                $data = ($form->get('codeArea')->getData());
+                $compiler = new CompilerHelper($data);
+                [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
+            } elseif ($form->get('submit')->isClicked()) {
+                dd('on submit');
+            }
+        }
 
         return $this->render('assessment/start_assessment.html.twig', [
             'requiredAssessment' => $requiredAssessment,
             'requiredSubject' => $requiredSubject,
-            'contentFileExist' => (bool)$requiredSubject->getContent()
+            'contentFileExist' => (bool)$requiredSubject->getContent(),
+            'submittedCode' => $form->createView(),
+            'responseMessage' => $responseMessage
         ]);
     }
 
@@ -197,5 +216,20 @@ class AssessmentController extends AbstractController
         $response->setAutoEtag();
 
         return $response;
+    }
+
+    #[Route('/home/assessments/startAssessment/{assessment}/run', name: 'app_assessment_run')]
+    public function runSubmittedCode(
+        Request $request,
+        int $assessment,
+    ): Response
+    {
+//        $form = $this->createForm(SubmittedCodeFormType::class);
+//        dd($request);
+//        $form->handleRequest($request);
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            dd('here');
+//        }
+//        return $this->render('assessment/assessments_list.html.twig');
     }
 }

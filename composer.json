@@ -19,6 +19,7 @@
         "symfony/flex": "^2",
         "symfony/form": "6.1.*",
         "symfony/framework-bundle": "6.1.*",
+        "symfony/http-client": "6.1.*",
         "symfony/mailer": "6.1.*",
         "symfony/maker-bundle": "^1.48",
         "symfony/password-hasher": "6.1.*",
