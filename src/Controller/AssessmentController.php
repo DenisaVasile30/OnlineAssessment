@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Assessment;
 use App\Entity\Subject;
 use App\Form\AssessmentFormType;
+use App\Form\AssignedSubjectsFormType;
 use App\Form\SubjectFormType;
 use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
@@ -62,9 +63,10 @@ class AssessmentController extends AbstractController
 
                 $subject->setFileName($newFilename);
                 $subject->setContent($subjectFile);
-                $entityManager->persist($subject);
-                $entityManager->flush();
+
             }
+            $entityManager->persist($subject);
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_assessment');
         }
@@ -100,6 +102,28 @@ class AssessmentController extends AbstractController
             ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->get('requirementsNo')->getData() != 1) {
+//                dd($form);
+                $sectionsNo = $form->get('requirementsNo')->getData();
+                $subjectsForm = $this->createForm(
+                    AssignedSubjectsFormType::class,
+                    [
+                        'subjects' => $subjects,
+                        'sectionsNo' => $sectionsNo
+                    ]
+                );
+                return $this->render('assessment/schedule_assessment.html.twig', [
+                    'scheduleAssessmentForm' => $form->createView(),
+                    'assignedSubjectsForm' => $subjectsForm->createView()
+                ]);
+//                return $this->render('assessment/schedule_assessment.html.twig', [
+//                    'requiredAssessment' => $requiredAssessment,
+//                    'requiredSubject' => $requiredSubject,
+//                    'contentFileExist' => (bool)$requiredSubject->getContent(),
+//                    'submittedCode' => $form->createView(),
+//                    'responseMessage' => $responseMessage
+//                ]);
+            }
             $assessment->setCreatedAt(new \DateTime());
             $assessment->setCreatedBy($teacher[0]);
 //            if the teacher selected multiple subjects we will extract one random at launch

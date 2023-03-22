@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AssessmentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -33,8 +35,11 @@ class Assessment
     #[ORM\Column(type: 'json', nullable: false)]
     private array $subjectList;
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private string $status;
+
+    #[ORM\Column(type: 'integer', nullable: false)]
+    private int $requirementsNo = 1;
 
     #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,6 +48,14 @@ class Assessment
     #[ORM\ManyToOne(targetEntity: Teacher::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]
     private Teacher $createdBy;
+
+    #[ORM\OneToMany(mappedBy: 'assessment', targetEntity: AssignedSubjects::class)]
+    private Collection $assignedSubjects;
+
+    public function __construct()
+    {
+        $this->assignedSubjects = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -157,5 +170,51 @@ class Assessment
     public function setStatus(string $status): void
     {
         $this->status = $status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequirementsNo(): string
+    {
+        return $this->requirementsNo;
+    }
+
+    /**
+     * @param string $requirementsNo
+     */
+    public function setRequirementsNo(string $requirementsNo): void
+    {
+        $this->requirementsNo = $requirementsNo;
+    }
+
+    /**
+     * @return Collection<int, AssignedSubjects>
+     */
+    public function getAssignedSubjects(): Collection
+    {
+        return $this->assignedSubjects;
+    }
+
+    public function addAssignedSubject(AssignedSubjects $assignedSubject): self
+    {
+        if (!$this->assignedSubjects->contains($assignedSubject)) {
+            $this->assignedSubjects->add($assignedSubject);
+            $assignedSubject->setAssessment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedSubject(AssignedSubjects $assignedSubject): self
+    {
+        if ($this->assignedSubjects->removeElement($assignedSubject)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedSubject->getAssessment() === $this) {
+                $assignedSubject->setAssessment(null);
+            }
+        }
+
+        return $this;
     }
 }
