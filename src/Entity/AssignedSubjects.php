@@ -15,20 +15,24 @@ class AssignedSubjects
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'integer', nullable: false)]
+    private int $id;
 
-    #[ORM\Column]
-    private array $subjectsOptionList = [];
+    #[ORM\Column(type: 'json', nullable: false)]
+    /**
+     * @Groups({"read", "write"})
+     */
+    private $subjectsOptionList = [];
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer', nullable: false)]
     private ?int $requirementNo = null;
 
-    #[ORM\ManyToOne(inversedBy: 'assignedSubjects')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Assessment $assessment = null;
+//    #[ORM\ManyToOne(targetEntity: Assessment::class, inversedBy: 'assignedSubjects')]
+//    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Column(type: 'integer', nullable: false)]
+    private $assessment = null;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -40,7 +44,12 @@ class AssignedSubjects
 
     public function setSubjectsOptionList(array $subjectsOptionList): self
     {
-        $this->subjectsOptionList = $subjectsOptionList;
+        foreach ($subjectsOptionList as $key => $value) {
+            $this->subjectsOptionList[$key] = [
+                'id' => $value->getId(),
+                'description' => $value->getDescription()
+            ];
+        }
 
         return $this;
     }
@@ -57,12 +66,12 @@ class AssignedSubjects
         return $this;
     }
 
-    public function getAssessment(): ?Assessment
+    public function getAssessment()
     {
         return $this->assessment;
     }
 
-    public function setAssessment(?Assessment $assessment): self
+    public function setAssessment( $assessment): self
     {
         $this->assessment = $assessment;
 

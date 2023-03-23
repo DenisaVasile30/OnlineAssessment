@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Assessment;
+use App\Entity\AssignedSubjects;
 use App\Entity\Subject;
 use App\Form\AssessmentFormType;
 use App\Form\AssignedSubjectsFormType;
@@ -81,7 +82,8 @@ class AssessmentController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         TeacherRepository $teacherRepository,
-        SubjectRepository $subjectRepository
+        SubjectRepository $subjectRepository,
+        AssessmentRepository $assessmentRepository
     ): Response
     {
         $assessment = new Assessment();
@@ -102,6 +104,9 @@ class AssessmentController extends AbstractController
             ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $assessment->setTimeLimit($form->get('timeLimit')->getData());
+            $assessment->setTimeUnit($form->get('timeUnit')->getData());
+
             if ($form->get('requirementsNo')->getData() != 1) {
 //                dd($form);
                 $sectionsNo = $form->get('requirementsNo')->getData();
@@ -112,17 +117,43 @@ class AssessmentController extends AbstractController
                         'sectionsNo' => $sectionsNo
                     ]
                 );
-                return $this->render('assessment/schedule_assessment.html.twig', [
-                    'scheduleAssessmentForm' => $form->createView(),
-                    'assignedSubjectsForm' => $subjectsForm->createView()
-                ]);
-//                return $this->render('assessment/schedule_assessment.html.twig', [
-//                    'requiredAssessment' => $requiredAssessment,
-//                    'requiredSubject' => $requiredSubject,
-//                    'contentFileExist' => (bool)$requiredSubject->getContent(),
-//                    'submittedCode' => $form->createView(),
-//                    'responseMessage' => $responseMessage
-//                ]);
+
+                $subjectsForm->handleRequest($request);
+                if ($subjectsForm->isSubmitted() && $subjectsForm->isValid()) {
+                    for ($i = 1; $i <= $sectionsNo; $i++) {
+                        $assignedSubjects = new AssignedSubjects();
+                        try {
+                            $subjectsOptions = $subjectsForm->get('subjectList' . $i)->getData();
+                            $lastAssessment = $assessmentRepository->findOneBy([], ['id' => 'DESC']);
+                            if ($lastAssessment) {
+                                $assessmentIdToAdd = $lastAssessment->getId() + 1;
+                            } else {
+                                $assessmentIdToAdd = 1;
+                            }
+                            $assignedSubjects->setAssessment($assessmentIdToAdd);
+                            $assignedSubjects->setRequirementNo($i);
+                            $options = [];
+                            foreach ($subjectsArray as $key => $value) {
+                                foreach ($subjectsOptions as $keySelected => $valueSelected)
+                                if ($value->getDescription() == $valueSelected) {
+                                    // TO DO: Do not allow subject have id 0
+                                    $options[] = $subjectRepository->find($value->getId());
+                                }
+                            }
+                            $assignedSubjects->setSubjectsOptionList($options);
+                            $entityManager->persist($assignedSubjects);
+                            $entityManager->flush();
+                        } catch (\Exception $exception) {
+                            dd($exception->getMessage());
+                        }
+                    }
+                } else {
+
+                    return $this->render('assessment/schedule_assessment.html.twig', [
+                        'scheduleAssessmentForm' => $form->createView(),
+                        'assignedSubjectsForm' => $subjectsForm->createView()
+                    ]);
+                }
             }
             $assessment->setCreatedAt(new \DateTime());
             $assessment->setCreatedBy($teacher[0]);
@@ -167,7 +198,6 @@ class AssessmentController extends AbstractController
             $groupId = ($studentRepository->getGroupByUserId($userId))[0]->getGroupId();
             $groupNo = $groupRepository->getGroupNo($groupId)[0]->getGroupNo();
             $assessments = $assessmentRepository->getAssessmentsByGroupNo($groupNo);
-//            dd($assessments);
         } elseif (in_array('ROLE_TEACHER', $this->getUser()->getRoles())) {
             $isStudent = false;
             $teacher = $teacherRepository->getGroupByUserId($userId)[0];

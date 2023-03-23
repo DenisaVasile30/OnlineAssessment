@@ -15,6 +15,8 @@
                     <th>Description</th>
                     <th>Start At</th>
                     <th>End At</th>
+                    <th>Time Limit</th>
+                    <th>Time Unit</th>
                     {% if is_granted('ROLE_TEACHER') %}
                         <th>Assignee Group</th>
                         <th>Status</th>
@@ -24,27 +26,32 @@
             </thead>
             <tbody>
                 {% for assessment in assessmentsList %}
-                    <td>{{ assessment.id }}</td>
-                    <td>{{ assessment.description }}</td>
-                    <td>{{ assessment.startAt|date('d/m/Y') }}</td>
-                    <td>{{ assessment.endAt|date('d/m/Y') }}</td>
-                    {% if is_granted('ROLE_TEACHER') %}
-                        <td>{{ assessment.assigneeGroup|join(', ') }}</td>
-                        <td>{{ assessment.status }}</td>
-{#                        implement this#}
-                        <td>
-                            <a href="#">
-                                Disable
-                            </a>
-                        </td>
-                    {% elseif is_granted('ROLE_STUDENT') %}
-                        <td>
-                            <a href="{{ path('app_start_assessment', { assessment: assessment.id }) }}">
-                                Start
-                            </a>
-                        </td>
-                    {% endif %}
-
+                    <div>
+                        <tr>
+                            <td>{{ assessment.id }}</td>
+                            <td>{{ assessment.description }}</td>
+                            <td>{{ assessment.startAt|date('d/m/Y') }}</td>
+                            <td>{{ assessment.endAt|date('d/m/Y') }}</td>
+                            <td>{{ assessment.timeLimit }}</td>
+                            <td>{{ assessment.timeUnit }}</td>
+                            {% if is_granted('ROLE_TEACHER') %}
+                                <td>{{ assessment.assigneeGroup|join(', ') }}</td>
+                                <td>{{ assessment.status }}</td>
+        {#                        implement this#}
+                                <td>
+                                    <a href="#">
+                                        Disable
+                                    </a>
+                                </td>
+                            {% elseif is_granted('ROLE_STUDENT') %}
+                                <td>
+                                    <a href="{{ path('app_start_assessment', { assessment: assessment.id }) }}">
+                                        Start
+                                    </a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    </div>
                 {% endfor %}
             </tbody>
         </table>

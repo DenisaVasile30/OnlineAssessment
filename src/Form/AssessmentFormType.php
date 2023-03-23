@@ -57,7 +57,14 @@ class AssessmentFormType extends AbstractType
             ])
             ->add('startAt')
             ->add('endAt')
-//            ->add('save', SubmitType::class)
+            ->add('timeLimit')
+            ->add('timeUnit', ChoiceType::class, [
+                'choices'  => [
+                    'no limit' => 'no time limit',
+                    'minutes' => 'minutes',
+                    'hours' => 'hours',
+                ],
+            ])
         ;
     }
 

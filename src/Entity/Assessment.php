@@ -41,6 +41,12 @@ class Assessment
     #[ORM\Column(type: 'integer', nullable: false)]
     private int $requirementsNo = 1;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $timeLimit = 0;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $timeUnit = '';
+
     #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: 'assessments')]
     #[ORM\JoinColumn(nullable: false)]
     private $subject;
@@ -49,12 +55,12 @@ class Assessment
     #[ORM\JoinColumn(nullable: false)]
     private Teacher $createdBy;
 
-    #[ORM\OneToMany(mappedBy: 'assessment', targetEntity: AssignedSubjects::class)]
-    private Collection $assignedSubjects;
+//    #[ORM\OneToMany(mappedBy: 'assessment', targetEntity: AssignedSubjects::class)]
+//    private Collection $assignedSubjects;
 
     public function __construct()
     {
-        $this->assignedSubjects = new ArrayCollection();
+       // $this->assignedSubjects = new ArrayCollection();
     }
 
     public function getId(): int
@@ -216,5 +222,28 @@ class Assessment
         }
 
         return $this;
+    }
+
+    public function getTimeLimit(): ?int
+    {
+        return $this->timeLimit;
+    }
+
+    public function setTimeLimit(?int $timeLimit): void
+    {
+        if ($timeLimit == null) {
+            $this->timeLimit = 0;
+        }
+        $this->timeLimit = $timeLimit;
+    }
+
+    public function getTimeUnit(): ?string
+    {
+        return $this->timeUnit;
+    }
+
+    public function setTimeUnit(?string $timeUnit): void
+    {
+        $this->timeUnit = $timeUnit;
     }
 }
