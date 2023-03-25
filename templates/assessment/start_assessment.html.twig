@@ -7,63 +7,70 @@
             {{ requiredAssessment.description }}
         </div>
         <div>
-            {{ requiredSubject.subject }}
-        </div>
-        <div>
-{#            TO DO: add programming language in assessment#}
+            {#                     TO DO: add programming language in assessment#}
             <label>Programming language to use: C++ </label>
         </div>
         <div>
-            {% if (requiredSubject.subjectRequirements)|length != 0 %}
-                <label>Requirements:</label>
-                <span>{{ requiredSubject.subjectRequirements }}</span>
-            {% else %}
-                <label>No specific requirements</label>
-            {% endif %}
-        </div>
-        <div>
-            {% if (requiredSubject.subjectContent)|length != 0 %}
-                <label>Resolve the following:</label>
+            {% for requiredSubject in requiredSubjects %}
+            <div>
                 <div>
-                    <span>{{ requiredSubject.subjectContent }}</span>
-                </div>
-            {% endif %}
-            {% if (contentFileExist) %}
-                <div>
-                    <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
-                </div>
-            {% endif %}
-        </div>
-        <div>
-            <label>Write below the solution</label>
-            {{ form_start(submittedCode) }}
-                <div>
-                    {{ form_widget(submittedCode.run, { 'label': 'Run' }) }}
+                    <span>Requirement: </span>
                 </div>
                 <div>
-                    {{ form_widget(submittedCode.submit, { 'label': 'Submit' }) }}
+                    {{ requiredSubject.subject }}
                 </div>
+                <div>
+                    {% if requiredSubject.subjectRequirements is not null %}
+                        <label>Additional information:</label>
+                        <span>{{ requiredSubject.subjectRequirements }}</span>
+                    {% else %}
+                        <label>No specific requirements</label>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if requiredSubject.subjectContent is not null %}
+                        <label>Resolve the following:</label>
+                        <div>
+                            <span>{{ requiredSubject.subjectContent }}</span>
+                        </div>
+                    {% endif %}
+                    {% if requiredSubject.subjectContent is defined %}
+{#                        add span with the content#}
+                        <div>
+                            <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+                <div>
+                    <label>Write below the solution</label>
+                    {{ form_start(submittedCode) }}
+                    <div>
+                        {{ form_widget(submittedCode.run, { 'label': 'Run' }) }}
+                    </div>
+                    <div>
+                        {{ form_widget(submittedCode.submit, { 'label': 'Submit' }) }}
+                    </div>
 
                 </div>
-                    <div>
-                        {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                        {{ form_errors(submittedCode.codeArea) }}
-                    </div>
-            {{ form_end(submittedCode) }}
-            <div>
-                <label>Resulted output:</label>
                 <div>
-                    <textarea style="width: 100%; color: black; height: 150px">
-                        {{ responseMessage }}
-                    </textarea>
+                    {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                    {{ form_errors(submittedCode.codeArea) }}
                 </div>
-            </div>
-            <div data-pym-src='https://www.jdoodle.com/plugin' data-language="cpp" data-version-index="5" class="codeText" id="codeText">
-                Write your solution in here
-            </div>
-            <script src="https://www.jdoodle.com/assets/jdoodle-pym.min.js" type="text/javascript"></script>
+                {{ form_end(submittedCode) }}
+                <div>
+                    <label>Resulted output:</label>
+                    <div>
+                        <textarea style="width: 100%; color: black; height: 150px">
+                            {{ responseMessage }}
+                        </textarea>
+                    </div>
+                </div>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
         </div>
+
+
 
     </div>
 

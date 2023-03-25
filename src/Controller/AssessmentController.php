@@ -11,16 +11,14 @@ use App\Form\SubjectFormType;
 use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
 use App\Repository\AssessmentRepository;
+use App\Repository\AssignedSubjectsRepository;
 use App\Repository\GroupRepository;
 use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,16 +53,17 @@ class AssessmentController extends AbstractController
             $teacher = $teacherRepository->getTeacher($userId);
             $subject->setCreatedAt(new \DateTime());
             $subject->setIssuedBy($teacher[0]);
-            $subjectFile = $form->get('content')->getData();
 
+            /** @var UploadedFile $subjectFile */
+            $subjectFile = $form['contentFile']->getData();
             if ($subjectFile) {
                 $originalFilename = pathinfo($subjectFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$subjectFile->guessExtension();
-
                 $subject->setFileName($newFilename);
-                $subject->setContent($subjectFile);
 
+                $content = file_get_contents($subjectFile->getPathname());
+                $subject->setContentFile($content);
             }
             $entityManager->persist($subject);
             $entityManager->flush();
@@ -212,21 +211,70 @@ class AssessmentController extends AbstractController
         ]);
     }
 
+//    #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
+//    public function startAssessment(
+//        Request $request,
+//        int $assessment,
+//        AssessmentRepository $assessmentRepository,
+//        SubjectRepository $subjectRepository
+//    ): Response
+//    {
+//        $responseMessage = '';
+//        $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
+//        $requiredSubject = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+//
+//        $form = $this->createForm(SubmittedCodeFormType::class);
+//        $form->handleRequest($request);
+////        dd('h');
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            if ($form->get('run')->isClicked()) {
+//                $data = ($form->get('codeArea')->getData());
+//                $compiler = new CompilerHelper($data);
+//                [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
+//            } elseif ($form->get('submit')->isClicked()) {
+//                dd('on submit');
+//            }
+//        }
+//
+//        return $this->render('assessment/start_assessment.html.twig', [
+//            'requiredAssessment' => $requiredAssessment,
+//            'requiredSubject' => $requiredSubject,
+//            'contentFileExist' => (bool)$requiredSubject->getContentFile(),
+//            'submittedCode' => $form->createView(),
+//            'responseMessage' => $responseMessage
+//        ]);
+//    }
+
     #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
     public function startAssessment(
         Request $request,
         int $assessment,
         AssessmentRepository $assessmentRepository,
-        SubjectRepository $subjectRepository
+        SubjectRepository $subjectRepository,
+        AssignedSubjectsRepository $assignedSubjectsRepository
     ): Response
     {
         $responseMessage = '';
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
-        $requiredSubject = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+        $requirementsNo = $requiredAssessment->getRequirementsNo();
+        $assignedSubjects = $assignedSubjectsRepository->findBy(['assessment' => $requiredAssessment->getId()]);
+//        dd($assignedSubjects);
+//        $requiredSubjects = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+        $requiredSubjects = [];
+        foreach ($assignedSubjects as $assignedSubject) {
+            if (count($assignedSubject->getSubjectsOptionList()) > 1) {
+                $randomKey = array_rand($assignedSubject->getSubjectsOptionList());
+                $randomSubject[] = $assignedSubject->getSubjectsOptionList()[$randomKey];
+                $assignedSubject->setSubjectsOptionListFromRand($randomSubject);
+            }
+
+            $requiredSubjects[] = $subjectRepository->findOneBy(
+                ['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]
+            );
+        }
 
         $form = $this->createForm(SubmittedCodeFormType::class);
         $form->handleRequest($request);
-//        dd('h');
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('run')->isClicked()) {
                 $data = ($form->get('codeArea')->getData());
@@ -236,11 +284,12 @@ class AssessmentController extends AbstractController
                 dd('on submit');
             }
         }
-
+//        dd($requiredSubjects);
         return $this->render('assessment/start_assessment.html.twig', [
             'requiredAssessment' => $requiredAssessment,
-            'requiredSubject' => $requiredSubject,
-            'contentFileExist' => (bool)$requiredSubject->getContent(),
+//            'requiredSubject' => $requiredSubject,
+            'requiredSubjects' => $requiredSubjects,
+//            'contentFileExist' => (bool)$requiredSubject->getContentFile(),
             'submittedCode' => $form->createView(),
             'responseMessage' => $responseMessage
         ]);

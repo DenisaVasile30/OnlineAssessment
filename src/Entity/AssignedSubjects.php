@@ -54,6 +54,13 @@ class AssignedSubjects
         return $this;
     }
 
+    public function setSubjectsOptionListFromRand(array $subjectsOptionList): self
+    {
+        $this->subjectsOptionList = $subjectsOptionList;
+
+        return $this;
+    }
+
     public function getRequirementNo(): ?int
     {
         return $this->requirementNo;

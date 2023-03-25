@@ -22,15 +22,16 @@ class SubjectFormType extends AbstractType
                     'POO' => 'POO',
                 ]]
             )
-            ->add('content', FileType::class, [
+            ->add('contentFile', FileType::class, [
                 'label' => 'Subject content file (TXT or PDF file)',
-                'mapped' => false,
+                'mapped' => true,
                 'required' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [
                             'text/plain',
+                            'text/x-c',
                             'application/pdf'
                         ],
                         'mimeTypesMessage' => 'Please upload a valid TXT/PDF file!',

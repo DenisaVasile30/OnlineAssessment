@@ -31,16 +31,16 @@ class Subject
     private ?\DateTime $lastModified;
 
     #[ORM\Column(type: Types::BLOB, nullable: true)]
-    private $content;
+    private $contentFile;
 
     #[ORM\Column(type: 'string', nullable: true)]
     private $fileName;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private string $subjectContent;
+    private ?string $subjectContent = null;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private string $subjectRequirements;
+    private ?string $subjectRequirements = null;
 
     #[ORM\ManyToOne(targetEntity: Teacher::class, inversedBy: 'subjects')]
     #[ORM\JoinColumn(nullable: false)]
@@ -95,18 +95,6 @@ class Subject
         return $this;
     }
 
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    public function setContent($content): self
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
     public function getSubjectContent(): ?string
     {
         return $this->subjectContent;
@@ -131,20 +119,16 @@ class Subject
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubjectRequirements(): string
+    public function getSubjectRequirements(): ?string
     {
         return $this->subjectRequirements;
     }
 
-    /**
-     * @param string $subjectRequirements
-     */
-    public function setSubjectRequirements(string $subjectRequirements): void
+    public function setSubjectRequirements(?string $subjectRequirements)
     {
         $this->subjectRequirements = $subjectRequirements;
+
+        return $this;
     }
 
     /**
@@ -158,9 +142,11 @@ class Subject
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(string $description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     /**
@@ -204,8 +190,28 @@ class Subject
     /**
      * @param mixed $fileName
      */
-    public function setFileName(string $fileName): void
+    public function setFileName(string $fileName)
     {
         $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentFile()
+    {
+        return $this->contentFile;
+    }
+
+    /**
+     * @param mixed $contentFile
+     */
+    public function setContentFile($contentFile)
+    {
+        $this->contentFile = $contentFile;
+
+        return $this;
     }
 }
