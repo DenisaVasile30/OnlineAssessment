@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ form_start(newTicketForm) }}
+
+    <div>
+        {{ form_label(newTicketForm.type, 'Subject', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(newTicketForm.type, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(newTicketForm.type) }}
+    </div>
+
+    <div>
+        {{ form_label(newTicketForm.ticketContent, 'Content', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(newTicketForm.ticketContent, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(newTicketForm.ticketContent) }}
+    </div>
+
+    <div>
+        {{ form_label(newTicketForm.assignedTo, 'Assign to', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(newTicketForm.assignedTo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(newTicketForm.assignedTo) }}
+    </div>
+
+    <div class="border-b border-gray-300"></div>
+
+    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+
+
+        <button type="submit"
+                class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>
+    </div>
+    {{ form_end(newTicketForm) }}
+
+{% endblock %}

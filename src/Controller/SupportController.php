@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Ticket;
 use App\Entity\TicketAnswer;
 use App\Entity\User;
+use App\Form\CreateTicketFormType;
 use App\Form\TicketAnswerFormType;
 use App\Repository\TicketAnswerRepository;
 use App\Repository\TicketRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +30,7 @@ class SupportController extends AbstractController
         ]);
     }
 
-    #[Route('/support/{id}', name: 'app_show_one_ticket')]
+    #[Route('/support/{id}', name: 'app_show_one_ticket', requirements: ['id' => '\d+'])]
     public function loadOneTicket(
         Request $request,
         int $id,
@@ -57,6 +60,36 @@ class SupportController extends AbstractController
             'ticket' => $ticket[0],
             'answersList' => $answersList,
             'answerForm' => $answerForm->createView()
+        ]);
+    }
+
+    #[Route('/support/new', name: 'app_create_ticket')]
+    public function createTicket(
+        Request $request,
+        UserRepository $userRepository,
+        TicketRepository $ticketRepository
+    ): Response
+    {
+        /** @var User $user */
+        $user  = $this->getUser();
+        $ticket = new Ticket();
+        $usersList =  $userRepository->getAllEmailAddresses();
+        $emails = array_column($usersList, "users_email");
+        $ticketForm = $this->createForm(CreateTicketFormType::class, $ticket, ['emails' => $emails]);
+        $ticketForm->handleRequest($request);
+        if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {
+            $ticket->setIssuedBy($this->getUser());
+            $ticket->setIssuedAt(new \DateTime());
+            $assignToEmail = $ticketForm->get('assignedTo')->getData();
+            $ticket->setAssignedTo($userRepository->findOneBy(['email' => $assignToEmail]));
+            $ticket->setTicketStatus('Active');
+            $ticketRepository->save($ticket, true);
+
+            return $this->redirectToRoute('app_support');
+        }
+
+        return $this->render('support/create_new_ticket.html.twig', [
+            'newTicketForm' => $ticketForm->createView()
         ]);
     }
 }

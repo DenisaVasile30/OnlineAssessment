@@ -258,16 +258,23 @@ class AssessmentController extends AbstractController
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
         $requirementsNo = $requiredAssessment->getRequirementsNo();
         $assignedSubjects = $assignedSubjectsRepository->findBy(['assessment' => $requiredAssessment->getId()]);
-//        dd($assignedSubjects);
-//        $requiredSubjects = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
+
         $requiredSubjects = [];
+        $filesContent = [];
         foreach ($assignedSubjects as $assignedSubject) {
             if (count($assignedSubject->getSubjectsOptionList()) > 1) {
                 $randomKey = array_rand($assignedSubject->getSubjectsOptionList());
                 $randomSubject[] = $assignedSubject->getSubjectsOptionList()[$randomKey];
                 $assignedSubject->setSubjectsOptionListFromRand($randomSubject);
             }
+            $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
+            $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
 
+            if ($subjectContent[0]->getContentFile() != null) {
+                $filesContent[$keyFile] = stream_get_contents($subjectContent[0]->getContentFile());
+            } else {
+                $filesContent[$keyFile] = 'Nothing to show';
+            }
             $requiredSubjects[] = $subjectRepository->findOneBy(
                 ['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]
             );
@@ -289,6 +296,7 @@ class AssessmentController extends AbstractController
             'requiredAssessment' => $requiredAssessment,
 //            'requiredSubject' => $requiredSubject,
             'requiredSubjects' => $requiredSubjects,
+            'filesContent' => $filesContent,
 //            'contentFileExist' => (bool)$requiredSubject->getContentFile(),
             'submittedCode' => $form->createView(),
             'responseMessage' => $responseMessage
@@ -302,21 +310,12 @@ class AssessmentController extends AbstractController
         SubjectRepository $subjectRepository
     ): Response
     {
-        $file = $subjectRepository->findOneBy(
-            ['id' => $subject]
-        )->getContent();
-//        dd($file);
-        if (!$file) {
-            throw $this->createNotFoundException('The file does not exist.');
-        }
-
-        $fileName = 'subject';
-        $contentType = '.txt';
-
-        $response = new BinaryFileResponse($file);
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $fileName);
-        $response->headers->set('Content-Type', $contentType);
-        $response->setAutoEtag();
+        $subjectContent = $subjectRepository->find($subject);
+        $content = stream_get_contents($subjectContent->getContentFile());
+        $response = new Response($content);
+        $fileName = $subjectContent->getFileName();
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
         return $response;
     }

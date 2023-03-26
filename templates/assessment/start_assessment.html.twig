@@ -12,6 +12,7 @@
         </div>
         <div>
             {% for requiredSubject in requiredSubjects %}
+                <hr>
             <div>
                 <div>
                     <span>Requirement: </span>
@@ -39,8 +40,13 @@
                         <div>
                             <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
                         </div>
+                        <button id="toggle-{{ requiredSubject.id }}" onclick="toggleContent('{{ requiredSubject.id }}')">View Content File</button>
+                        <div id="{{ requiredSubject.id }}" aria-readonly="true" >
+                            {{ filesContent[requiredSubject.id]|raw }}
+                        </div>
                     {% endif %}
                 </div>
+                <hr>
             </div>
             {% endfor %}
                 <div>
@@ -73,29 +79,34 @@
 
 
     </div>
+{% endblock  %}
 
+{% block stylesheets %}
+    <style>
+        #file-content {
+            display: none;
+        }
+        #file-content.show {
+            display: block;
+        }
+    </style>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
     <script>
-        function saveAssessment()
-        {
-            console.log('here');
-            // const data = document.getElementById("codeText").getElementsByTagName("iframe");
-            const data = document.getElementsByClassName("codeText");
-            console.log(data);
-            const tmp = (data[0].querySelector('iframe'));
-            const docTmp = (tmp.ownerDocument);
-            // console.log(docTmp.getElementsByClassName('ace_text-layer'));
-            console.log(docTmp);
-            const docc = document.getElementsByClassName("app-wrap");
-            console.log(docc);
-            for (let i = 0; i < docc.length; i++) {
-                console.log(docc[i].textContent);
+        function toggleContent(subjectId) {
+            var contentDiv = document.getElementById(subjectId);
+            var toggleButton = document.getElementById('toggle-' + subjectId);
+
+            if (contentDiv.style.display === 'none') {
+                contentDiv.style.display = 'block';
+                toggleButton.textContent = 'Hide Content';
+            } else {
+                contentDiv.style.display = 'none';
+                toggleButton.textContent = 'View Content';
             }
-
-            // const elmnt = tmp.contentWindow.document;
-            // const elmnt = $('#codeText').contents().find('ace_text-layer');
-
-            // ace_layer ace_text-layer foreach ace_line get span ace_identifier
-
         }
     </script>
 
