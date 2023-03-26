@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -41,6 +43,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Teacher::class, cascade: ['persist', 'remove'])]
     private $teacher;
+
+    #[ORM\OneToMany(mappedBy: 'issuedBy', targetEntity: Ticket::class)]
+    private Collection $tickets;
+
+    #[ORM\OneToMany(mappedBy: 'assignedTo', targetEntity: Ticket::class)]
+    private Collection $assignedTickets;
+
+    public function __construct()
+    {
+        $this->tickets = new ArrayCollection();
+        $this->assignedTickets = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -180,5 +194,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getIdentifierId(): int
     {
         return $this->getId();
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Ticket $ticket): self
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setIssuedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Ticket $ticket): self
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getIssuedBy() === $this) {
+                $ticket->setIssuedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getAssignedTickets(): Collection
+    {
+        return $this->assignedTickets;
+    }
+
+    public function addAssignedTicket(Ticket $assignedTicket): self
+    {
+        if (!$this->assignedTickets->contains($assignedTicket)) {
+            $this->assignedTickets->add($assignedTicket);
+            $assignedTicket->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTicket(Ticket $assignedTicket): self
+    {
+        if ($this->assignedTickets->removeElement($assignedTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTicket->getAssignedTo() === $this) {
+                $assignedTicket->setAssignedTo(null);
+            }
+        }
+
+        return $this;
     }
 }

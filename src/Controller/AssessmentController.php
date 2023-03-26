@@ -31,7 +31,7 @@ class AssessmentController extends AbstractController
     #[Route('/home/assessment', name: 'app_assessment')]
     public function index(): Response
     {
-        return $this->render('assessment/assessment.html.twig', [
+        return $this->render('assessment/profile.html.twig', [
             'controller_name' => 'AssessmentController',
         ]);
     }

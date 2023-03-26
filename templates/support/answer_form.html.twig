@@ -1,0 +1,12 @@
+
+<div>
+    {{ form_label(answerForm.answer) }}
+    {{ form_widget(answerForm.answer, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+    {{ form_errors(answerForm.answer) }}
+
+    <div>
+    <button type="submit"
+            class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Reply</button>
+    </div>
+</div>
+

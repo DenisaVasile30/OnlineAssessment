@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <div>
+            <span style="margin-right: 170px">Ticket Id:  {{ ticket.id }}</span>
+            <span>Status:  {{ ticket.ticketStatus }}</span>
+        </div>
+        <div>
+            <span style="margin-right: 70px">Issuer:  {{ ticket.issuedBy.email }}</span>
+            <span>Issued at:  {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</span>
+        </div>
+        <div>
+            <span style="margin-right: 70px">Assigned to:  {{ ticket.assignedTo.email }}</span>
+        </div>
+        <div>
+            <span>Subject: </span>
+            <span>{{ ticket.type }} </span>
+        </div>
+        <hr style="margin-top: 20px; margin-bottom: 20px">
+        <div>
+            <label>{{ ticket.issuedBy.email }}</label>
+            <textarea readonly style="width: 100%; color: black; height: auto">
+                            {{ ticket.ticketContent }}
+            </textarea>
+        </div>
+        {% if answersList is defined %}
+            <div>
+                {% for answer in answersList %}
+                <div>
+                    <label>{{ answer.answerBy }} at {{ answer.addedAt|date('Y-m-d H:i:s') }}</label>
+                    <textarea readonly style="width: 100%; color: black; height: auto">
+                            {{ answer.answer }}
+                    </textarea>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div>
+            {{ form_start(answerForm) }}
+            {{ include('support/answer_form.html.twig') }}
+
+            {{ form_end(answerForm) }}
+        </div>
+    </div>
+{% endblock %}

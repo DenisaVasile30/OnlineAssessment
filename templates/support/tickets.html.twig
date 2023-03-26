@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <table style="width: 100%">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Issuer Id</th>
+                <th>Issuer email</th>
+                <th>Subject</th>
+                <th>Content</th>
+                <th>Status</th>
+                <th>Assigned to</th>
+                <th>Issued at</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ticket in ownedTickets %}
+                <div>
+                    <tr class="selectable-row" data-href="{{ path('app_show_one_ticket', {id: ticket.id}) }}">
+                        <td>{{ ticket.id }}</td>
+                        <td>{{ ticket.issuedBy.id }}</td>
+                        <td>{{ ticket.issuedBy.email }}</td>
+                        <td>{{ ticket.type }}</td>
+                        <td>{{ ticket.ticketContent }}</td>
+                        <td>{{ ticket.ticketStatus }}</td>
+                        <td>{{ ticket.assignedTo.email }}</td>
+                        <td>{{ ticket.issuedAt|date('Y-m-d H:i:s') }}</td>
+                    </tr>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        jQuery(document).ready(function($) {
+            $(".selectable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+{% endblock %}

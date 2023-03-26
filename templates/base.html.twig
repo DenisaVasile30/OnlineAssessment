@@ -23,6 +23,22 @@
     </head>
 <body class="bg-gray-100 text-gray-800 m-10 dark:bg-gray-800 dark:text-white">
     <div class="w-full md:w-2/3 mx-auto mb-4 flex justify-between items-center">
+        <div class="text-left">
+            <div class="text-sm text-gray-500 dark:text-gray-400 flex">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <div class="ml-2">
+                        <a href="{{ path('app_home') }}">
+                            Home
+                        </a>
+                    </div>
+                    <div class="ml-2">
+                        <a href="{{ path('app_support') }}">
+                            Support
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
         <div class="text-4xl">
             <a href="{{ path('app_home') }}">
                 Home
@@ -36,9 +52,9 @@
             <div class="text-sm text-gray-500 dark:text-gray-400 flex">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <div class="ml-2">
-{#                        <a href="{{ path('app_settings_profile') }}">#}
+                        <a href="{{ path('app_profile_settings') }}">
                             Profile Settings
-{#                        </a>#}
+                        </a>
                     </div>
                     <div class="ml-2">
                         <a href="{{ path('app_logout') }}">Logout</a>
