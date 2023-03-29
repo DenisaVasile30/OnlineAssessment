@@ -30,6 +30,9 @@ class Teacher
     #[ORM\OneToMany(mappedBy: 'issuedBy', targetEntity: Subject::class)]
     private Collection $subjects;
 
+    #[ORM\OneToMany(mappedBy: 'issuedBy', targetEntity: QuizQuestion::class)]
+    private Collection $quizQuestions;
+
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Assessment::class)]
     private Collection $assessments;
 
@@ -37,6 +40,7 @@ class Teacher
     {
         $this->subjects = new ArrayCollection();
         $this->assessments = new ArrayCollection();
+        $this->quizQuestions = new ArrayCollection();
     }
 
     public function getId(): int
@@ -138,5 +142,21 @@ class Teacher
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getQuizQuestions(): Collection
+    {
+        return $this->quizQuestions;
+    }
+
+    /**
+     * @param Collection $quizQuestions
+     */
+    public function setQuizQuestions(Collection $quizQuestions): void
+    {
+        $this->quizQuestions = $quizQuestions;
     }
 }

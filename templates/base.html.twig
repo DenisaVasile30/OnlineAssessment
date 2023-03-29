@@ -37,7 +37,7 @@
                         </a>
                     </div>
                     <div class="ml-2">
-                        <a href="{{ path('app_show_assessments') }}">Assessments</a>
+                        <a href="{{ path('app_assessment') }}">Assessments</a>
                     </div>
                 {% endif %}
             </div>
@@ -79,6 +79,10 @@
     <div class="w-full md:w-2/3 mx-auto">
         {% for message in app.flashes('success') %}
             <div class="rounded-md p-2 border-green-300 bg-green-50 border dark:border-green-600 dark:bg-green-700 dark:text-white mb-4">{{ message }}</div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="rounded-md p-2 border-red-300 bg-red-50 border dark:border-red-600 dark:bg-green-700 dark:text-white mb-4">{{ message }}</div>
         {% endfor %}
 
         {% block body %}{% endblock %}

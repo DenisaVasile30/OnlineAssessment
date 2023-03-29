@@ -4,15 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Assessment;
 use App\Entity\AssignedSubjects;
+use App\Entity\QuizQuestion;
 use App\Entity\Subject;
 use App\Form\AssessmentFormType;
 use App\Form\AssignedSubjectsFormType;
+use App\Form\QuizQuestionsAddFormType;
+use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\SubjectFormType;
 use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
 use App\Repository\GroupRepository;
+use App\Repository\QuizQuestionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
@@ -31,7 +35,7 @@ class AssessmentController extends AbstractController
     #[Route('/home/assessment', name: 'app_assessment')]
     public function index(): Response
     {
-        return $this->render('assessment/profile.html.twig', [
+        return $this->render('assessment/assessment.html.twig', [
             'controller_name' => 'AssessmentController',
         ]);
     }
@@ -211,40 +215,6 @@ class AssessmentController extends AbstractController
         ]);
     }
 
-//    #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
-//    public function startAssessment(
-//        Request $request,
-//        int $assessment,
-//        AssessmentRepository $assessmentRepository,
-//        SubjectRepository $subjectRepository
-//    ): Response
-//    {
-//        $responseMessage = '';
-//        $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
-//        $requiredSubject = $subjectRepository->findOneBy(['id' => $requiredAssessment->getSubject()->getId()]);
-//
-//        $form = $this->createForm(SubmittedCodeFormType::class);
-//        $form->handleRequest($request);
-////        dd('h');
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            if ($form->get('run')->isClicked()) {
-//                $data = ($form->get('codeArea')->getData());
-//                $compiler = new CompilerHelper($data);
-//                [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
-//            } elseif ($form->get('submit')->isClicked()) {
-//                dd('on submit');
-//            }
-//        }
-//
-//        return $this->render('assessment/start_assessment.html.twig', [
-//            'requiredAssessment' => $requiredAssessment,
-//            'requiredSubject' => $requiredSubject,
-//            'contentFileExist' => (bool)$requiredSubject->getContentFile(),
-//            'submittedCode' => $form->createView(),
-//            'responseMessage' => $responseMessage
-//        ]);
-//    }
-
     #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
     public function startAssessment(
         Request $request,
@@ -320,18 +290,171 @@ class AssessmentController extends AbstractController
         return $response;
     }
 
-    #[Route('/home/assessments/startAssessment/{assessment}/run', name: 'app_assessment_run')]
-    public function runSubmittedCode(
+    #[Route('/home/assessment/quiz/questions', name: 'app_quiz_questions')]
+    public function addQuizQuestions(
         Request $request,
-        int $assessment,
+        TeacherRepository $teacherRepository,
+        QuizQuestionRepository $questionRepository,
+        SluggerInterface $slugger
     ): Response
     {
-//        $form = $this->createForm(SubmittedCodeFormType::class);
-//        dd($request);
-//        $form->handleRequest($request);
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            dd('here');
-//        }
-//        return $this->render('assessment/assessments_list.html.twig');
+        $quizQuestions = new QuizQuestion();
+        $quizForm = $this->createForm(QuizQuestionsAddFormType::class, $quizQuestions);
+        $quizForm->handleRequest($request);
+
+        if ($quizForm->isSubmitted() && $quizForm->isValid()) {
+            $userId = $this->getUser()->getIdentifierId();
+            $teacher = $teacherRepository->getTeacher($userId);
+            $quizQuestions->setCreatedAt(new \DateTime());
+            $quizQuestions->setIssuedBy($teacher[0]);
+
+            $questionRepository->save($quizQuestions, true);
+
+            return $this->redirectToRoute('app_assessment');
+        }
+
+//        $quizQuestionsFromFile = new QuizQuestion();
+        $quizQuestionsFromFileForm = $this->createForm(QuizQuestionsFromFileFormType::class);
+        $quizQuestionsFromFileForm->handleRequest($request);
+
+        if ($quizQuestionsFromFileForm->isSubmitted() && $quizQuestionsFromFileForm->isValid()) {
+            $questionsCategory = $quizQuestionsFromFileForm['category']->getData();
+            /** @var UploadedFile $questionsFile */
+            $questionsFile = $quizQuestionsFromFileForm['contentFile']->getData();
+            if ($questionsFile) {
+                $originalFilename = pathinfo($questionsFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$questionsFile->guessExtension();
+
+                $content = file_get_contents($questionsFile->getPathname());
+                try {
+                    $arrayContent = explode("\r\n\r\n", $content);
+                    if (
+                        $this->processFile(
+                        $arrayContent, $newFilename, $teacherRepository, $questionsCategory, $questionRepository)
+                    ) {
+                        $this->addFlash(
+                            'success',
+                            'Saved successfully!'
+                        );
+                    };
+                } catch (\Exception $exception) {
+                    $this->addFlash(
+                        'error',
+                        $exception->getMessage()
+                    );
+                    $this->redirectToRoute('app_quiz_questions');
+//                    dd($exception->getMessage());
+                }
+//                dd($content);
+//                $questionsFromFile->setContentFile($content);
+            }
+        }
+
+        return $this->render('assessment/quiz_add_questions.html.twig', [
+            'quizQuestions' => $quizForm->createView(),
+            'quizQuestionsFromFileForm' => $quizQuestionsFromFileForm->createView()
+        ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function isValidContent(array $arrayContent): bool
+    {
+        if (count($arrayContent) < 1 ) {
+            throw new \Exception('Invalid TXT file structure!'
+                . 'Required structure: '
+                . '    On separate lines:'
+                .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                .   'Questions must be separated by an empty line!'
+            );
+        }
+        foreach ($arrayContent as $key => $questionContent) {
+            $arrayQuestionContent = explode("\r\n", $questionContent);
+            if (count($arrayQuestionContent) != 6) {
+                throw new \Exception('Invalid structure at question no ' . $key
+                    . ' Required structure: '
+                    . '    On separate lines:'
+                    .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                    .   'Questions must be separated by an empty line!'
+                );
+            }
+            foreach ($arrayQuestionContent as $keyQuestion => $valueQuestion) {
+                if (strlen(trim($valueQuestion)) == 0) {
+                    throw new \Exception('Invalid structure at question no ' . $key
+                        . ': empty line found at position no: ' . $keyQuestion
+                    );
+                }
+            }
+            if (
+                !in_array($arrayQuestionContent[5], array_slice($arrayQuestionContent, 1, 4, true))
+            ) {
+                throw new \Exception('Invalid value for correct answer at question no ' . $key
+                    . '. The correct answer should match a previous given choice! '
+                );
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function processFile(
+        array $arrayContent,
+        string $filename,
+        TeacherRepository $teacherRepository,
+        string $questionsCategory,
+        QuizQuestionRepository $questionRepository
+    ): bool {
+        if ($this->isValidContent($arrayContent)) {
+            if (
+                $this->saveQuestions($arrayContent, $filename,  $teacherRepository, $questionsCategory, $questionRepository)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function saveQuestions(
+        array $arrayContent,
+        string $filename,
+        TeacherRepository $teacherRepository,
+        string $questionsCategory,
+        QuizQuestionRepository $questionRepository
+    ): bool
+    {
+        foreach ($arrayContent as $key => $questionContent) {
+            $arrayQuestionContent = explode("\r\n", $questionContent);
+            $question = new QuizQuestion();
+            $question->setCategory($questionsCategory);
+            foreach ($arrayQuestionContent as $keyQuestion => $valueQuestion) {
+                if ($keyQuestion == 0) {
+                    $question->setQuestionContent($valueQuestion);
+                } elseif ($keyQuestion == 1) {
+                    $question->setChoiceA($valueQuestion);
+                } elseif ($keyQuestion == 2) {
+                    $question->setChoiceB($valueQuestion);
+                } elseif ($keyQuestion == 3) {
+                    $question->setChoiceC($valueQuestion);
+                } elseif ($keyQuestion == 4) {
+                    $question->setChoiceD($valueQuestion);
+                } elseif ($keyQuestion == 5) {
+                    $question->setCorrectAnswer($valueQuestion);
+                }
+            }
+            $userId = $this->getUser()->getIdentifierId();
+            $teacher = $teacherRepository->getTeacher($userId);
+            $question->setIssuedBy($teacher[0]);
+            $question->setCreatedAt(new \DateTime());
+            $question->setContentFile(implode("\r\n", $arrayContent));
+            $question->setFileName($filename);
+
+            $questionRepository->save($question, true);
+        }
+        return true;
     }
 }

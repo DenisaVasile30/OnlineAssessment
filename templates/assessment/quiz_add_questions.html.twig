@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{ form_start(quizQuestionsFromFileForm) }}
+
+    <div class="ml-16">
+        {{ form_row(quizQuestionsFromFileForm.contentFile, {'attr': {'class': ''}}) }}
+        {{ form_errors(quizQuestionsFromFileForm.contentFile) }}
+    </div>
+    <div>
+        {{ form_label(quizQuestionsFromFileForm.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestionsFromFileForm.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestionsFromFileForm.category) }}
+    </div>
+
+    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+
+
+        <button type="submit"
+                class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>
+    </div>
+    <div class="border-b border-gray-300"></div>
+
+
+    {{ form_end(quizQuestionsFromFileForm) }}
+
+    {{ form_start(quizQuestions) }}
+    <div>
+        {{ form_label(quizQuestions.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.category) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.optionalDescription, 'Optional description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.optionalDescription, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.optionalDescription) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.questionContent, 'Question content', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.questionContent, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.questionContent) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.choiceA, 'Choice A', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.choiceA, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.choiceA) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.choiceB, 'Choice B', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.choiceB, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.choiceB) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.choiceC, 'Choice C', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.choiceC, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.choiceC) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.choiceD, 'Choice D', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.choiceD, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.choiceD) }}
+    </div>
+
+    <div>
+        {{ form_label(quizQuestions.correctAnswer, 'Correct answer', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(quizQuestions.correctAnswer, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_errors(quizQuestions.correctAnswer) }}
+    </div>
+
+    <div class="border-b border-gray-300"></div>
+
+    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+
+
+        <button type="submit"
+                class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>
+    </div>
+    {{ form_end(quizQuestions) }}
+
+{% endblock %}
