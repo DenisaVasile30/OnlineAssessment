@@ -25,7 +25,7 @@ class Teacher
 
     #[ORM\OneToOne(inversedBy: 'teacher', targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    public $user;
 
     #[ORM\OneToMany(mappedBy: 'issuedBy', targetEntity: Subject::class)]
     private Collection $subjects;

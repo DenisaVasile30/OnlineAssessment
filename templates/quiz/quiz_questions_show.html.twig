@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <table style="width: 100%">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Category</th>
+                <th>Optional description</th>
+                <th>Content</th>
+                <th>Choice A</th>
+                <th>Choice B</th>
+                <th>Choice C</th>
+                <th>Choice D</th>
+                <th>Correct answer</th>
+                <th>Issued by</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <form action="{{ path('app_quiz_questions_filter') }}" method="post" name="filter-form">
+                    <button type="submit" id="filter-btn">
+                        {% if  app.request.uri ends with 'filter' %}
+                            <div>Reset Filters</div>
+                        {% else %}
+                            <div>Apply Filters</div>
+                        {% endif %}
+                    </button>
+                    <input type="hidden" name="action" id="action" value="{{ app.request.uri }}">
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="id">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="category">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="optionalDescription">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="questionContent">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="choiceA">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="choiceB">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="choiceC">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="choiceD">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="correctAnswer">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="issuedBy">
+                </th>
+                <th>
+                    <input type="text" placeholder="'Filter" style="color:black" name="createdAt">
+                </th>
+                </form>
+            </tr>
+            </thead>
+            <tbody>
+            {% for question in questions %}
+                <div>
+                    <tr>
+                        <td>{{ question.id }}</td>
+                        <td>{{ question.category }}</td>
+                        <td>{{ question.optionalDescription }}</td>
+                        <td>{{ question.questionContent }}</td>
+                        <td>{{ question.choiceA }}</td>
+                        <td>{{ question.choiceB }}</td>
+                        <td>{{ question.choiceC }}</td>
+                        <td>{{ question.choiceD }}</td>
+                        <td>{{ question.correctAnswer }}</td>
+                        <td>{{ question.issuedBy.user.email }}</td>
+                        <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td>TO DO:::add edit/delete</td>
+                    </tr>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#filter-btn').on('click', function() {
+            $(this).closest('form').submit();
+        });
+        window.onload = function() {
+            var buttonText = document.querySelector('#filter-btn div').textContent;
+            document.querySelector('#action').value = buttonText;
+        };
+    </script>
+
+{% endblock %}

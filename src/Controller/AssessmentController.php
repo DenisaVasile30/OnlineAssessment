@@ -20,6 +20,7 @@ use App\Repository\QuizQuestionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -457,4 +458,60 @@ class AssessmentController extends AbstractController
         }
         return true;
     }
+
+    #[Route('/home/assessment/quiz/questions/show', name: 'app_quiz_questions_show')]
+    public function displayQuizQuestions(
+        Request $request,
+        TeacherRepository $teacherRepository,
+        QuizQuestionRepository $questionRepository,
+    ): Response
+    {
+//        dd($request);
+
+        $user = $this->getUser()->getIdentifierId();
+        $teacher = $teacherRepository->getTeacher($user);
+        $questions = $questionRepository->findBy(['issuedBy' => $teacher[0]->getId()]);
+//        dd($questions);
+        return $this->render('quiz/quiz_questions_show.html.twig', [
+            'questions' => $questions
+        ]);
+    }
+
+    #[Route('/home/assessment/quiz/questions/show/filter', name: 'app_quiz_questions_filter')]
+    public function filterQuizQuestions(
+        Request $request,
+        QuizQuestionRepository $questionRepository,
+        TeacherRepository $teacherRepository,
+        UserRepository $userRepository
+    ): Response
+    {
+        if ($request->request->get('action') == 'Reset Filters') {
+            return $this->redirectToRoute('app_quiz_questions_show');
+        }
+        $filters = [];
+        $filters['id'] = $request->request->get('id') ?? '';
+        $filters['category'] = $request->request->get('category') ?? '';
+        $filters['optional_description'] = $request->request->get('optionalDescription') ?? '';
+        $filters['question_content'] = $request->request->get('questionContent');
+        $filters['choice_a'] = $request->request->get('choiceA') ?? '';
+        $filters['choice_b'] = $request->request->get('choiceB') ?? '';
+        $filters['choice_c'] = $request->request->get('choiceC') ?? '';
+        $filters['choice_d'] = $request->request->get('choiceD') ?? '';
+        $filters['correct_answer'] = $request->request->get('correctAnswer') ?? '';
+        $filters['issued_by'] = $request->request->get('issuedBy') ?? '';
+        if ($request->request->get('issuedBy')) {
+            $user = $userRepository->findByEmail($request->request->get('issuedBy'));
+            if ($user) {
+                $teacherId = $teacherRepository->findBy([
+                    'user' => $user[0]->getId()
+                ]);
+                $filters['issued_by'] = $teacherId;
+            }
+        }
+        $filteredQuestions = $questionRepository->filterQuestions($filters);
+        return $this->render('quiz/quiz_questions_show.html.twig', [
+            'questions' => $filteredQuestions
+        ]);
+    }
+
 }
