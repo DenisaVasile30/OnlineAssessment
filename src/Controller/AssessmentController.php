@@ -13,6 +13,7 @@ use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\SubjectFormType;
 use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
+use App\Helper\ProgrammingLanguageHelper;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
 use App\Repository\GroupRepository;
@@ -229,7 +230,8 @@ class AssessmentController extends AbstractController
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
         $requirementsNo = $requiredAssessment->getRequirementsNo();
         $assignedSubjects = $assignedSubjectsRepository->findBy(['assessment' => $requiredAssessment->getId()]);
-
+        $reservedWordsList = ProgrammingLanguageHelper::getReservedWords('cpp');
+//        dd($reservedWordsList);
         $requiredSubjects = [];
         $filesContent = [];
         foreach ($assignedSubjects as $assignedSubject) {
@@ -268,6 +270,7 @@ class AssessmentController extends AbstractController
 //            'requiredSubject' => $requiredSubject,
             'requiredSubjects' => $requiredSubjects,
             'filesContent' => $filesContent,
+            'reservedWordsList' => $reservedWordsList,
 //            'contentFileExist' => (bool)$requiredSubject->getContentFile(),
             'submittedCode' => $form->createView(),
             'responseMessage' => $responseMessage

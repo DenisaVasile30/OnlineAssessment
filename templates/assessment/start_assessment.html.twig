@@ -60,9 +60,13 @@
                     </div>
 
                 </div>
-                <div>
-                    {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                    {{ form_errors(submittedCode.codeArea) }}
+                <div id="parent-div">
+                    <div id="dropdown-autocomplete" style="color: black">
+                    </div>
+                    <div>
+                        {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                        {{ form_errors(submittedCode.codeArea) }}
+                    </div>
                 </div>
                 {{ form_end(submittedCode) }}
                 <div>
@@ -108,6 +112,105 @@
                 toggleButton.textContent = 'View Content';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var textareaCode = document.getElementById("submitted_code_form_codeArea");
+
+            textareaCode.addEventListener("paste", function(e) {
+                var clipboardData = e.clipboardData || window.clipboardData;
+                var pastedData = clipboardData.getData("text/plain");
+                var currentValue = textareaCode.value;
+
+                // Check if the pasted data came from within the textarea
+                if (currentValue.includes(pastedData)) {
+                    // Allow the paste to proceed
+                    console.log('Allow paste');
+                } else {
+                    // Prevent the paste
+                    console.log('Deny paste');
+                    e.preventDefault();
+                }
+            });
+
+            textareaCode.addEventListener("keydown", handleKeyDown);
+
+            function handleKeyDown(event) {
+                if (event.ctrlKey && event.code === "Space") {
+                    let reservedWordsList = JSON.parse('{{ reservedWordsList|json_encode|raw }}');
+                    // for (let i = 0; i < reservedWordsList.length; i++) {
+                    //     console.log(reservedWordsList[i]);
+                    // }
+
+                    const partialWord = getPartialWord();
+                    // console.log(partialWord);
+                    const startIndex = getStartIndex();
+                    let filteredWords = reservedWordsList.filter((element) => element.includes(partialWord));
+                    // console.log(filteredWords);
+                    if (filteredWords !== undefined) {
+                        if (document.getElementById("select") !== null) {
+                            const doc = document.getElementById("select");
+                            doc.remove();
+                        }
+                        const dropdown = document.createElement("select");
+                        dropdown.id = "select";
+
+                        const optionElement = document.createElement("option");
+                        optionElement.value = partialWord + "-" + startIndex + "-" + "";
+                        optionElement.text = "";
+                        dropdown.appendChild(optionElement);
+                        filteredWords.forEach((option) => {
+                            const optionElement = document.createElement("option");
+                            optionElement.value = partialWord + "-" + startIndex + "-" + option;
+                            optionElement.text = option;
+                            dropdown.appendChild(optionElement);
+                        });
+
+                        const dropdownAutocomplete = document.getElementById("dropdown-autocomplete");
+                        dropdownAutocomplete.appendChild(dropdown);
+
+                        const parentDiv = document.getElementById("parent-div");
+                        parentDiv.insertBefore(dropdownAutocomplete, parentDiv.firstChild);
+
+                        const selectDropDown = document.getElementById("select");
+                        selectDropDown.onchange = function () {
+                            const selectedKey = document.getElementById("select").value;
+                            const selectedValuesArray = selectedKey.split("-");
+                            console.log(selectedValuesArray.length);
+                            console.log("actual value::" + textareaCode.value);
+                            let lengthToReplace = partialWord.length;
+
+                            const firstPart = (textareaCode.value).substr(0, startIndex);
+                            console.log("firstPart::" + firstPart);
+                            const secondPart = (textareaCode.value).substr(startIndex);
+                            console.log("secondPart::" + secondPart);
+
+                            if (selectedValuesArray[2].length > secondPart.length) {
+                                lengthToReplace = selectedValuesArray[2].length;
+                            }
+                            const stringToReplace = (textareaCode.value).substr(startIndex, lengthToReplace);
+                            console.log(stringToReplace);
+                            const updatedSecondPart = secondPart.replace(stringToReplace, selectedValuesArray[2]);
+                            const updatedTextArea = firstPart + " " + updatedSecondPart;
+                            textareaCode.value = updatedTextArea;
+                        };
+                    }
+                }
+            }
+
+            function getPartialWord() {
+                const text = textareaCode.value;
+                const startIndex = text.lastIndexOf(" ") + 1;
+                const endIndex = text.length;
+
+                return text.substring(startIndex, endIndex);
+            }
+
+            function getStartIndex() {
+                const text = textareaCode.value;
+
+                return text.lastIndexOf(" ") + 1;
+            }
+        });
     </script>
 
 {% endblock %}
