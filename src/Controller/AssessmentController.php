@@ -109,60 +109,17 @@ class AssessmentController extends AbstractController
             ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $assessment->setDescription($form->get('description')->getData());
+            $assessment->setCreatedAt(new \DateTime());
+            $assessment->setAssigneeGroup($form->get('assigneeGroup')->getData());
+            $assessment->setStartAt($form->get('startAt')->getData());
+            $assessment->setEndAt($form->get('endAt')->getData());
+            $assessment->setCreatedBy($teacher[0]);
+            $assessment->setStatus('Active');
+            $assessment->setSubjectList($form->get('subjectList')->getData());
             $assessment->setTimeLimit($form->get('timeLimit')->getData());
             $assessment->setTimeUnit($form->get('timeUnit')->getData());
 
-            if ($form->get('requirementsNo')->getData() != 1) {
-//                dd($form);
-                $sectionsNo = $form->get('requirementsNo')->getData();
-                $subjectsForm = $this->createForm(
-                    AssignedSubjectsFormType::class,
-                    [
-                        'subjects' => $subjects,
-                        'sectionsNo' => $sectionsNo
-                    ]
-                );
-
-                $subjectsForm->handleRequest($request);
-                if ($subjectsForm->isSubmitted() && $subjectsForm->isValid()) {
-                    for ($i = 1; $i <= $sectionsNo; $i++) {
-                        $assignedSubjects = new AssignedSubjects();
-                        try {
-                            $subjectsOptions = $subjectsForm->get('subjectList' . $i)->getData();
-                            $lastAssessment = $assessmentRepository->findOneBy([], ['id' => 'DESC']);
-                            if ($lastAssessment) {
-                                $assessmentIdToAdd = $lastAssessment->getId() + 1;
-                            } else {
-                                $assessmentIdToAdd = 1;
-                            }
-                            $assignedSubjects->setAssessment($assessmentIdToAdd);
-                            $assignedSubjects->setRequirementNo($i);
-                            $options = [];
-                            foreach ($subjectsArray as $key => $value) {
-                                foreach ($subjectsOptions as $keySelected => $valueSelected)
-                                if ($value->getDescription() == $valueSelected) {
-                                    // TO DO: Do not allow subject have id 0
-                                    $options[] = $subjectRepository->find($value->getId());
-                                }
-                            }
-                            $assignedSubjects->setSubjectsOptionList($options);
-                            $entityManager->persist($assignedSubjects);
-                            $entityManager->flush();
-                        } catch (\Exception $exception) {
-                            dd($exception->getMessage());
-                        }
-                    }
-                } else {
-
-                    return $this->render('assessment/schedule_assessment.html.twig', [
-                        'scheduleAssessmentForm' => $form->createView(),
-                        'assignedSubjectsForm' => $subjectsForm->createView()
-                    ]);
-                }
-            }
-            $assessment->setCreatedAt(new \DateTime());
-            $assessment->setCreatedBy($teacher[0]);
-//            if the teacher selected multiple subjects we will extract one random at launch
             $selectedSubjects = $assessment->getSubjectList();
             $isSingleSubject = count($selectedSubjects) > 1;
             foreach ($subjectsArray as $key => $value) {
@@ -170,21 +127,21 @@ class AssessmentController extends AbstractController
                     if ($value->getDescription() == $selectedSubjects[0]) {
                         // TO DO: Do not allow subject have id 0
                         $assessment->setSubject(
-                            $subjectRepository->find($key)
+                            ($subjectRepository->findBy(['description' => $selectedSubjects[0]])[0])
                         );
                     }
 //                }
             }
-
             $entityManager->persist($assessment);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_assessment');
-        }
+        } else {
 
-        return $this->render('assessment/schedule_assessment.html.twig', [
-            'scheduleAssessmentForm' => $form->createView()
-        ]);
+            return $this->render('assessment/schedule_assessment.html.twig', [
+                'scheduleAssessmentForm' => $form->createView(),
+            ]);
+        }
     }
 
     #[Route('/home/assessments/show', name: 'app_show_assessments')]
@@ -228,30 +185,40 @@ class AssessmentController extends AbstractController
     {
         $responseMessage = '';
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
-        $requirementsNo = $requiredAssessment->getRequirementsNo();
         $assignedSubjects = $assignedSubjectsRepository->findBy(['assessment' => $requiredAssessment->getId()]);
+//        dd(($requiredAssessment->getSubject())->getId());
+        $subjectContent = $subjectRepository->findOneBy(['id' => ($requiredAssessment->getSubject())->getId()]);
         $reservedWordsList = ProgrammingLanguageHelper::getReservedWords('cpp');
 //        dd($reservedWordsList);
         $requiredSubjects = [];
         $filesContent = [];
-        foreach ($assignedSubjects as $assignedSubject) {
-            if (count($assignedSubject->getSubjectsOptionList()) > 1) {
-                $randomKey = array_rand($assignedSubject->getSubjectsOptionList());
-                $randomSubject[] = $assignedSubject->getSubjectsOptionList()[$randomKey];
-                $assignedSubject->setSubjectsOptionListFromRand($randomSubject);
-            }
-            $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
-            $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
+//        $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
+//        $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
 
-            if ($subjectContent[0]->getContentFile() != null) {
-                $filesContent[$keyFile] = stream_get_contents($subjectContent[0]->getContentFile());
-            } else {
-                $filesContent[$keyFile] = 'Nothing to show';
-            }
-            $requiredSubjects[] = $subjectRepository->findOneBy(
-                ['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]
-            );
+        if ($subjectContent->getContentFile() != null) {
+            $filesContent[$subjectContent->getId()] = stream_get_contents($subjectContent->getContentFile());
+        } else {
+            $filesContent[$subjectContent->getId()] = 'Nothing to show';
         }
+        $requiredSubject[] = $subjectContent;
+//        foreach ($assignedSubjects as $assignedSubject) {
+//            if (count($assignedSubject->getSubjectsOptionList()) > 1) {
+//                $randomKey = array_rand($assignedSubject->getSubjectsOptionList());
+//                $randomSubject[] = $assignedSubject->getSubjectsOptionList()[$randomKey];
+//                $assignedSubject->setSubjectsOptionListFromRand($randomSubject);
+//            }
+//            $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
+//            $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
+//
+//            if ($subjectContent[0]->getContentFile() != null) {
+//                $filesContent[$keyFile] = stream_get_contents($subjectContent[0]->getContentFile());
+//            } else {
+//                $filesContent[$keyFile] = 'Nothing to show';
+//            }
+//            $requiredSubjects[] = $subjectRepository->findOneBy(
+//                ['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]
+//            );
+//        }
 
         $form = $this->createForm(SubmittedCodeFormType::class);
         $form->handleRequest($request);
@@ -268,7 +235,7 @@ class AssessmentController extends AbstractController
         return $this->render('assessment/start_assessment.html.twig', [
             'requiredAssessment' => $requiredAssessment,
 //            'requiredSubject' => $requiredSubject,
-            'requiredSubjects' => $requiredSubjects,
+            'requiredSubjects' => $requiredSubject,
             'filesContent' => $filesContent,
             'reservedWordsList' => $reservedWordsList,
 //            'contentFileExist' => (bool)$requiredSubject->getContentFile(),

@@ -38,9 +38,6 @@ class Assessment
     #[ORM\Column(type: 'string', nullable: true)]
     private string $status;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private int $requirementsNo = 1;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $timeLimit = 0;
 

@@ -61,9 +61,11 @@
 
                 </div>
                 <div id="parent-div">
-                    <div id="dropdown-autocomplete" style="color: black">
                     </div>
                     <div>
+                        <div>
+                        <div id="dropdown-autocomplete" style="color: black">
+                        </div>
                         {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
                         {{ form_errors(submittedCode.codeArea) }}
                     </div>
@@ -77,7 +79,23 @@
                         </textarea>
                     </div>
                 </div>
+            <div class="ui-widget">
+{#                <textarea></textarea>#}
+            <label for="tags">Tags: </label>
+            <input id="tags" style="color: black">
+            <div>
+                <label for="myInput">Last try: </label>
+                <input id="inp" style="color: black">
+            </div>
+                <div>
+                    <textarea id="text-area1" class="text-area1"></textarea>
+                </div>
+        </div>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+            <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+{#            <link rel="stylesheet" href="/resources/demos/style.css">#}
+            <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+            <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
         </div>
 
 
@@ -92,6 +110,41 @@
         }
         #file-content.show {
             display: block;
+        }
+        #result {
+            border: 1px dotted #ccc;
+            padding: 3px;
+        }
+        #result ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #result ul li {
+            padding: 5px 0;
+        }
+        #result ul li:hover {
+            background: #eee;
+        }
+        #myTextarea {
+            position: relative;
+            height: 100px;
+            width: 200px;
+            padding: 10px;
+            border: 1px solid black;
+        }
+
+        #myInput {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none;
+        }
+        #dropdown-autocomplete{
+            position: absolute;
+            background-color: transparent;
+            border: none;
+            outline: none;
         }
     </style>
 
@@ -116,9 +169,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             var textareaCode = document.getElementById("submitted_code_form_codeArea");
 
-            textareaCode.addEventListener("paste", function(e) {
+            textareaCode.addEventListener("paste", function (e) {
                 var clipboardData = e.clipboardData || window.clipboardData;
                 var pastedData = clipboardData.getData("text/plain");
+                console.log(clipboardData);
+                console.log('pasted data');
+                console.log(pastedData);
                 var currentValue = textareaCode.value;
 
                 // Check if the pasted data came from within the textarea
@@ -136,6 +192,12 @@
 
             function handleKeyDown(event) {
                 if (event.ctrlKey && event.code === "Space") {
+                    const cursorPosition = event.target.getBoundingClientRect();
+                    const positionTop = event.target.getBoundingClientRect().top;
+                    const positionLeft = event.target.getBoundingClientRect().left;
+
+
+                    // console.log( cursorPosition );
                     let reservedWordsList = JSON.parse('{{ reservedWordsList|json_encode|raw }}');
                     // for (let i = 0; i < reservedWordsList.length; i++) {
                     //     console.log(reservedWordsList[i]);
@@ -167,10 +229,14 @@
 
                         const dropdownAutocomplete = document.getElementById("dropdown-autocomplete");
                         dropdownAutocomplete.appendChild(dropdown);
-
+                        console.log(textareaCode.selectionStart);
+                        console.log(textareaCode.selectionEnd);
                         const parentDiv = document.getElementById("parent-div");
+                        dropdown.style.position = "absolute";
+                        dropdown.style.top = positionTop + "px";
+                        dropdown.style.left = positionLeft + "px";
                         parentDiv.insertBefore(dropdownAutocomplete, parentDiv.firstChild);
-
+                        // console.log(pageYOffset);
                         const selectDropDown = document.getElementById("select");
                         selectDropDown.onchange = function () {
                             const selectedKey = document.getElementById("select").value;
@@ -210,7 +276,17 @@
 
                 return text.lastIndexOf(" ") + 1;
             }
+            var suggests = ["head", "hello", "heart", "health"];
+            $("#text-area1").asuggest(suggests, {
+                'autoComplete': false,
+                'cycleOnTab': true
+            });
+
         });
+
+
+
     </script>
 
 {% endblock %}
+
