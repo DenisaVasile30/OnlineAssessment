@@ -2,29 +2,21 @@
 
 namespace App\Form;
 
-use App\Entity\Assessment;
-use App\Entity\AssignedSubjects;
+use App\Entity\CreatedQuiz;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AssessmentFormType extends AbstractType
+class CreateQuizFormType extends AbstractType
 {
-    private array $subjects = [];
-
-    public function buildForm(
-        FormBuilderInterface $builder,
-        array $options,
-    ): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-//        dd($options['sectionsNo']);
-        $assignedGroups = $options['teacherAssignedGroups'][0];
-        $this->subjects = $options['subjects'];
+        $assignedGroups = $options['teacherAssignedGroups'];
+        $categories = $options['quizCategories'];
+        $categories[] = "";
+
         $builder
             ->add('description')
             ->add('assigneeGroup', ChoiceType::class, [
@@ -34,13 +26,22 @@ class AssessmentFormType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
             ])
-            ->add('subjectList', ChoiceType::class, [
-                'label' => 'Subject/s',
+            ->add('category', ChoiceType::class, [
                 'required' => true,
-                'choices' => array_combine($options['subjects'], $options['subjects']),
+                'choices' => array_combine($categories, $categories),
                 'expanded' => false,
-                'multiple' => true,
+                'multiple' => false,
             ])
+            ->add('questionsNo')
+            ->add('maxGrade')
+            ->add('questionsSource', ChoiceType::class, [
+                'choices'  => [
+                    'Random from Category' => 'Random from Category',
+                    'From Category' => 'From Category',
+                    'Mixed' => 'Mixed',
+                ],
+            ])
+//            ->add('questionsList')
             ->add('startAt')
             ->add('endAt')
             ->add('timeLimit')
@@ -51,16 +52,19 @@ class AssessmentFormType extends AbstractType
                     'hours' => 'hours',
                 ],
             ])
+            ->add('save', SubmitType::class, [
+                'label' => 'Save'
+            ])
+
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Assessment::class,
+            'data_class' => CreatedQuiz::class,
             'teacherAssignedGroups' => null,
-            'subjects' => null,
-            'sectionsNo' => 1
+            'quizCategories' => null
         ]);
     }
 }

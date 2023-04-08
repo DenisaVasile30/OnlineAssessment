@@ -96,4 +96,15 @@ class QuizQuestionRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getQuestionsByIds($questionsIds)
+    {
+        $questionsIdsArray = explode(',', $questionsIds);
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.id IN (:questionsIds)')
+            ->setParameter('questionsIds', $questionsIdsArray)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

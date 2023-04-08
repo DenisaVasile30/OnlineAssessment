@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{#    {% for question in questions %}#}
+
+    {{ form_start(supportQuiz) }}
+
+        <fieldset>
+        <div>
+            <label>{{ (index + 1)~'. '~question.questionContent }}</label>
+        </div>
+        <div>
+            <input type="radio" id="choiceA" name="answerOption" value="{{ question.choiceA }}" checked>
+            <label for="{{ question.choiceA }}">{{ 'a. '~question.choiceA }}</label>
+        </div>
+        <div>
+            <input type="radio" id="choiceB" name="answerOption" value="{{ question.choiceB }}">
+            <label for="{{ question.choiceB }}">{{ 'b. '~question.choiceB }}</label>
+        </div>
+        <div>
+            <input type="radio" id="choiceC" name="answerOption" value="{{ question.choiceC }}">
+            <label for="{{ question.choiceC }}">{{ 'c. '~question.choiceC }}</label>
+        </div>
+        <div>
+            <input type="radio" id="choiceD" name="answerOption" value="{{ question.choiceD }}">
+            <label for="{{ question.choiceD }}">{{ 'd. '~question.choiceD }}</label>
+        </div>
+            <input type="text" id="index" name="index" value="{{ index }}" style="visibility: hidden">
+
+        </fieldset>
+{#    {% endfor %}#}
+
+
+    {{ form_end(supportQuiz) }}
+
+
+
+
+    <script>
+        // Add event listener to the "Next" button
+        document.getElementById('next-btn').addEventListener('click', function() {
+            // Get the selected answer
+            var selectedAnswer = document.querySelector('.question.active input:checked');
+
+            // If an answer was selected, move to the next question
+            if (selectedAnswer) {
+                // Get the next question
+                var nextQuestion = document.querySelector('.question.active').nextElementSibling;
+
+                // If there is a next question, show it
+                if (nextQuestion) {
+                    document.querySelector('.question.active').classList.remove('active');
+                    nextQuestion.classList.add('active');
+                }
+            }
+        });
+    </script>
+{% endblock %}

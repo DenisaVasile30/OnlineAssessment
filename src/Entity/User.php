@@ -50,6 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'assignedTo', targetEntity: Ticket::class)]
     private Collection $assignedTickets;
 
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -252,6 +253,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $assignedTicket->setAssignedTo(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSupportedQuiz(): ?SupportedQuiz
+    {
+        return $this->supportedQuiz;
+    }
+
+    public function setSupportedQuiz(?SupportedQuiz $supportedQuiz): self
+    {
+        $this->supportedQuiz = $supportedQuiz;
+
+        return $this;
+    }
+
+    public function getSupportedQuizDetails(): ?SupportedQuizDetails
+    {
+        return $this->supportedQuizDetails;
+    }
+
+    public function setSupportedQuizDetails(?SupportedQuizDetails $supportedQuizDetails): self
+    {
+        $this->supportedQuizDetails = $supportedQuizDetails;
 
         return $this;
     }

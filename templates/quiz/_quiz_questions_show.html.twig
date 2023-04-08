@@ -1,0 +1,45 @@
+{% block body %}
+    <div>
+        <table style="width: 100%" id="questionsTable">
+            <thead>
+            <tr>
+                <th>Select</th>
+                <th>Id</th>
+                <th>Category</th>
+                <th>Optional description</th>
+                <th>Content</th>
+                <th>Created At</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for question in questions %}
+                <div>
+                    <tr>
+                        <td><input type="checkbox" name="questionsIds[]" value="{{ question.id }}"></td>
+                        <td>{{ question.id }}</td>
+                        <td>{{ question.category }}</td>
+                        <td>{{ question.optionalDescription }}</td>
+                        <td>{{ question.questionContent }}</td>
+                        <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td>
+                            <td>
+                                <input type="text" name="questionsScores[]" id="{{ question.id }}" style="color: black">
+                            </td>
+                        </td>
+                    </tr>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block javascripts %}
+
+
+{% endblock %}

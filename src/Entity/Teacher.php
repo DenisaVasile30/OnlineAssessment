@@ -36,11 +36,15 @@ class Teacher
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Assessment::class)]
     private Collection $assessments;
 
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: CreatedQuiz::class)]
+    private Collection $createdQuizzes;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->assessments = new ArrayCollection();
         $this->quizQuestions = new ArrayCollection();
+        $this->createdQuizzes = new ArrayCollection();
     }
 
     public function getId(): int
@@ -158,5 +162,35 @@ class Teacher
     public function setQuizQuestions(Collection $quizQuestions): void
     {
         $this->quizQuestions = $quizQuestions;
+    }
+
+    /**
+     * @return Collection<int, CreatedQuiz>
+     */
+    public function getCreatedQuizzes(): Collection
+    {
+        return $this->createdQuizzes;
+    }
+
+    public function addCreatedQuiz(CreatedQuiz $createdQuiz): self
+    {
+        if (!$this->createdQuizzes->contains($createdQuiz)) {
+            $this->createdQuizzes->add($createdQuiz);
+            $createdQuiz->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedQuiz(CreatedQuiz $createdQuiz): self
+    {
+        if ($this->createdQuizzes->removeElement($createdQuiz)) {
+            // set the owning side to null (unless already changed)
+            if ($createdQuiz->getCreatedBy() === $this) {
+                $createdQuiz->setCreatedBy(null);
+            }
+        }
+
+        return $this;
     }
 }
