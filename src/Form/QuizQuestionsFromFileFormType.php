@@ -15,7 +15,7 @@ class QuizQuestionsFromFileFormType extends AbstractType
     {
         $builder
             ->add('contentFile', FileType::class, [
-                'label' => 'Upload questions from txt file here',
+//                'label' => 'Upload questions from txt file here',
                 'mapped' => true,
                 'required' => true,
                 'constraints' => [

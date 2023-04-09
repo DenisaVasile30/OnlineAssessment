@@ -22,8 +22,7 @@ class AssessmentFormType extends AbstractType
         array $options,
     ): void
     {
-//        dd($options['sectionsNo']);
-        $assignedGroups = $options['teacherAssignedGroups'][0];
+        $assignedGroups = $options['teacherAssignedGroups'];
         $this->subjects = $options['subjects'];
         $builder
             ->add('description')

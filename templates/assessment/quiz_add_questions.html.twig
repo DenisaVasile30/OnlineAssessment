@@ -3,29 +3,35 @@
 {% block body %}
 
     {{ form_start(quizQuestionsFromFileForm) }}
+        <div class="text-xl">
+            Load quiz questions from file:
+        </div>
 
-    <div>
-        {{ form_label(quizQuestionsFromFileForm.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-        {{ form_widget(quizQuestionsFromFileForm.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-        {{ form_errors(quizQuestionsFromFileForm.category) }}
-    </div>
-    <div class="ml-16">
-        {{ form_row(quizQuestionsFromFileForm.contentFile, {'attr': {'class': ''}}) }}
-        {{ form_errors(quizQuestionsFromFileForm.contentFile) }}
-    </div>
+        <div>
+            {{ form_label(quizQuestionsFromFileForm.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(quizQuestionsFromFileForm.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(quizQuestionsFromFileForm.category) }}
+        </div>
 
-    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+        <div>
+            {{ form_row(quizQuestionsFromFileForm.contentFile) }}
+            {{ form_errors(quizQuestionsFromFileForm.contentFile) }}
+        </div>
 
+        <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+            <button type="submit"
+                    class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2"
+                    >Save</button>
+        </div>
 
-        <button type="submit"
-                class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>
-    </div>
-    <div class="border-b border-gray-300"></div>
-
+        <div class="border-b border-gray-300"></div>
 
     {{ form_end(quizQuestionsFromFileForm) }}
 
     {{ form_start(quizQuestions) }}
+    <div class="text-xl">
+        Assessments:
+    </div>
     <div>
         {{ form_label(quizQuestions.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
         {{ form_widget(quizQuestions.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}

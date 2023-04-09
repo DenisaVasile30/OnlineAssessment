@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\CreatedQuiz;
+use App\Entity\QuizQuestion;
 use App\Entity\SupportedQuiz;
 use App\Entity\SupportedQuizDetails;
 use App\Entity\User;
 use App\Form\CreateQuizFormType;
+use App\Form\QuizQuestionsAddFormType;
+use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\StartQuizFormType;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
@@ -21,12 +24,235 @@ use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class QuizController extends AbstractController
 {
+    #[Route('/home/assessment/quiz/questions', name: 'app_quiz_questions')]
+    public function addQuizQuestions(
+        Request $request,
+        TeacherRepository $teacherRepository,
+        QuizQuestionRepository $questionRepository,
+        SluggerInterface $slugger
+    ): Response
+    {
+        $quizQuestions = new QuizQuestion();
+        $quizForm = $this->createForm(QuizQuestionsAddFormType::class, $quizQuestions);
+        $quizForm->handleRequest($request);
+
+        if ($quizForm->isSubmitted() && $quizForm->isValid()) {
+            $userId = $this->getUser()->getIdentifierId();
+            $teacher = $teacherRepository->getTeacher($userId);
+            $quizQuestions->setCreatedAt(new \DateTime());
+            $quizQuestions->setIssuedBy($teacher[0]);
+
+            $questionRepository->save($quizQuestions, true);
+
+            return $this->redirectToRoute('app_quiz_questions');
+        }
+
+        $quizQuestionsFromFileForm = $this->createForm(QuizQuestionsFromFileFormType::class);
+        $quizQuestionsFromFileForm->handleRequest($request);
+
+        if ($quizQuestionsFromFileForm->isSubmitted() && $quizQuestionsFromFileForm->isValid()) {
+            $questionsCategory = $quizQuestionsFromFileForm['category']->getData();
+            /** @var UploadedFile $questionsFile */
+            $questionsFile = $quizQuestionsFromFileForm['contentFile']->getData();
+            if ($questionsFile) {
+                $originalFilename = pathinfo($questionsFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$questionsFile->guessExtension();
+
+                $content = file_get_contents($questionsFile->getPathname());
+                try {
+                    $arrayContent = explode("\r\n\r\n", $content);
+                    if (
+                        $this->processFile(
+                            $arrayContent, $newFilename, $teacherRepository, $questionsCategory, $questionRepository)
+                    ) {
+                        $this->addFlash(
+                            'success',
+                            'Saved successfully!'
+                        );
+                        return $this->redirectToRoute('app_quiz_questions');
+                    };
+                } catch (\Exception $exception) {
+                    $this->addFlash(
+                        'error',
+                        $exception->getMessage()
+                    );
+                    $this->redirectToRoute('app_quiz_questions');
+                }
+            }
+        }
+
+        return $this->render('assessment/quiz_add_questions.html.twig', [
+            'quizQuestions' => $quizForm->createView(),
+            'quizQuestionsFromFileForm' => $quizQuestionsFromFileForm->createView()
+        ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function isValidContent(array $arrayContent): bool
+    {
+        if (count($arrayContent) < 1 ) {
+            throw new \Exception('Invalid TXT file structure!'
+                . 'Required structure: '
+                . '    On separate lines:'
+                .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                .   'Questions must be separated by an empty line!'
+            );
+        }
+        foreach ($arrayContent as $key => $questionContent) {
+            $arrayQuestionContent = explode("\r\n", $questionContent);
+            if (count($arrayQuestionContent) != 6) {
+                throw new \Exception('Invalid structure at question no ' . $key
+                    . ' Required structure: '
+                    . '    On separate lines:'
+                    .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                    .   'Questions must be separated by an empty line!'
+                );
+            }
+            foreach ($arrayQuestionContent as $keyQuestion => $valueQuestion) {
+                if (strlen(trim($valueQuestion)) == 0) {
+                    throw new \Exception('Invalid structure at question no ' . $key
+                        . ': empty line found at position no: ' . $keyQuestion
+                    );
+                }
+            }
+            if (
+                !in_array($arrayQuestionContent[5], array_slice($arrayQuestionContent, 1, 4, true))
+            ) {
+                throw new \Exception('Invalid value for correct answer at question no ' . $key
+                    . '. The correct answer should match a previous given choice! '
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function processFile(
+        array $arrayContent,
+        string $filename,
+        TeacherRepository $teacherRepository,
+        string $questionsCategory,
+        QuizQuestionRepository $questionRepository
+    ): bool {
+        if ($this->isValidContent($arrayContent)) {
+            if (
+                $this->saveQuestions($arrayContent, $filename,  $teacherRepository, $questionsCategory, $questionRepository)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function saveQuestions(
+        array $arrayContent,
+        string $filename,
+        TeacherRepository $teacherRepository,
+        string $questionsCategory,
+        QuizQuestionRepository $questionRepository
+    ): bool
+    {
+        foreach ($arrayContent as $key => $questionContent) {
+            $arrayQuestionContent = explode("\r\n", $questionContent);
+            $question = new QuizQuestion();
+            $question->setCategory($questionsCategory);
+            foreach ($arrayQuestionContent as $keyQuestion => $valueQuestion) {
+                if ($keyQuestion == 0) {
+                    $question->setQuestionContent($valueQuestion);
+                } elseif ($keyQuestion == 1) {
+                    $question->setChoiceA($valueQuestion);
+                } elseif ($keyQuestion == 2) {
+                    $question->setChoiceB($valueQuestion);
+                } elseif ($keyQuestion == 3) {
+                    $question->setChoiceC($valueQuestion);
+                } elseif ($keyQuestion == 4) {
+                    $question->setChoiceD($valueQuestion);
+                } elseif ($keyQuestion == 5) {
+                    $question->setCorrectAnswer($valueQuestion);
+                }
+            }
+            $userId = $this->getUser()->getIdentifierId();
+            $teacher = $teacherRepository->getTeacher($userId);
+            $question->setIssuedBy($teacher[0]);
+            $question->setCreatedAt(new \DateTime());
+            $question->setContentFile(implode("\r\n", $arrayContent));
+            $question->setFileName($filename);
+
+            $questionRepository->save($question, true);
+        }
+        return true;
+    }
+
+    #[Route('/home/assessment/quiz/questions/show', name: 'app_quiz_questions_show')]
+    public function displayQuizQuestions(
+        Request $request,
+        TeacherRepository $teacherRepository,
+        QuizQuestionRepository $questionRepository,
+    ): Response
+    {
+//        dd($request);
+
+        $user = $this->getUser()->getIdentifierId();
+        $teacher = $teacherRepository->getTeacher($user);
+        $questions = $questionRepository->findBy(['issuedBy' => $teacher[0]->getId()]);
+//        dd($questions);
+        return $this->render('quiz/quiz_questions_show.html.twig', [
+            'questions' => $questions
+        ]);
+    }
+
+    #[Route('/home/assessment/quiz/questions/show/filter', name: 'app_quiz_questions_filter')]
+    public function filterQuizQuestions(
+        Request $request,
+        QuizQuestionRepository $questionRepository,
+        TeacherRepository $teacherRepository,
+        UserRepository $userRepository
+    ): Response
+    {
+        if ($request->request->get('action') == 'Reset Filters') {
+            return $this->redirectToRoute('app_quiz_questions_show');
+        }
+        $filters = [];
+        $filters['id'] = $request->request->get('id') ?? '';
+        $filters['category'] = $request->request->get('category') ?? '';
+        $filters['optional_description'] = $request->request->get('optionalDescription') ?? '';
+        $filters['question_content'] = $request->request->get('questionContent');
+        $filters['choice_a'] = $request->request->get('choiceA') ?? '';
+        $filters['choice_b'] = $request->request->get('choiceB') ?? '';
+        $filters['choice_c'] = $request->request->get('choiceC') ?? '';
+        $filters['choice_d'] = $request->request->get('choiceD') ?? '';
+        $filters['correct_answer'] = $request->request->get('correctAnswer') ?? '';
+        $filters['issued_by'] = $request->request->get('issuedBy') ?? '';
+        if ($request->request->get('issuedBy')) {
+            $user = $userRepository->findByEmail($request->request->get('issuedBy'));
+            if ($user) {
+                $teacherId = $teacherRepository->findBy([
+                    'user' => $user[0]->getId()
+                ]);
+                $filters['issued_by'] = $teacherId;
+            }
+        }
+        $filteredQuestions = $questionRepository->filterQuestions($filters);
+        return $this->render('quiz/quiz_questions_show.html.twig', [
+            'questions' => $filteredQuestions
+        ]);
+    }
+
     #[Route('/home/assessment/quiz/create', name: 'app_quiz_create')]
     public function createQuiz(
         Request $request,
