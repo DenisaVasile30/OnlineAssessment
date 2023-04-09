@@ -14,20 +14,6 @@ class QuizQuestionsAddFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-//            ->add('contentFile', FileType::class, [
-//                'label' => 'Upload questions from txt file here',
-//                'mapped' => true,
-//                'required' => false,
-//                'constraints' => [
-//                    new File([
-//                        'maxSize' => '1024k',
-//                        'mimeTypes' => [
-//                            'text/plain',
-//                            'text/x-c',
-//                        ],
-//                        'mimeTypesMessage' => 'Please upload a valid TXT file!',
-//                    ])
-//                ]])
             ->add('category')
             ->add('optionalDescription')
             ->add('questionContent')

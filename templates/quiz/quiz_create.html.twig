@@ -1,83 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block bread %}
-    → Create Quiz
-{% endblock %}
-
 {% block body %}
     <div>
+        <div class="text-xl">
+            Create new quiz:
+        </div>
         {{ form_start(createQuiz) }}
 
-        <div>
-            {{ form_label(createQuiz.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.description) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.description) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.questionsSource, 'Questions source', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.questionsSource, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.questionsSource) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.questionsSource, 'Questions source', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.questionsSource, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.questionsSource) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.category) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.category) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
-            {{ form_errors(createQuiz.assigneeGroup) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
+                {{ form_errors(createQuiz.assigneeGroup) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.questionsNo, 'Questions no', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.questionsNo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.questionsNo) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.questionsNo, 'Questions no', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.questionsNo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.questionsNo) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.maxGrade, 'Maximum grade', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.maxGrade, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.maxGrade) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.maxGrade, 'Maximum grade', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.maxGrade, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.maxGrade) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.startAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.startAt) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.startAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.startAt) }}
+            </div>
 
-        <div>
-            {{ form_label(createQuiz.endAt, 'Date to end at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.endAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.endAt) }}
-        </div>
-        <div>
-            {{ form_label(createQuiz.timeLimit, 'Time limit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.timeLimit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.timeLimit) }}
-        </div>
-        <div>
-            {{ form_label(createQuiz.timeUnit, 'Time unit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(createQuiz.timeUnit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(createQuiz.timeUnit) }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.endAt, 'Date to end at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.endAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.endAt) }}
+            </div>
 
-        <div id="questions">
-            {{ include ('quiz/_quiz_questions_show.html.twig') }}
-        </div>
+            <div>
+                {{ form_label(createQuiz.timeLimit, 'Time limit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.timeLimit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.timeLimit) }}
+            </div>
 
-        <div class="border-b border-gray-300"></div>
-        {{ form_widget(createQuiz.save, { 'label': 'Save' }) }}
+            <div>
+                {{ form_label(createQuiz.timeUnit, 'Time unit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                {{ form_widget(createQuiz.timeUnit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(createQuiz.timeUnit) }}
+            </div>
 
-{#        <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">#}
-{#            <button type="submit"#}
-{#                    class="submit block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save#}
-{#            </button>#}
-{#        </div>#}
+            <div id="questions">
+                {{ include ('quiz/_quiz_questions_show.html.twig') }}
+            </div>
+
+            <div>
+                {{ form_widget(createQuiz.save, {'attr': {'class': 'block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2'}}) }}
+            </div>
+
         {{ form_end(createQuiz) }}
     </div>
 {% endblock %}
@@ -121,15 +118,12 @@
                 }
             }
 
-            // Get the form and table elements
             const form = document.querySelector('form');
             const table = document.querySelector('#questionsTable');
 
-// Get all the checkboxes in the table
             const checkboxes = table.querySelectorAll('input[type="checkbox"]');
             const questionsScores = table.querySelectorAll('input[name="questionsScores[]"]');
 
-// Create a hidden input field to hold the selected data
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'questionsIdsFromSelect';
@@ -140,13 +134,10 @@
             hiddenInputScores.name = 'questionsScores';
             form.appendChild(hiddenInputScores);
 
-// Add event listener to update the hidden input field
             table.addEventListener('click', function(event) {
                 if (event.target.type === 'checkbox') {
-                    // Create an array to hold the selected rows
                     const selectedRows = [];
 
-                    // Loop through all the checkboxes in the table and add the values of the selected ones to the array
                     checkboxes.forEach(function(checkbox) {
                         if (checkbox.checked) {
                             selectedRows.push(checkbox.value);
@@ -154,21 +145,12 @@
                     });
                     hiddenInput.value = JSON.stringify(selectedRows);
                 } else if (event.target.name === 'questionsScores[]') {
-                    // const scores = [];
-                    // questionsScores.forEach(score => {
-                    //     console.log('scores:::::::');
-                    //     scores.push({[score.id]: (score.value)});
-                    // });
-                    // hiddenInputScores.value = JSON.stringify(scores);
-                    // console.log(hiddenInputScores.value);
-
-
                     questionsScores.forEach(score => {
                         score.addEventListener('keyup', event => {
                             console.log('Input changed:', event.target.value);
-
-                            const existingScoreIndex = postedScores.findIndex(postedScore => postedScore.hasOwnProperty(score.id));
-
+                            const existingScoreIndex = postedScores.findIndex(
+                                postedScore => postedScore.hasOwnProperty(score.id)
+                            );
                             if (existingScoreIndex !== -1) {
                                 console.log('already exists');
                                 postedScores[existingScoreIndex][score.id] = event.target.value;
@@ -183,6 +165,5 @@
             });
 
         })
-
     </script>
 {% endblock %}

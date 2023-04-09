@@ -41,7 +41,6 @@ class CreateQuizFormType extends AbstractType
                     'Mixed' => 'Mixed',
                 ],
             ])
-//            ->add('questionsList')
             ->add('startAt')
             ->add('endAt')
             ->add('timeLimit')

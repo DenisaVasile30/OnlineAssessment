@@ -140,7 +140,11 @@ class CreatedQuiz
 
     public function setAssigneeGroup(array $assigneeGroup): self
     {
-        $this->assigneeGroup = $assigneeGroup;
+        $intAssignedGroup = [];
+        foreach ($assigneeGroup as $k => $value) {
+            $intAssignedGroup[] = (int)$value;
+        }
+        $this->assigneeGroup = $intAssignedGroup;
 
         return $this;
     }
