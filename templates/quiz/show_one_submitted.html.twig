@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        {{ requiredQuiz.description }}
+        </br>
+        <label>
+            Date started: {{ submittedQuiz.startedAt|date("Y-m-d H:i:s") }}
+        </label>
+        </br>
+        <label>
+            Date ended: {{ submittedQuiz.endedAt|date("Y-m-d H:i:s") }}
+        </label>
+        </br>
+        <label>
+            Spent time: {{ submittedQuiz.totalTimeSpent| date('i:s') }}
+        </label>
+        </br>
+        <label>
+            Grade: {{ submittedQuiz.obtainedGrade }} / {{ submittedQuiz.maxGrade }}
+        </label>
+        </br>
+        <label>
+            Points: {{ score }} / 100
+        </label>
+        </br>
+    </div>
+    <label>Review answers</label>
+    <br>
+    {% set index = 1 %}
+        {% for question in submittedQuestions %}
+            {% for q in questions %}
+                {% if q.id == question.questionId %}
+                    <label>Points: {{ question.obtainedScore }} / {{ question.questionScore }}</label>
+                    </br>
+                    <label>{{ index~'. '~ q.questionContent }}</label>
+                    </br>
+                    <input type="radio" readonly value="{{ q.choiceA }}"
+                           {% if q.choiceA == question.providedAnswer%}
+                               checked
+                           {% endif %}>
+                    <label>{{ q.choiceA }}</label>
+                    </br>
+                    <input type="radio" readonly value="{{ q.choiceB }}"
+                            {% if q.choiceB == question.providedAnswer%}
+                            checked
+                            {% endif %}>
+                    <label>{{ q.choiceB }}</label>
+                    </br>
+                    <input type="radio" readonly value="{{ q.choiceC }}"
+                            {% if q.choiceC == question.providedAnswer%}
+                            checked
+                            {% endif %}>
+                    <label>{{ q.choiceC }}</label>
+                    </br>
+                    <input type="radio" readonly value="{{ q.choiceD }}"
+                            {% if q.choiceD == question.providedAnswer%}
+                            checked
+                            {% endif %}>
+                    <label>{{ q.choiceD }}</label>
+                    </br>
+                    </br>
+                    <label>Correct answer: {{ q.correctAnswer }}</label>
+                    </br>
+                    <hr>
+                    {% set index = index + 1  %}
+
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

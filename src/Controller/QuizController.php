@@ -266,19 +266,51 @@ class QuizController extends AbstractController
                         $supportedQuiz->setObtainedGrade(number_format($resultedGrade, 2));
 
                         $supportedQuizRepository->save($supportedQuiz, true);
+
+                        return $this->redirectToRoute('app_show_submitted_one', [
+                            'quiz' => $requiredQuiz->getId(),
+                            'id' => $supportedQuiz->getId()
+                        ]);
                     }
                 }
 
-//                to do: redirect to a submitted page ( show preview )
-                return $this->redirectToRoute('app_home');
-
             } elseif ($form->get('submit')->isClicked()) {
-                dd('submit');
+                $supportedQuiz = $supportedQuizRepository->findOneBy(['quiz' => $quiz, 'supportedBy' => $this->getUser()]);
+                if ($supportedQuiz != null) {
+                    $supportedQuiz->setEndedAt(new \DateTime(''));
+                    $startedAt = \DateTime::createFromFormat(
+                        'Y-m-d H:i:s',
+                        $supportedQuiz->getStartedAt()->format('Y-m-d H:i:s')
+                    );
+                    $endedAt = \DateTime::createFromFormat(
+                        'Y-m-d H:i:s',
+                        $supportedQuiz->getEndedAt()->format('Y-m-d H:i:s')
+                    );
+                    $timeSpent = $endedAt->diff($startedAt);
+                    $seconds = $timeSpent->s + $timeSpent->i * 60 + $timeSpent->h * 3600 + $timeSpent->days * 86400;
+                    $supportedQuiz->setTotalTimeSpent($seconds);
+                    $submittedQuestions = $detailsRepository->getTotalObtainedScore(
+                        $requiredQuiz->getId(),
+                        $user
+                    );
+                    $totalScore = 0;
+                    foreach ($submittedQuestions as $key => $submittedQuestion) {
+                        $totalScore += $submittedQuestion->getObtainedScore();
+                    }
+                    $maxGrade = $requiredQuiz->getMaxGrade();
+                    $resultedGrade = ($totalScore * $maxGrade) / 100;
+                    $supportedQuiz->setObtainedGrade(number_format($resultedGrade, 2));
+
+                    $supportedQuizRepository->save($supportedQuiz, true);
+
+                    return $this->redirectToRoute('app_show_submitted_one', [
+                        'quiz' => $requiredQuiz->getId(),
+                        'id' => $supportedQuiz->getId()
+                    ]);
+                }
             }
         }
 
-//        to do
-//      add ended_at, obtained_grade, total_time_Spent for $supportedQuiz
         return $this->render('quiz/start_quiz.html.twig', [
             'requiredQuiz' => $requiredQuiz,
             'question' => $questions[$index],
@@ -286,5 +318,40 @@ class QuizController extends AbstractController
             'remainingTime' => $remainingTime,
             'supportQuiz' => $form->createView()
         ]);
+    }
+
+    #[Route('/home/assessments/quiz/{quiz}/submitted{id}', name: 'app_show_submitted_one')]
+    public function showSubmittedQuiz(
+        Request $request,
+        int $quiz,
+        int $id,
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        SupportedQuizDetailsRepository $detailsRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quiz);
+        $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
+        $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
+        $user = $this->getUser();
+        $submittedQuiz = $supportedQuizRepository->find($id);
+        $submittedQuestions = $detailsRepository->getTotalObtainedScore(
+            $requiredQuiz->getId(),
+            $user
+        );
+        $totalScore = 0;
+        foreach ($submittedQuestions as $key => $submittedQuestion) {
+            $totalScore += $submittedQuestion->getObtainedScore();
+        }
+
+        return $this->render('quiz/show_one_submitted.html.twig',[
+            'requiredQuiz' => $requiredQuiz,
+            'submittedQuiz' => $submittedQuiz,
+            'submittedQuestions' => $submittedQuestions,
+            'score' => $totalScore,
+            'questions' => $questions
+        ]);
+
     }
 }
