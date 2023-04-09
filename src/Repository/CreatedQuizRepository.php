@@ -77,7 +77,7 @@ class CreatedQuizRepository extends ServiceEntityRepository
             ;
     }
 
-    public function getAssessmentsByIssuerId(int $issuerId, string $status = 'Active'): array
+    public function getCreatedQuizzesByIssuerId(int $issuerId, string $status = 'Active'): array
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.createdBy = :issuerId')

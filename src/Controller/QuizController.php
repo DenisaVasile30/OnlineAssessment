@@ -390,7 +390,7 @@ class QuizController extends AbstractController
             $isStudent = false;
             $teacher = $teacherRepository->getGroupByUserId($userId)[0];
             $groupId = $teacher->getAssignedGroups();
-            $quizzes = $createdQuizRepository->getAssessmentsByIssuerId($teacher->getId());
+            $quizzes = $createdQuizRepository->getCreatedQuizzesByIssuerId($teacher->getId());
         }
 
         return $this->render('quiz/created_quiz_show.html.twig', [
@@ -620,7 +620,5 @@ class QuizController extends AbstractController
                 'submittedQuiz' => $submittedQuiz,
             ]);
         }
-
-
     }
 }
