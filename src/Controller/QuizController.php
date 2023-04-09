@@ -352,6 +352,50 @@ class QuizController extends AbstractController
             'score' => $totalScore,
             'questions' => $questions
         ]);
+    }
+
+    #[Route('/home/assessments/quiz/results/{quiz}', name: 'app_quiz_view_one_result')]
+    public function showResultsQuiz(
+        Request $request,
+        int $quiz,
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        SupportedQuizDetailsRepository $detailsRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quiz);
+        $submittedQuiz = $supportedQuizRepository->findBy([
+            'supportedBy' => $this->getUser()->getIdentifierId(),
+            'quiz' => $quiz
+        ]);
+
+        if ($submittedQuiz != null) {
+            $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
+            $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
+            $user = $this->getUser();
+            $submittedQuestions = $detailsRepository->getTotalObtainedScore(
+                $requiredQuiz->getId(),
+                $user
+            );
+            $totalScore = 0;
+            foreach ($submittedQuestions as $key => $submittedQuestion) {
+                $totalScore += $submittedQuestion->getObtainedScore();
+            }
+
+            return $this->render('quiz/show_one_submitted.html.twig',[
+                'requiredQuiz' => $requiredQuiz,
+                'submittedQuiz' => $submittedQuiz[0],
+                'submittedQuestions' => $submittedQuestions,
+                'score' => $totalScore,
+                'questions' => $questions
+            ]);
+        } else {
+            return $this->render('quiz/show_one_submitted.html.twig',[
+                'submittedQuiz' => $submittedQuiz,
+            ]);
+        }
+
 
     }
 }

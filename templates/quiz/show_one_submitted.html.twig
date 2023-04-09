@@ -1,6 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% if submittedQuiz == null %}
+        <div> No results found</div>
+        <div> Attempt the quiz and come back later!</div>
+    {% else %}
     <div>
         {{ requiredQuiz.description }}
         </br>
@@ -70,5 +74,6 @@
         {% endfor %}
 
     </div>
+    {% endif %}
 
 {% endblock %}

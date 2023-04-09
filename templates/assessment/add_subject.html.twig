@@ -1,13 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block bread %}
-    → Add Subject
-{% endblock %}
-
 {% block body %}
     {{ form_start(addSubjectForm) }}
     <div class="text-xl">
-        Basic Information
+        Add new subject
     </div>
 
     <div>
@@ -22,12 +18,9 @@
         {{ form_errors(addSubjectForm.subject) }}
     </div>
 
-    <div class="flex items-center">
-        <div class="ml-16">
-            {{ form_label(addSubjectForm.contentFile, 'Upload subject file', {'label_attr': {'class': 'shadow-sm border-transparent bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-900 cursor-pointer rounded-md border p-2'}}) }}
-            {{ form_row(addSubjectForm.contentFile, {'attr': {'class': 'hidden'}}) }}
-            {{ form_errors(addSubjectForm.contentFile) }}
-        </div>
+    <div>
+        {{ form_row(addSubjectForm.contentFile, {'attr': {'class': ''}}) }}
+        {{ form_errors(addSubjectForm.contentFile) }}
     </div>
 
     <div>
@@ -45,7 +38,6 @@
     <div class="border-b border-gray-300"></div>
 
     <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
-
 
         <button type="submit"
                 class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>

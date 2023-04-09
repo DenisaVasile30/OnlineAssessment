@@ -1,10 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block bread %}
-    → Assessments
-
-{%  endblock %}
-
 {% block body %}
 
     <div>
@@ -12,7 +7,6 @@
             Add new subject
         </a>
     </div>
-
 
     <div>
         <a href="{{ path('app_schedule_assessment') }}">
@@ -23,7 +17,7 @@
     <div>
         <a href="{{ path('app_show_assessments') }}">Assessments</a>
     </div>
-
+    </br>
     <hr>
     <div>
         <a href="{{ path('app_quiz_questions') }}">
