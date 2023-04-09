@@ -205,12 +205,10 @@ class QuizController extends AbstractController
         QuizQuestionRepository $questionRepository,
     ): Response
     {
-//        dd($request);
-
         $user = $this->getUser()->getIdentifierId();
         $teacher = $teacherRepository->getTeacher($user);
         $questions = $questionRepository->findBy(['issuedBy' => $teacher[0]->getId()]);
-//        dd($questions);
+
         return $this->render('quiz/quiz_questions_show.html.twig', [
             'questions' => $questions
         ]);
@@ -248,6 +246,7 @@ class QuizController extends AbstractController
             }
         }
         $filteredQuestions = $questionRepository->filterQuestions($filters);
+
         return $this->render('quiz/quiz_questions_show.html.twig', [
             'questions' => $filteredQuestions
         ]);
