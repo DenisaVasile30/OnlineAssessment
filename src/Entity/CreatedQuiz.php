@@ -50,6 +50,9 @@ class CreatedQuiz
     #[ORM\Column]
     private ?int $maxGrade = null;
 
+    #[ORM\Column]
+    private ?int $maxPoints = null;
+
     #[ORM\Column(length: 255)]
     private ?string $questionsSource = null;
 
@@ -212,5 +215,21 @@ class CreatedQuiz
         $this->questionsSource = $questionsSource;
 
         return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMaxPoints(): ?int
+    {
+        return $this->maxPoints;
+    }
+
+    /**
+     * @param int|null $maxPoints
+     */
+    public function setMaxPoints(?int $maxPoints): void
+    {
+        $this->maxPoints = $maxPoints;
     }
 }

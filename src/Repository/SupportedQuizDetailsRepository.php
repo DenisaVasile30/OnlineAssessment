@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\SupportedQuizDetails;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,4 +64,15 @@ class SupportedQuizDetailsRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function getTotalObtainedScore(int $quizId, User $user)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.quizId = :quizId')
+            ->setParameter('quizId', $quizId)
+            ->andWhere('s.supportedByStudent = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

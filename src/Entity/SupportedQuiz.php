@@ -28,8 +28,8 @@ class SupportedQuiz
     #[ORM\Column(type: 'integer', nullable: false)]
     private int $maxGrade;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $obtainedGrade = null;
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $obtainedGrade = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $totalTimeSpent = null;
@@ -83,12 +83,12 @@ class SupportedQuiz
         return $this;
     }
 
-    public function getObtainedGrade(): ?int
+    public function getObtainedGrade(): ?float
     {
         return $this->obtainedGrade;
     }
 
-    public function setObtainedGrade(int $obtainedGrade): self
+    public function setObtainedGrade(float $obtainedGrade): self
     {
         $this->obtainedGrade = $obtainedGrade;
 
@@ -118,9 +118,11 @@ class SupportedQuiz
     /**
      * @param User $supportedBy
      */
-    public function setSupportedBy(User $supportedBy): void
+    public function setSupportedBy(User $supportedBy): self
     {
         $this->supportedBy = $supportedBy;
+
+        return $this;
     }
 
     public function getSupportedQuizDetails(): ?SupportedQuizDetails

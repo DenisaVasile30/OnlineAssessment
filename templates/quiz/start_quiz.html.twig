@@ -1,10 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-{#    {% for question in questions %}#}
 
     {{ form_start(supportQuiz) }}
 
+        {% if remainingTime != null %}
+            <div>
+                <label>Remaining Time: </label>
+                <span id="remaining-time">{{ remainingTime | date('i:s') }}</span>
+                <input type="text" id="remainingTime" name="remainingTime" value="{{ remainingTime }}" style="visibility: hidden">
+                <input type="text" id="started-time" name="started-time" value="{{ remainingTime }}" style="visibility: hidden">
+                <input type="text" id="seconds-spent" name="seconds-spent" value="" style="visibility: hidden">
+            </div>
+        {% endif %}
         <fieldset>
         <div>
             <label>{{ (index + 1)~'. '~question.questionContent }}</label>
@@ -28,31 +36,53 @@
             <input type="text" id="index" name="index" value="{{ index }}" style="visibility: hidden">
 
         </fieldset>
-{#    {% endfor %}#}
-
 
     {{ form_end(supportQuiz) }}
 
-
-
-
     <script>
-        // Add event listener to the "Next" button
-        document.getElementById('next-btn').addEventListener('click', function() {
-            // Get the selected answer
-            var selectedAnswer = document.querySelector('.question.active input:checked');
+        {{ parent() }}
+        var timeRemaining = {{ remainingTime }}; // minutes in seconds
 
-            // If an answer was selected, move to the next question
-            if (selectedAnswer) {
-                // Get the next question
-                var nextQuestion = document.querySelector('.question.active').nextElementSibling;
+        $(document).ready(function() {
+            // function updateTime() {
+            //     console.log('in time update');
+            //     var minutes =  Math.floor(timeRemaining / 60);
+            //     var seconds = timeRemaining % 60;
+            //     var timeString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            //     document.getElementById('remaining-time').textContent = timeString;
+            //
+            //     timeRemaining--; // Decrement the time remaining by one second
+            //
+            //     if (timeRemaining < 0) {
+            //         console.log((timeRemaining));
+            //         clearInterval(intervalId); // Stop the countdown
+            //         const submitBtn = document.getElementById("start_quiz_form_submit");
+            //         submitBtn.click();
+            //         // $('form#start_quiz_form').submit();
+            //     }
+            // }
+            function updateTime() {
+                console.log('in time update');
+                var minutes =  Math.floor(timeRemaining / 60);
+                var seconds = timeRemaining % 60;
+                var timeString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                document.getElementById('remaining-time').textContent = timeString;
+                document.getElementById('remainingTime').value = timeRemaining;
+                document.getElementById('seconds-spent').value = document.getElementById('started-time').value - timeRemaining;
 
-                // If there is a next question, show it
-                if (nextQuestion) {
-                    document.querySelector('.question.active').classList.remove('active');
-                    nextQuestion.classList.add('active');
+                timeRemaining--; // Decrement the time remaining by one second
+
+                if (timeRemaining < 0) {
+                    console.log((timeRemaining));
+                    clearInterval(intervalId); // Stop the countdown
+                    const submitBtn = document.getElementById("start_quiz_form_submit");
+                    submitBtn.click();
+                    // $('form#start_quiz_form').submit();
                 }
             }
+
+            // Start the countdown timer
+            var intervalId = setInterval(updateTime, 1000);
         });
     </script>
 {% endblock %}

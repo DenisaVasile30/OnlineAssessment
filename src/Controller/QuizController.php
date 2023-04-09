@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CreatedQuiz;
 use App\Entity\SupportedQuiz;
 use App\Entity\SupportedQuizDetails;
+use App\Entity\User;
 use App\Form\CreateQuizFormType;
 use App\Form\StartQuizFormType;
 use App\Repository\AssessmentRepository;
@@ -86,18 +87,38 @@ class QuizController extends AbstractController
 //                only for manually selected questions
                 $selectedQuestionsIds = json_decode($request->request->get('questionsIdsFromSelect'), true);
                 $postedScores = json_decode($request->request->get('questionsScores'), true);
+//                dd($postedScores);
                 $scores = [];
-                foreach ($postedScores as $childArray) {
-                    $scores = array_merge($scores, array_values($childArray));
+                foreach ($postedScores as $k => $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $key => $score) {
+                            $scores[$key] = $score;
+                        }
+                    }
                 }
 
                 $questionsScores = [];
-
+                $postedPointsTotal = 0;
+                $questionsWithScore = 0;
+                $questionsNo = count($selectedQuestionsIds);
+                foreach ($scores as $keyScore => $scoreValue) {
+                    if (strlen(trim($scoreValue)) > 0) {
+                        $postedPointsTotal += (int)$scoreValue;
+                        $questionsWithScore++;
+                    }
+                }
+                $remainedPoints = 100 - $postedPointsTotal;
+                $scorePerQuestion = $remainedPoints / (count($selectedQuestionsIds) - $questionsWithScore);
                 foreach ($selectedQuestionsIds as $questionsId) {
+                    $found = false;
                     foreach ($scores as $keyScore => $scoreValue) {
                         if ($questionsId == $keyScore) {
-                            $questionsScores[$questionsId] = $scoreValue;
+                            $questionsScores[$questionsId] = (int)$scoreValue;
+                            $found = true;
                         }
+                    }
+                    if (!$found) {
+                        $questionsScores[$questionsId] = $scorePerQuestion;
                     }
                 }
 
@@ -105,6 +126,7 @@ class QuizController extends AbstractController
                 $createdQuiz->setCategory($form->get('category')->getData());
                 $createdQuiz->setCreatedBy($teacher[0]);
                 $createdQuiz->setMaxGrade($form->get('maxGrade')->getData());
+                $createdQuiz->setMaxPoints(100);
                 $createdQuiz->setQuestionsSource($form->get('questionsSource')->getData());
 
                 $createdQuizRepository->save($createdQuiz, true);
@@ -169,6 +191,7 @@ class QuizController extends AbstractController
             $supportedQuiz->setMaxGrade($requiredQuiz->getMaxGrade());
             $user = $this->getUser();
             $supportedQuiz->setSupportedBy($user);
+            $supportedQuiz->setQuiz($quiz);
 
             $supportedQuizRepository->save($supportedQuiz, true);
         }
@@ -178,6 +201,7 @@ class QuizController extends AbstractController
         $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
         $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
         $index = 0;
+        $remainingTime = $requiredQuiz->getTimeLimit() * 60;
         $totalQuestions = count($questions) - 1;
         $form = $this->createForm(
             StartQuizFormType::class,
@@ -187,9 +211,11 @@ class QuizController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+//            dd('here');
             if ($form->get('next')->isClicked()) {
+                $remainingTime = $request->request->get('remainingTime');
+                $secondsSpent = $request->request->get('seconds-spent');
                 $index = $request->request->get('index');
-                $isCorrectAnswer = false;
                 $question = new SupportedQuizDetails();
                 $question->setQuizId($requiredQuiz->getId());
                 $question->setQuestionId($questions[$index]->getId());
@@ -203,16 +229,19 @@ class QuizController extends AbstractController
                 } else {
                     $question->setObtainedScore(0);
                 }
+                $question->setTimeSpent($secondsSpent);
+                /**@var User $user*/
                 $user = $this->getUser();
-                $question->setSupportedBy($user);
+
+                $question->setSupportedByStudent($user);
                 $detailsRepository->save($question, true);
                 $index++;
-
-                if (!$index > $totalQuestions) {
+                if ($index <= $totalQuestions) {
                     return $this->render('quiz/start_quiz.html.twig', [
                         'requiredQuiz' => $requiredQuiz,
                         'question' => $questions[$index],
                         'index' => $index,
+                        'remainingTime' => $remainingTime,
                         'supportQuiz' => $form->createView()
                     ]);
                 } else {
@@ -224,6 +253,17 @@ class QuizController extends AbstractController
                         $timeSpent = $endedAt->diff($startedAt);
                         $seconds = $timeSpent->s + $timeSpent->i * 60 + $timeSpent->h * 3600 + $timeSpent->days * 86400;
                         $supportedQuiz->setTotalTimeSpent($seconds);
+                        $submittedQuestions = $detailsRepository->getTotalObtainedScore(
+                            $requiredQuiz->getId(),
+                            $user
+                        );
+                        $totalScore = 0;
+                        foreach ($submittedQuestions as $key => $submittedQuestion) {
+                            $totalScore += $submittedQuestion->getObtainedScore();
+                        }
+                        $maxGrade = $requiredQuiz->getMaxGrade();
+                        $resultedGrade = ($totalScore * $maxGrade) / 100;
+                        $supportedQuiz->setObtainedGrade(number_format($resultedGrade, 2));
 
                         $supportedQuizRepository->save($supportedQuiz, true);
                     }
@@ -232,6 +272,8 @@ class QuizController extends AbstractController
 //                to do: redirect to a submitted page ( show preview )
                 return $this->redirectToRoute('app_home');
 
+            } elseif ($form->get('submit')->isClicked()) {
+                dd('submit');
             }
         }
 
@@ -241,6 +283,7 @@ class QuizController extends AbstractController
             'requiredQuiz' => $requiredQuiz,
             'question' => $questions[$index],
             'index' => $index,
+            'remainingTime' => $remainingTime,
             'supportQuiz' => $form->createView()
         ]);
     }

@@ -103,6 +103,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            const postedScores = [];
             const category = document.getElementById("create_quiz_form_category");
             category.addEventListener('change', getCategory);
             function getCategory(event) {
@@ -153,12 +154,31 @@
                     });
                     hiddenInput.value = JSON.stringify(selectedRows);
                 } else if (event.target.name === 'questionsScores[]') {
-                    const scores = [];
+                    // const scores = [];
+                    // questionsScores.forEach(score => {
+                    //     console.log('scores:::::::');
+                    //     scores.push({[score.id]: (score.value)});
+                    // });
+                    // hiddenInputScores.value = JSON.stringify(scores);
+                    // console.log(hiddenInputScores.value);
+
+
                     questionsScores.forEach(score => {
-                        console.log('scores:::::::');
-                        scores.push({[score.id]: (score.value)});
+                        score.addEventListener('keyup', event => {
+                            console.log('Input changed:', event.target.value);
+
+                            const existingScoreIndex = postedScores.findIndex(postedScore => postedScore.hasOwnProperty(score.id));
+
+                            if (existingScoreIndex !== -1) {
+                                console.log('already exists');
+                                postedScores[existingScoreIndex][score.id] = event.target.value;
+                            } else {
+                                postedScores.push({[score.id]: (event.target.value)});
+                            }
+                            hiddenInputScores.value = JSON.stringify(postedScores)
+                            console.log(postedScores);
+                        });
                     });
-                    hiddenInputScores.value = JSON.stringify(scores);
                 }
             });
 

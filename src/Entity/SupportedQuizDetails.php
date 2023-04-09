@@ -39,7 +39,7 @@ class SupportedQuizDetails
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'supportedQuizDetails')]
     #[ORM\JoinColumn(nullable: false)]
-    private User $supportedBy;
+    private User $supportedByStudent;
 
 
     public function __construct()
@@ -145,10 +145,13 @@ class SupportedQuizDetails
 
     /**
      * @param User $supportedBy
+     * @return  User
      */
-    public function setSupportedBy(User $supportedBy): void
+    public function setSupportedBy(User $supportedBy): self
     {
         $this->supportedBy = $supportedBy;
+
+        return $this;
     }
 
     /**
@@ -179,5 +182,21 @@ class SupportedQuizDetails
         }
 
         return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getSupportedByStudent(): User
+    {
+        return $this->supportedByStudent;
+    }
+
+    /**
+     * @param User $supportedByStudent
+     */
+    public function setSupportedByStudent(User $supportedByStudent): void
+    {
+        $this->supportedByStudent = $supportedByStudent;
     }
 }
