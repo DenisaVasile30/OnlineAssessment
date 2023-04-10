@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Student;
 use App\Entity\SupportedQuiz;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +40,19 @@ class SupportedQuizRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getSupportedQuizzesById($quiz) {
+        return $this->createQueryBuilder('s')
+//            ->join(User::class, 'u',  Query\Expr\Join::WITH, 's.supportedBy = u.id')
+//            ->select('u')
+            ->leftJoin('s.supportedBy', 'u')
+            ->addSelect('u')
+            ->andwhere('s.quiz = :quiz')
+            ->setParameter('quiz',  $quiz)
+            ->getQuery()
+            ->getResult();
+        ;
     }
 
 //    /**

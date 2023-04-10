@@ -50,11 +50,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'assignedTo', targetEntity: Ticket::class)]
     private Collection $assignedTickets;
 
+    #[ORM\OneToMany(mappedBy: 'supportedBy', targetEntity: SupportedQuiz::class)]
+    private Collection $supportedQuiz;
+
 
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
         $this->assignedTickets = new ArrayCollection();
+        $this->supportedQuiz = new ArrayCollection();
     }
 
     public function getId(): int

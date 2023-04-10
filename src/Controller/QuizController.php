@@ -579,29 +579,31 @@ class QuizController extends AbstractController
         ]);
     }
 
-    #[Route('/home/assessments/quiz/results/{quiz}', name: 'app_quiz_view_one_result')]
+    #[Route('/home/assessments/quiz/results/{quiz}/{user}', name: 'app_quiz_view_one_result')]
     public function showResultsQuiz(
         Request $request,
         int $quiz,
+        int $user,
         CreatedQuizRepository $createdQuizRepository,
         QuizQuestionRepository $quizQuestionRepository,
         SupportedQuizRepository $supportedQuizRepository,
-        SupportedQuizDetailsRepository $detailsRepository
+        SupportedQuizDetailsRepository $detailsRepository,
+        UserRepository $userRepository
     ): Response
     {
         $requiredQuiz = $createdQuizRepository->find($quiz);
+        $userDetails = $userRepository->find($user);
         $submittedQuiz = $supportedQuizRepository->findBy([
-            'supportedBy' => $this->getUser()->getIdentifierId(),
+            'supportedBy' => $userDetails,
             'quiz' => $quiz
         ]);
 
         if ($submittedQuiz != null) {
             $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
             $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
-            $user = $this->getUser();
             $submittedQuestions = $detailsRepository->getTotalObtainedScore(
                 $requiredQuiz->getId(),
-                $user
+                $userDetails
             );
             $totalScore = 0;
             foreach ($submittedQuestions as $key => $submittedQuestion) {
@@ -618,6 +620,30 @@ class QuizController extends AbstractController
         } else {
             return $this->render('quiz/show_one_submitted.html.twig',[
                 'submittedQuiz' => $submittedQuiz,
+            ]);
+        }
+    }
+
+    #[Route('/home/assessments/quiz/show/results/{quiz}', name: 'app_quiz_all_results')]
+    public function showAllQuizResults(
+        Request $request,
+        int $quiz,
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        SupportedQuizDetailsRepository $detailsRepository,
+        GroupRepository $groupRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quiz);
+        $submittedQuizzes = $supportedQuizRepository->getSupportedQuizzesById($quiz);
+        $groups = $groupRepository->findAll();
+
+        if ($submittedQuizzes != null) {
+            return $this->render('quiz/show_all_quiz_results.html.twig',[
+                'requiredQuiz' => $requiredQuiz,
+                'submittedQuizzes' => $submittedQuizzes,
+                'groups' => $groups,
             ]);
         }
     }

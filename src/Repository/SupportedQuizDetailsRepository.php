@@ -75,4 +75,14 @@ class SupportedQuizDetailsRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getDetailedQuestionsByQuizId(int $quizId)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.quizId = :quizId')
+            ->setParameter('quizId', $quizId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

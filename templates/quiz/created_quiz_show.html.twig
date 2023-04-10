@@ -37,6 +37,11 @@
                         {% if is_granted('ROLE_TEACHER') %}
                             <td>{{ quiz.assigneeGroup|join(', ') }}</td>
                             <td>{{ quiz.questionsSource }}</td>
+                            <td>
+                                <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">
+                                    View quiz results
+                                </a>
+                            </td>
 {#                            <td>{{ assessment.status }}</td>#}
                             {#                        implement this#}
 {#                            <td>#}
