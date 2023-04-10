@@ -629,9 +629,7 @@ class QuizController extends AbstractController
         Request $request,
         int $quiz,
         CreatedQuizRepository $createdQuizRepository,
-        QuizQuestionRepository $quizQuestionRepository,
         SupportedQuizRepository $supportedQuizRepository,
-        SupportedQuizDetailsRepository $detailsRepository,
         GroupRepository $groupRepository
     ): Response
     {
