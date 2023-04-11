@@ -24,9 +24,11 @@ use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -325,13 +327,14 @@ class QuizController extends AbstractController
                 $questionsScores = [];
                 $postedPointsTotal = 0;
                 $questionsWithScore = 0;
-                $questionsNo = count($selectedQuestionsIds);
+//                $questionsNo = count($selectedQuestionsIds);
                 foreach ($scores as $keyScore => $scoreValue) {
                     if (strlen(trim($scoreValue)) > 0) {
                         $postedPointsTotal += (int)$scoreValue;
                         $questionsWithScore++;
                     }
                 }
+//                dd($selectedQuestionsIds);
                 $remainedPoints = 100 - $postedPointsTotal;
                 $scorePerQuestion = $remainedPoints / (count($selectedQuestionsIds) - $questionsWithScore);
                 foreach ($selectedQuestionsIds as $questionsId) {
@@ -644,5 +647,52 @@ class QuizController extends AbstractController
                 'groups' => $groups,
             ]);
         }
+    }
+
+    #[Route('/home/assessments/quiz/{quizId}/download/timeSpentReport/', name: 'app_quiz_download_time_spent_report')]
+    public function downloadTimeSpentQuizReport(
+        Request $request,
+        int $quizId,
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository,
+        SupportedQuizDetailsRepository $detailsRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quizId);
+        $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
+        $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
+
+        $questionsWithTimeSpent = $detailsRepository->getDetailedSupportedQuizByQuiz($quizId);
+
+        $arrayReport = [];
+        foreach ($questions as $key => $question) {
+            foreach ($questionsWithTimeSpent as $k => $questionTimeSpent) {
+                if ($question->getId() == $questionTimeSpent['questionId']) {
+                    $tmpQuestion = [];
+                    $tmpQuestion['id'] = $question->getId();
+                    $tmpQuestion['questionName'] = $question->getQuestionContent();
+                    $tmpQuestion['answerA'] = $question->getChoiceA();
+                    $tmpQuestion['answerB'] = $question->getChoiceB();
+                    $tmpQuestion['answerC'] = $question->getChoiceC();
+                    $tmpQuestion['correctAnswer'] = $question->getCorrectAnswer();
+                    $tmpQuestion['timeSpent'] = $questionTimeSpent['averageTime'];
+
+                    $arrayReport[] = $tmpQuestion;
+                }
+            }
+        }
+
+        $jsonReport = json_encode($arrayReport, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $fileName = 'TimeSpentReport.txt';
+        $fileContent = $jsonReport;
+        $response = new Response($fileContent);
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileName
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Type', 'text/plain');
+
+        return $response;
     }
 }

@@ -85,4 +85,15 @@ class SupportedQuizDetailsRepository extends ServiceEntityRepository
             ->getResult()
             ;
     }
+
+    public function getDetailedSupportedQuizByQuiz($quizId) {
+        return $this->createQueryBuilder('q')
+            ->select('q.quizId, q.questionId, AVG(q.timeSpent) as averageTime')
+            ->where('q.quizId = :quizId')
+            ->setParameter('quizId', $quizId)
+            ->groupBy('q.quizId, q.questionId')
+            ->getQuery()
+            ->getResult();
+        ;
+    }
 }
