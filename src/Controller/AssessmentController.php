@@ -7,6 +7,7 @@ use App\Entity\AssignedSubjects;
 use App\Entity\CreatedQuiz;
 use App\Entity\QuizQuestion;
 use App\Entity\Subject;
+use App\Entity\SupportedAssessment;
 use App\Form\AssessmentFormType;
 use App\Form\AssignedSubjectsFormType;
 use App\Form\CreateQuizFormType;
@@ -15,7 +16,9 @@ use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\SubjectFormType;
 use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
+use App\Helper\FormatHelper\CodeCheckCLanguage;
 use App\Helper\ProgrammingLanguageHelper;
+use App\Helper\StructuredRequirements\StructuredRequirements;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
 use App\Repository\CreatedQuizRepository;
@@ -23,6 +26,7 @@ use App\Repository\GroupRepository;
 use App\Repository\QuizQuestionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
+use App\Repository\SupportedAssessmentRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -181,45 +185,41 @@ class AssessmentController extends AbstractController
         int $assessment,
         AssessmentRepository $assessmentRepository,
         SubjectRepository $subjectRepository,
-        AssignedSubjectsRepository $assignedSubjectsRepository
+        AssignedSubjectsRepository $assignedSubjectsRepository,
+        SupportedAssessmentRepository $supportedAssessmentRepository
     ): Response
     {
         $responseMessage = '';
         $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessment]);
         $assignedSubjects = $assignedSubjectsRepository->findBy(['assessment' => $requiredAssessment->getId()]);
-//        dd(($requiredAssessment->getSubject())->getId());
         $subjectContent = $subjectRepository->findOneBy(['id' => ($requiredAssessment->getSubject())->getId()]);
         $reservedWordsList = ProgrammingLanguageHelper::getReservedWords('cpp');
-//        dd($reservedWordsList);
-        $requiredSubjects = [];
         $filesContent = [];
-//        $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
-//        $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
+
+//        dd($requiredAssessment->getSubject()->getSubjectContent());
+
+
+        $submittedAssessment = $supportedAssessmentRepository->findBy([
+            'assessmentId' => $assessment,
+            'submittedBy' => $this->getUser()]
+        );
+
+        if ($submittedAssessment == null) {
+            $submittedAssessment = new SupportedAssessment();
+            $submittedAssessment->setSubmittedBy($this->getUser());
+            $submittedAssessment->setStartedAt(new \DateTime());
+            $submittedAssessment->setAssessmentId($assessment);
+
+            $supportedAssessmentRepository->save($submittedAssessment, true);
+        }
 
         if ($subjectContent->getContentFile() != null) {
             $filesContent[$subjectContent->getId()] = stream_get_contents($subjectContent->getContentFile());
+//            dd($filesContent);
         } else {
             $filesContent[$subjectContent->getId()] = 'Nothing to show';
         }
         $requiredSubject[] = $subjectContent;
-//        foreach ($assignedSubjects as $assignedSubject) {
-//            if (count($assignedSubject->getSubjectsOptionList()) > 1) {
-//                $randomKey = array_rand($assignedSubject->getSubjectsOptionList());
-//                $randomSubject[] = $assignedSubject->getSubjectsOptionList()[$randomKey];
-//                $assignedSubject->setSubjectsOptionListFromRand($randomSubject);
-//            }
-//            $subjectContent = $subjectRepository->findby(['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]);
-//            $keyFile = $assignedSubject->getSubjectsOptionList()[0]['id'];
-//
-//            if ($subjectContent[0]->getContentFile() != null) {
-//                $filesContent[$keyFile] = stream_get_contents($subjectContent[0]->getContentFile());
-//            } else {
-//                $filesContent[$keyFile] = 'Nothing to show';
-//            }
-//            $requiredSubjects[] = $subjectRepository->findOneBy(
-//                ['id' => $assignedSubject->getSubjectsOptionList()[0]['id']]
-//            );
-//        }
 
         $form = $this->createForm(SubmittedCodeFormType::class);
         $form->handleRequest($request);
@@ -229,7 +229,25 @@ class AssessmentController extends AbstractController
                 $compiler = new CompilerHelper($data);
                 [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
             } elseif ($form->get('submit')->isClicked()) {
-                dd('on submit');
+                $submittedCode = $form->get('codeArea')->getData();
+
+                if ($subjectContent->getContentFile() != null) {
+                    $content = $filesContent[$requiredAssessment->getSubject()->getId()];
+                    $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
+                    $requirementsNo = count($structuredRequirements['requirements']);
+                    $codeCheckResult = CodeCheckCLanguage::checkSubmittedRequirementsAnswers(
+                        $structuredRequirements['requirements'],
+                        $submittedCode
+                    );
+
+
+                    dd($codeCheckResult);
+
+                } else {
+//                to do: check for subjectContent string
+                }
+//                dd($submittedCode);
+//                dd('on submit');
             }
         }
 //        dd($requiredSubjects);

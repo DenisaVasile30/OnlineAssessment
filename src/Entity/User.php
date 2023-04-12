@@ -53,12 +53,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'supportedBy', targetEntity: SupportedQuiz::class)]
     private Collection $supportedQuiz;
 
+    #[ORM\OneToMany(mappedBy: 'submittedBy', targetEntity: SupportedAssessment::class)]
+    private Collection $supportedAssessments;
+
 
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
         $this->assignedTickets = new ArrayCollection();
         $this->supportedQuiz = new ArrayCollection();
+        $this->supportedAssessments = new ArrayCollection();
     }
 
     public function getId(): int
@@ -281,6 +285,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSupportedQuizDetails(?SupportedQuizDetails $supportedQuizDetails): self
     {
         $this->supportedQuizDetails = $supportedQuizDetails;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SupportedAssessment>
+     */
+    public function getSupportedAssessments(): Collection
+    {
+        return $this->supportedAssessments;
+    }
+
+    public function addSupportedAssessment(SupportedAssessment $supportedAssessment): self
+    {
+        if (!$this->supportedAssessments->contains($supportedAssessment)) {
+            $this->supportedAssessments->add($supportedAssessment);
+            $supportedAssessment->setSubmittedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSupportedAssessment(SupportedAssessment $supportedAssessment): self
+    {
+        if ($this->supportedAssessments->removeElement($supportedAssessment)) {
+            // set the owning side to null (unless already changed)
+            if ($supportedAssessment->getSubmittedBy() === $this) {
+                $supportedAssessment->setSubmittedBy(null);
+            }
+        }
 
         return $this;
     }

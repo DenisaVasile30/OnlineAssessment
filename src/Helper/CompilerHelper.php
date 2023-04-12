@@ -10,7 +10,7 @@ class CompilerHelper
     private string $submittedContent;
     private const CLIENT_ID = 'e5444e7ee16db3e9a3f7d83f231ee20e';
     private const CLIENT_SECRET = 'f3e4e9db2a8f500490b9abdffaf5a60d2e3fc5686bf71af4ee523e946d1948b9';
-    private const LANGUAGE = 'cpp';
+    private const LANGUAGE = 'c';
     private const VERSION_INDEX = '5';
     private array $data = [];
     private bool $compiledSuccessfully = false;

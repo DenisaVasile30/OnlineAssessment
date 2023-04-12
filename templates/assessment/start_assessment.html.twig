@@ -170,22 +170,22 @@
             var textareaCode = document.getElementById("submitted_code_form_codeArea");
 
             textareaCode.addEventListener("paste", function (e) {
-                var clipboardData = e.clipboardData || window.clipboardData;
-                var pastedData = clipboardData.getData("text/plain");
-                console.log(clipboardData);
-                console.log('pasted data');
-                console.log(pastedData);
-                var currentValue = textareaCode.value;
-
-                // Check if the pasted data came from within the textarea
-                if (currentValue.includes(pastedData)) {
-                    // Allow the paste to proceed
-                    console.log('Allow paste');
-                } else {
-                    // Prevent the paste
-                    console.log('Deny paste');
-                    e.preventDefault();
-                }
+                // var clipboardData = e.clipboardData || window.clipboardData;
+                // var pastedData = clipboardData.getData("text/plain");
+                // console.log(clipboardData);
+                // console.log('pasted data');
+                // console.log(pastedData);
+                // var currentValue = textareaCode.value;
+                //
+                // // Check if the pasted data came from within the textarea
+                // if (currentValue.includes(pastedData)) {
+                //     // Allow the paste to proceed
+                //     console.log('Allow paste');
+                // } else {
+                //     // Prevent the paste
+                //     console.log('Deny paste');
+                //     e.preventDefault();
+                // }
             });
 
             textareaCode.addEventListener("keydown", handleKeyDown);
