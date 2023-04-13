@@ -93,4 +93,17 @@ class AssessmentRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function getDetailedAssessment(int $assessmentId)
+    {
+        return $this->createQueryBuilder('a')
+//            ->join(User::class, 'u',  Query\Expr\Join::WITH, 's.supportedBy = u.id')
+//            ->select('u')
+            ->leftJoin('a.subject', 's')
+            ->addSelect('s')
+            ->andwhere('a.id = :id')
+            ->setParameter('id',  $assessmentId)
+            ->getQuery()
+            ->getResult();
+        ;
+    }
 }

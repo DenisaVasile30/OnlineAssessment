@@ -1,0 +1,116 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Uzina {
+    char* locatie;
+    int rAngajati;
+    float profitUzina;
+};
+
+struct Node {
+    struct Uzina data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+void insertNode(struct Node** head_ref, struct Uzina new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    // Inseram datele in noul nod
+    new_node->data = new_data;
+    new_node->next = (*head_ref);
+    new_node->prev = NULL;
+    if ((*head_ref) != NULL) {
+        (*head_ref)->prev = new_node;
+    }
+    (*head_ref) = new_node;
+}
+
+void traverseList(struct Node* node) {
+    struct Node* last;
+    printf("Traversal in forward direction:\n");
+    while (node != NULL) {
+        printf("Locatie: %s\n", node->data.locatie);
+        printf("Numar angajati: %d\n", node->data.rAngajati);
+        printf("Profit uzina: %.2f\n", node->data.profitUzina);
+        last = node;
+        node = node->next;
+    }
+    printf("\nTraversal in reverse direction:\n");
+    while (last != NULL) {
+        printf("Locatie: %s\n", last->data.locatie);
+        printf("Numar angajati: %d\n", last->data.rAngajati);
+        printf("Profit uzina: %.2f\n", last->data.profitUzina);
+        last = last->prev;
+    }
+}
+
+float calcAvgProfit(struct Node* head) {
+    float total_profit = 0.0;
+    int num_nodes = 0;
+    while (head != NULL) {
+        total_profit += head->data.profitUzina;
+        num_nodes++;
+        head = head->next;
+    }
+    return total_profit / num_nodes;
+}
+
+struct Uzina* searchUzina(struct Node* head, char* locatie) {
+    while (head != NULL) {
+        if (strcmp(head->data.locatie, locatie) == 0) {
+            struct Uzina* found_uzina = (struct Uzina*)malloc(sizeof(struct Uzina));
+            found_uzina->locatie = (char*)malloc(strlen(head->data.locatie) + 1);
+            strcpy(found_uzina->locatie, head->data.locatie);
+            found_uzina->rAngajati = head->data.rAngajati;
+            found_uzina->profitUzina = head->data.profitUzina;
+            return found_uzina;
+        }
+        head = head->next;
+    }
+    return NULL;
+}
+
+void freeList(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        struct Node* next = current->next;
+        free(current->data.locatie);
+        free(current);
+        current = next;
+    }
+}
+int main()
+{
+    struct Node* head = NULL;
+    struct Uzina uz1 = { "Orasul 1", 100, 5000.50 };
+    struct Uzina uz2 = { "Orasul 2", 200, 10000.75 };
+    struct Uzina uz3 = { "Orasul 3", 150, 7500.25 };
+    struct Uzina uz4 = { "Orasul 4", 75, 3000.00 };
+    struct Uzina uz5 = { "Orasul 5", 250, 15000.00 };
+
+    insertNode(&head, uz1);
+    insertNode(&head, uz2);
+    insertNode(&head, uz3);
+    insertNode(&head, uz4);
+    insertNode(&head, uz5);
+
+    printf("Lista dubla inlantuita inainte de cautare:\n");
+    traverseList(head);
+    printf("\n");
+
+    struct Uzina* found_uzina = searchUzina(head, "Orasul 3");
+    if (found_uzina != NULL) {
+        printf("Uzina gasita: %s, %d angajati, profit %.2f\n", found_uzina->locatie,
+            found_uzina->rAngajati, found_uzina->profitUzina);
+        free(found_uzina->locatie);
+        free(found_uzina);
+    }
+    else {
+        printf("Nu s-a gasit nicio uzina cu locatia 'Orasul 3'\n");
+    }
+
+    //freeList(head);
+    return 0;
+}

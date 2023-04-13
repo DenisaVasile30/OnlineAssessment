@@ -32,9 +32,18 @@ class SupportedAssessment
     #[ORM\Column(nullable: true)]
     private ?int $timeSpent = null;
 
+    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    private $contentFile;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private $fileName;
+
     #[ORM\ManyToOne(inversedBy: 'supportedAssessments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $submittedBy = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private $resultedResponse;
 
     public function getId(): ?int
     {
@@ -121,6 +130,54 @@ class SupportedAssessment
     public function setSubmittedBy(User $submittedBy): self
     {
         $this->submittedBy = $submittedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param mixed $fileName
+     */
+    public function setFileName(string $fileName)
+    {
+        $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentFile()
+    {
+        return $this->contentFile;
+    }
+
+    /**
+     * @param mixed $contentFile
+     */
+    public function setContentFile($contentFile)
+    {
+        $this->contentFile = $contentFile;
+
+        return $this;
+    }
+
+    public function getResultedResponse(): ?array
+    {
+        return $this->resultedResponse;
+    }
+
+    public function setResultedResponse(?array $resultedResponse): self
+    {
+        $this->resultedResponse = $resultedResponse;
 
         return $this;
     }

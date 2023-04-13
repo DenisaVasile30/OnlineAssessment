@@ -24,11 +24,12 @@ class CodeCheckCLanguage
     {
         [$structName, $attributesArray] = self::getStructDetails($requirement);
         [$isValid, $errors] = self::isValidUserStruct($structName, $attributesArray, $submittedCode);
-        if ($isValid) {
-            dd('must check the creation of objects');
-        } else {
-            return [$isValid, $errors];
-        }
+//        if ($isValid) {
+//            dd('must check the creation of objects');
+//        } else {
+//        }
+        return [$isValid, $errors];
+
     }
 
     private static function getStructDetails(array $requirement)

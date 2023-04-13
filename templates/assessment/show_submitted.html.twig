@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>Submitted assessment:</div>
+
+    <div>
+        <label>{{ requiredAssessment.id~' '~requiredAssessment.description }}</label>
+        <br>
+        <label>
+            Started at: {{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}
+            Ended at: {{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}
+        </label>
+        <br>
+        <label>
+            Maximum grade: {{ submittedAssessment.maxGrade }}
+            Time spent: {{ submittedAssessment.timeSpent|date('H:i:s') }}
+        </label>
+        <br>
+        <label>
+            Status:
+            {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
+                <br>
+                <label>Compiled: Yes</label>
+                <br>
+                <label>Errors:</label><br>
+                {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
+                    {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
+                        <label>{{ error }}</label><br>
+                    {% endfor %}
+                {% else %}
+                    <label>No errors found</label><br>
+                {% endif %}
+            {% else %}
+                <br>
+                <label>Compiled: No</label>
+                <br>
+            {% endif %}
+        </label>
+        <br>
+        <br>
+        <label>Requirements:</label>
+        <br>
+        <label>{{ structuredRequirements['baseRequirement'] }}</label>
+        {% for requirement in structuredRequirements['requirements'] %}
+            <label>{{ requirement['content'] }}</label><br>
+        {% endfor %}
+        <br>
+        <hr>
+        <label>Submitted code:</label>
+        <br>
+        <label><pre>{{ submittedCode }}</pre></label>
+    </div>
+
+    </div>
+{% endblock %}

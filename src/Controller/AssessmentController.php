@@ -27,10 +27,13 @@ use App\Repository\QuizQuestionRepository;
 use App\Repository\StudentRepository;
 use App\Repository\SubjectRepository;
 use App\Repository\SupportedAssessmentRepository;
+use App\Repository\SupportedQuizDetailsRepository;
+use App\Repository\SupportedQuizRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -186,7 +189,8 @@ class AssessmentController extends AbstractController
         AssessmentRepository $assessmentRepository,
         SubjectRepository $subjectRepository,
         AssignedSubjectsRepository $assignedSubjectsRepository,
-        SupportedAssessmentRepository $supportedAssessmentRepository
+        SupportedAssessmentRepository $supportedAssessmentRepository,
+        SluggerInterface $slugger
     ): Response
     {
         $responseMessage = '';
@@ -232,22 +236,79 @@ class AssessmentController extends AbstractController
                 $submittedCode = $form->get('codeArea')->getData();
 
                 if ($subjectContent->getContentFile() != null) {
-                    $content = $filesContent[$requiredAssessment->getSubject()->getId()];
-                    $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
-                    $requirementsNo = count($structuredRequirements['requirements']);
-                    $codeCheckResult = CodeCheckCLanguage::checkSubmittedRequirementsAnswers(
-                        $structuredRequirements['requirements'],
-                        $submittedCode
+                    $submittedAssessment = $supportedAssessmentRepository->findBy([
+                            'assessmentId' => $assessment,
+                            'submittedBy' => $this->getUser()]
                     );
 
+                    if ($submittedAssessment != null) {
+                        $submittedAssessment[0]->setEndedAt(new \DateTime());
+                        $startedAt = \DateTime::createFromFormat(
+                            'Y-m-d H:i:s',
+                            $submittedAssessment[0]->getStartedAt()->format('Y-m-d H:i:s')
+                        );
+                        $endedAt = \DateTime::createFromFormat(
+                            'Y-m-d H:i:s',
+                            $submittedAssessment[0]->getEndedAt()->format('Y-m-d H:i:s')
+                        );
+                        $timeSpent = $endedAt->diff($startedAt);
+                        $seconds = $timeSpent->s + $timeSpent->i * 60 + $timeSpent->h * 3600 + $timeSpent->days * 86400;
+                        $submittedAssessment[0]->setTimeSpent($seconds);
 
-                    dd($codeCheckResult);
+                        if ($submittedCode) {
+                            $user = $this->getUser();
+                            $newFilename = $user->getEmail()  . '-' . $subjectContent->getId()
+                                . '.txt';
+                            $submittedAssessment[0]->setFileName($newFilename);
+
+                            $filesystem = new Filesystem();
+                            $filesystem->dumpFile($newFilename, $submittedCode);
+                            $submittedAssessment[0]->setContentFile(file_get_contents($newFilename));
+
+                            $compiler = new CompilerHelper($submittedCode);
+                            [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
+//                            dd($responseMessage);
+                            if (!$compiledSuccessfully) {
+                                $submittedAssessment[0]->setResultedResponse([
+                                    'compiledSuccessfully' => $compiledSuccessfully,
+                                    'error'=> 'Program did not compile successfully!',
+                                    'errorMessage' => $responseMessage
+                                ]);
+//                                dd($submittedAssessment);
+                            } else {
+                                $content = $filesContent[$requiredAssessment->getSubject()->getId()];
+                                $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
+                                $requirementsNo = count($structuredRequirements['requirements']);
+                                $codeCheckResult = CodeCheckCLanguage::checkSubmittedRequirementsAnswers(
+                                    $structuredRequirements['requirements'],
+                                    $submittedCode
+                                );
+//                                dd($codeCheckResult[0][1][0]);
+                                $submittedAssessment[0]->setResultedResponse([
+                                    'compiledSuccessfully' => $compiledSuccessfully,
+                                    'error'=> '',
+                                    'errorMessage' => $codeCheckResult[0][1][0]['errors']
+                                ]);
+                                $maxGrade = 0;
+                                foreach ($structuredRequirements['requirements'] as $key => $value) {
+                                    $maxGrade += $value['score'];
+                                }
+                                $submittedAssessment[0]->setMaxGrade($maxGrade);
+                            }
+
+                            $supportedAssessmentRepository->save($submittedAssessment[0], true);
+                        }
+                    }
 
                 } else {
 //                to do: check for subjectContent string
                 }
-//                dd($submittedCode);
-//                dd('on submit');
+
+                return $this->redirectToRoute('app_show_submitted_assessment', [
+                    'assessmentId' => $assessment,
+//                    'submittedId' => $submittedAssessment[0]->getId()
+                    'userId' => $this->getUser()->getIdentifierId()
+                ]);
             }
         }
 //        dd($requiredSubjects);
@@ -278,5 +339,61 @@ class AssessmentController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
         return $response;
+    }
+
+    #[Route('/home/assessments/assessment/{assessmentId}/submitted/{userId}', name: 'app_show_submitted_assessment')]
+    public function showSubmittedAssessment(
+        Request $request,
+        int $assessmentId,
+        int $userId,
+        SupportedAssessmentRepository $supportedAssessmentRepository,
+        SubjectRepository $subjectRepository,
+        AssessmentRepository $assessmentRepository,
+        UserRepository $userRepository
+    ): Response
+    {
+        $user = $userRepository->find($userId);
+        $requiredAssessment = $assessmentRepository->findOneBy(['id' => $assessmentId]);
+        $subjectContent = $subjectRepository->findOneBy(['id' => ($requiredAssessment->getSubject())->getId()]);
+        $submittedAssessment = $supportedAssessmentRepository->findSubmittedAssessmentDetailed($assessmentId, $user);
+        if ($subjectContent->getContentFile() != null) {
+            $filesContent[$subjectContent->getId()] = stream_get_contents($subjectContent->getContentFile());
+        } else {
+            $filesContent[$subjectContent->getId()] = 'Nothing to show';
+        }
+        $content = $filesContent[$requiredAssessment->getSubject()->getId()];
+        $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
+//        dd($submittedAssessment);
+
+        return $this->render('assessment/show_submitted.html.twig',[
+            'requiredAssessment' => $requiredAssessment,
+            'structuredRequirements' => $structuredRequirements,
+            'submittedAssessment' => $submittedAssessment[0],
+            'submittedCode' => stream_get_contents($submittedAssessment[0]->getContentFile())
+        ]);
+    }
+
+    #[Route('/home/assessments/assessment/show/results/{assessmentId}', name: 'app_assessment_all_results')]
+    public function showAllQuizResults(
+        Request $request,
+        int $assessmentId,
+        CreatedQuizRepository $createdQuizRepository,
+        AssessmentRepository $assessmentRepository,
+        SupportedAssessmentRepository $supportedAssessmentRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        GroupRepository $groupRepository
+    ): Response
+    {
+        $requiredAssessment = $assessmentRepository->getDetailedAssessment($assessmentId);
+        $submittedAssessments = $supportedAssessmentRepository->getSupportedAssessmentsById($assessmentId);
+        $groups = $groupRepository->findAll();
+
+        if ($submittedAssessments != null) {
+            return $this->render('assessment/show_all_assessment_results.html.twig',[
+                'requiredAssessment' => $requiredAssessment[0],
+                'submittedAssessments' => $submittedAssessments,
+                'groups' => $groups,
+            ]);
+        }
     }
 }

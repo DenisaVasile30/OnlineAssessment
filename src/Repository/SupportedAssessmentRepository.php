@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\SupportedAssessment;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,4 +64,26 @@ class SupportedAssessmentRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function findSubmittedAssessmentDetailed(int $assessmentId, User $user)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.assessmentId = :assessmentId')
+            ->setParameter('assessmentId', $assessmentId)
+            ->andWhere('s.submittedBy = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getSupportedAssessmentsById($assessmentId) {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.submittedBy', 'u')
+            ->addSelect('u')
+            ->andwhere('s.assessmentId = :assessmentId')
+            ->setParameter('assessmentId',  $assessmentId)
+            ->getQuery()
+            ->getResult();
+        ;
+    }
 }

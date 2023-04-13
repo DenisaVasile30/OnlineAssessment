@@ -40,11 +40,17 @@
                                     <a href="#">
                                         Disable
                                     </a>
+                                    <a href="{{ path('app_assessment_all_results', { assessmentId: assessment.id }) }}">
+                                        View all results
+                                    </a>
                                 </td>
                             {% elseif is_granted('ROLE_STUDENT') %}
                                 <td>
                                     <a href="{{ path('app_start_assessment', { assessment: assessment.id }) }}">
                                         Start
+                                    </a>
+                                    <a href="{{ path('app_show_submitted_assessment', { assessmentId: assessment.id, userId: app.user.id }) }}">
+                                        View results
                                     </a>
                                 </td>
                             {% endif %}
