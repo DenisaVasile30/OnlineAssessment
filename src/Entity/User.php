@@ -183,7 +183,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getTeacher(): Student
+    public function getTeacher(): Teacher
     {
         return $this->teacher;
     }

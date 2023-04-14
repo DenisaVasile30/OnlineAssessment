@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <button>
+            <a href="{{ path('app_new_group') }}">
+                Create new group
+            </a>
+        </button>
+    </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Unique identifier</th>
+                        <th>Group no</th>
+                        <th>Created date</th>
+                        <th>Faculty</th>
+                        <th>No of students</th>
+                        <th>Assigned</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.id }}</td>
+                        <td>{{ group.groupNo }}</td>
+                        <td>{{ group.createdDate|date('Y-m-d') }}</td>
+                        <td>{{ group.faculty }}</td>
+                        <td>{{ studentsNoList[group.id] }}</td>
+                        <td>
+                            {% if group.groupNo in teacherAssignedGroups %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif%}
+                        </td>
+                        <td>
+                            {% if group.groupNo in teacherAssignedGroups %}
+                                <a href="{{ path('app_unassign_group', { groupNo: group.groupNo}) }}">
+                                    Unassign group
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_assign_group', { groupNo: group.groupNo}) }}">
+                                    Assign to yourself
+                                </a>
+                            {% endif%}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+{% endblock %}

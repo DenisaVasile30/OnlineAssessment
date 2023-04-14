@@ -101,4 +101,20 @@ class Group
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedDate()
+    {
+        return $this->createdDate;
+    }
+
+    /**
+     * @param mixed $createdDate
+     */
+    public function setCreatedDate($createdDate): void
+    {
+        $this->createdDate = $createdDate;
+    }
 }

@@ -24,9 +24,6 @@ class Student
     #[ORM\Column(type: 'integer', nullable: true)]
     private $year;
 
-    #[ORM\Column(type: 'string', length: 500, nullable: false)]
-    private $faculty;
-
     #[ORM\OneToOne(inversedBy: 'student', targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
@@ -71,18 +68,6 @@ class Student
     public function setYear(?int $year): self
     {
         $this->year = $year;
-
-        return $this;
-    }
-
-    public function getFaculty(): string
-    {
-        return $this->faculty;
-    }
-
-    public function setFaculty(string $faculty): self
-    {
-        $this->faculty = $faculty;
 
         return $this;
     }

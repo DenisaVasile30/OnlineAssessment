@@ -102,4 +102,15 @@ class GroupRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function getGroups($teacherAssignedGroups)
+    {
+//        $groups = implode(',', $teacherAssignedGroups);
+
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.groupNo IN (:groups)')
+            ->setParameter('groups', $teacherAssignedGroups)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }
