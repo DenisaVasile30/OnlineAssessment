@@ -28,10 +28,12 @@ class SupportController extends AbstractController
         $ownedTickets = $ticketRepository->getOwnedTickets($user);
         if (in_array('ROLE_STUDENT', $user->getRoles())) {
             $userGroupId = $user->getStudent()->getGroupId();
-            $groupNo = $groupRepository->findBy(['id' => $userGroupId])[0]->getGroupNo();
-            $ticketsAssignedToGroup = $ticketRepository->getTicketsWithMultipleAssignedTo($groupNo);
-            if (count($ownedTickets) > 0) {
-                $ownedTickets = array_merge($ownedTickets, $ticketsAssignedToGroup);
+            if ($userGroupId) {
+                $groupNo = $groupRepository->findBy(['id' => $userGroupId])[0]->getGroupNo();
+                $ticketsAssignedToGroup = $ticketRepository->getTicketsWithMultipleAssignedTo($groupNo);
+                if (count($ownedTickets) > 0) {
+                    $ownedTickets = array_merge($ownedTickets, $ticketsAssignedToGroup);
+                }
             }
         }
 
