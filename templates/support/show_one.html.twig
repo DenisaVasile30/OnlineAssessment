@@ -11,7 +11,11 @@
             <span>Issued at:  {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</span>
         </div>
         <div>
-            <span style="margin-right: 70px">Assigned to:  {{ ticket.assignedTo.email }}</span>
+            {% if ticket.multipleAssignTo is not null and ticket.multipleAssignTo is not empty %}
+                <span>{{ 'Assigned to: Group '~ticket.multipleAssignTo['Group'] }}</span>
+            {% else %}
+                <span style="margin-right: 70px">Assigned to:  {{ ticket.assignedTo.email }}</span>
+            {% endif %}
         </div>
         <div>
             <span>Subject: </span>

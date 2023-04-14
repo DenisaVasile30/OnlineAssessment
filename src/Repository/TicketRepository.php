@@ -54,6 +54,16 @@ class TicketRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getTicketsWithMultipleAssignedTo(int $groupNo) {
+
+        return $this->createQueryBuilder('t')
+            ->andWhere("t.multipleAssignTo LIKE :groupNo")
+            ->setParameter('groupNo', '%"Group":'.$groupNo.'%')
+            ->getQuery()
+            ->getResult();
+
+    }
+
     public function findTicket(int $id) {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.issuedBy', 'i')

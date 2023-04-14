@@ -7,6 +7,7 @@ use App\Entity\TicketAnswer;
 use App\Entity\User;
 use App\Form\CreateTicketFormType;
 use App\Form\TicketAnswerFormType;
+use App\Repository\GroupRepository;
 use App\Repository\TicketAnswerRepository;
 use App\Repository\TicketRepository;
 use App\Repository\UserRepository;
@@ -19,11 +20,20 @@ class SupportController extends AbstractController
 {
     #[Route('/support', name: 'app_support')]
     public function loadTickets(
-        TicketRepository $ticketRepository
+        TicketRepository $ticketRepository,
+        GroupRepository $groupRepository
     ): Response
     {
         $user = $this->getUser();
         $ownedTickets = $ticketRepository->getOwnedTickets($user);
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            $userGroupId = $user->getStudent()->getGroupId();
+            $groupNo = $groupRepository->findBy(['id' => $userGroupId])[0]->getGroupNo();
+            $ticketsAssignedToGroup = $ticketRepository->getTicketsWithMultipleAssignedTo($groupNo);
+            if (count($ownedTickets) > 0) {
+                $ownedTickets = array_merge($ownedTickets, $ticketsAssignedToGroup);
+            }
+        }
 
         return $this->render('support/tickets.html.twig', [
             'ownedTickets' => $ownedTickets,
@@ -67,7 +77,8 @@ class SupportController extends AbstractController
     public function createTicket(
         Request $request,
         UserRepository $userRepository,
-        TicketRepository $ticketRepository
+        TicketRepository $ticketRepository,
+        GroupRepository $groupRepository
     ): Response
     {
         /** @var User $user */
@@ -75,13 +86,25 @@ class SupportController extends AbstractController
         $ticket = new Ticket();
         $usersList =  $userRepository->getAllEmailAddresses();
         $emails = array_column($usersList, "users_email");
+
+        $groups = $groupRepository->findAll();
+        foreach ($groups as $group) {
+            $emails[] = 'Group ' . $group->getGroupNo();
+        }
+
         $ticketForm = $this->createForm(CreateTicketFormType::class, $ticket, ['emails' => $emails]);
         $ticketForm->handleRequest($request);
         if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {
             $ticket->setIssuedBy($this->getUser());
             $ticket->setIssuedAt(new \DateTime());
             $assignToEmail = $ticketForm->get('assignedTo')->getData();
-            $ticket->setAssignedTo($userRepository->findOneBy(['email' => $assignToEmail]));
+
+            if (str_starts_with($assignToEmail, 'Group')) {
+                $groupNo = explode(" ", $assignToEmail)[1];
+                $ticket->setMultipleAssignTo(['Group' => $groupNo]);
+            } else {
+                $ticket->setAssignedTo($userRepository->findOneBy(['email' => $assignToEmail]));
+            }
             $ticket->setTicketStatus('Active');
             $ticketRepository->save($ticket, true);
 

@@ -31,7 +31,11 @@
                         <td>{{ ticket.type }}</td>
                         <td>{{ ticket.ticketContent }}</td>
                         <td>{{ ticket.ticketStatus }}</td>
-                        <td>{{ ticket.assignedTo.email }}</td>
+                        {% if ticket.multipleAssignTo is not null and ticket.multipleAssignTo is not empty %}
+                            <td>{{ 'Group '~ticket.multipleAssignTo['Group'] }}</td>
+                        {% else %}
+                            <td>{{ ticket.assignedTo.email }}</td>
+                        {% endif %}
                         <td>{{ ticket.issuedAt|date('Y-m-d H:i:s') }}</td>
                     </tr>
                 </div>

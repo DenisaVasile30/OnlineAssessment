@@ -34,15 +34,19 @@ class Ticket
     private User $issuedBy;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'assignedTickets')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private User $assignedTo;
 
     #[ORM\OneToMany(mappedBy: 'tickets', targetEntity: TicketAnswer::class)]
     private Collection $ticketAnswers;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private $multipleAssignTo = [];
+
     public function __construct()
     {
         $this->ticketAnswers = new ArrayCollection();
+//        $this->multipleAssignTo = new ArrayCollection();
     }
 
     public function getId(): int
@@ -150,5 +154,19 @@ class Ticket
         }
 
         return $this;
+    }
+
+    public function getMultipleAssignTo(): ?array
+    {
+        return $this->multipleAssignTo;
+    }
+
+    public function setMultipleAssignTo(array $multipleAssignTo): void
+    {
+        if (isset($multipleAssignTo['Group'])) {
+            $this->multipleAssignTo = [
+                'Group' => (int)$multipleAssignTo['Group']
+            ];
+        }
     }
 }
