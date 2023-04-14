@@ -35,11 +35,16 @@
                             {% if is_granted('ROLE_TEACHER') %}
                                 <td>{{ assessment.assigneeGroup|join(', ') }}</td>
                                 <td>{{ assessment.status }}</td>
-        {#                        implement this#}
                                 <td>
-                                    <a href="#">
-                                        Disable
-                                    </a>
+                                    {% if assessment.status == 'Active' %}
+                                        <a href="{{ path('app_assessment_disable', { assessmentId: assessment.id }) }}">
+                                            Disable
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('app_assessment_enable', { assessmentId: assessment.id }) }}">
+                                            Enable
+                                        </a>
+                                    {% endif %}
                                     <a href="{{ path('app_assessment_all_results', { assessmentId: assessment.id }) }}">
                                         View all results
                                     </a>

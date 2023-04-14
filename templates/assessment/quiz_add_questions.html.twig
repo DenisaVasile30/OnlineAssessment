@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
+    {% if quizQuestionsFromFileForm is defined %}
     {{ form_start(quizQuestionsFromFileForm) }}
         <div class="text-xl">
             Load quiz questions from file:
@@ -27,6 +27,8 @@
         <div class="border-b border-gray-300"></div>
 
     {{ form_end(quizQuestionsFromFileForm) }}
+
+    {% endif %}
 
     {{ form_start(quizQuestions) }}
     <div class="text-xl">
@@ -88,6 +90,9 @@
         <button type="submit"
                 class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save</button>
     </div>
+
+    {{ form_row(quizQuestions.id) }} {# this field is hidden and will not be displayed #}
+
     {{ form_end(quizQuestions) }}
 
 {% endblock %}

@@ -61,7 +61,9 @@ class AssessmentController extends AbstractController
     ): Response
     {
         $subject = new Subject();
-        $form = $this->createForm(SubjectFormType::class, $subject);
+        $form = $this->createForm(SubjectFormType::class, $subject,[
+            'edit' => false
+        ]);
         $form->handleRequest($request);
 //        to do: check the file uploading
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,7 +86,7 @@ class AssessmentController extends AbstractController
             $entityManager->persist($subject);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_assessment');
+            return $this->redirectToRoute('app_show_subject');
         }
 
         return $this->render('assessment/add_subject.html.twig', [
@@ -176,7 +178,7 @@ class AssessmentController extends AbstractController
 //            dd($assessments);
 //            TO DO implement functionality
         }
-
+//        dd($assessments);
         return $this->render('assessment/assessments_list.html.twig', [
             'assessmentsList' => $assessments
         ]);
@@ -394,6 +396,119 @@ class AssessmentController extends AbstractController
                 'submittedAssessments' => $submittedAssessments,
                 'groups' => $groups,
             ]);
+        } else {
+            return $this->render('assessment/show_all_assessment_results.html.twig',[
+                'submittedAssessments' => null,
+            ]);
         }
     }
+
+    #[Route('/home/assessment/subjects/show', name: 'app_show_subject')]
+    public function displaySubjects(
+        Request $request,
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository,
+    ): Response
+    {
+        $user = $this->getUser()->getIdentifierId();
+        $teacher = $teacherRepository->getTeacher($user);
+        $subjects = $subjectRepository->findBy(['issuedBy' => $teacher[0]->getId()]);
+
+        return $this->render('assessment/subjects_show.html.twig', [
+            'subjects' => $subjects
+        ]);
+    }
+
+    #[Route('/home/assessment/subject/edit/{subjectId}', name: 'app_edit_subject')]
+    public function editSubject(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        TeacherRepository $teacherRepository,
+        SluggerInterface $slugger,
+        int $subjectId,
+        SubjectRepository $subjectRepository
+    ): Response
+    {
+        $subject = $subjectRepository->find($subjectId);
+        $form = $this->createForm(SubjectFormType::class, $subject, [
+            'subject_id' => $subject->getId(),
+            'edit' => true,
+        ]);
+        $form->handleRequest($request);
+//        to do: check the file uploading
+        if ($form->isSubmitted() && $form->isValid()) {
+            $subject = $form->getData();
+
+            if ($form->getConfig()->getOption('edit')) {
+                $subject->setDescription($subject->getDescription());
+                $subject->setSubject($subject->getSubject());
+                /** @var UploadedFile $subjectFile */
+                $subjectFile = $form['contentFile']->getData();
+                if ($subjectFile) {
+                    $originalFilename = pathinfo($subjectFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$subjectFile->guessExtension();
+                    $subject->setFileName($newFilename);
+
+                    $content = file_get_contents($subjectFile->getPathname());
+                    $subject->setContentFile($content);
+                }
+                $subject->setLastModified(new \DateTime());
+                $subjectRepository->save($subject, true);
+
+                return $this->redirectToRoute('app_show_subject');
+            }
+        }
+
+        return $this->render('assessment/add_subject.html.twig', [
+            'addSubjectForm' => $form->createView()
+        ]);
+    }
+
+    #[Route('/home/assessment/subject/delete/{subjectId}', name: 'app_delete_subject')]
+    public function deleteSubject(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        TeacherRepository $teacherRepository,
+        SluggerInterface $slugger,
+        int $subjectId,
+        SubjectRepository $subjectRepository
+    ): Response
+    {
+        $subject = $subjectRepository->find($subjectId);
+        $subjectRepository->remove($subject, true);
+
+        return $this->redirectToRoute('app_show_subject');
+    }
+
+    #[Route('/home/assessment/disable/{assessmentId}', name: 'app_assessment_disable')]
+    public function disableAssessment(
+        Request $request,
+        int $assessmentId,
+        AssessmentRepository $assessmentRepository
+    ): Response
+    {
+        $assessment = $assessmentRepository->find($assessmentId);
+        $assessment->setStatus('Disabled');
+
+        $assessmentRepository->save($assessment, true);
+
+        return $this->redirectToRoute('app_show_assessments');
+    }
+
+    #[Route('/home/assessment/enable/{assessmentId}', name: 'app_assessment_enable')]
+    public function enableAssessment(
+        Request $request,
+        int $assessmentId,
+        AssessmentRepository $assessmentRepository
+    ): Response
+    {
+        $assessment = $assessmentRepository->find($assessmentId);
+        $assessment->setStatus('Active');
+
+        $assessmentRepository->save($assessment, true);
+
+        return $this->redirectToRoute('app_show_assessments');
+    }
+
 }

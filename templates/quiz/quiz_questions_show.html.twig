@@ -82,7 +82,14 @@
                         <td>{{ question.correctAnswer }}</td>
                         <td>{{ question.issuedBy.user.email }}</td>
                         <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>
-                        <td>TO DO:::add edit/delete</td>
+                        <td>
+                            <a href="{{ path('app_edit_question', { questionId: question.id}) }}">
+                                Edit
+                            </a>
+                            <a href="{{ path('app_delete_question', { questionId: question.id}) }}">
+                                Delete
+                            </a>
+                        </td>
                     </tr>
                 </div>
             {% endfor %}

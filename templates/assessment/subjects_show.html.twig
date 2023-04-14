@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <div class="text-xl">
+            Existing subjects:
+        </div>
+        <table style="width: 100%; table-layout: auto;">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Subject</th>
+                <th>Description</th>
+                <th>Optional requirements</th>
+                <th>Subject content</th>
+                <th>File name</th>
+{#                <th>Content File</th>#}
+                <th>Created at</th>
+                <th>Last modified</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for subject in subjects %}
+                <div>
+                    <tr>
+                        <td>{{ subject.id }}</td>
+                        <td>{{ subject.subject }}</td>
+                        <td>{{ subject.description }}</td>
+                        <td>{{ subject.subjectRequirements }}</td>
+                        <td>{{ subject.subjectContent }}</td>
+                        <td>
+                            <a href="{{ path('app_download_subject_content', { subject: (subject.id) }) }}">
+                                {{ subject.fileName }}
+                            </a>
+                        </td>
+{#                        <td>{{ subject.subjectContent }}</td>#}
+                        <td>{{ subject.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td>{{ subject.lastModified|date('Y-m-d H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('app_edit_subject', { subjectId: (subject.id) }) }}">
+                                Edit
+                            </a>
+                            <a href="{{ path('app_delete_subject', { subjectId: (subject.id) }) }}">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#filter-btn').on('click', function() {
+            $(this).closest('form').submit();
+        });
+        window.onload = function() {
+            var buttonText = document.querySelector('#filter-btn div').textContent;
+            document.querySelector('#action').value = buttonText;
+        };
+    </script>
+
+{% endblock %}

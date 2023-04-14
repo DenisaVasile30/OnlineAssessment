@@ -11,6 +11,7 @@ use App\Form\CreateQuizFormType;
 use App\Form\QuizQuestionsAddFormType;
 use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\StartQuizFormType;
+use App\Form\SubjectFormType;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
 use App\Repository\CreatedQuizRepository;
@@ -43,7 +44,9 @@ class QuizController extends AbstractController
     ): Response
     {
         $quizQuestions = new QuizQuestion();
-        $quizForm = $this->createForm(QuizQuestionsAddFormType::class, $quizQuestions);
+        $quizForm = $this->createForm(QuizQuestionsAddFormType::class, $quizQuestions, [
+            'edit' => false
+        ]);
         $quizForm->handleRequest($request);
 
         if ($quizForm->isSubmitted() && $quizForm->isValid()) {
@@ -694,5 +697,48 @@ class QuizController extends AbstractController
         $response->headers->set('Content-Type', 'text/plain');
 
         return $response;
+    }
+
+    #[Route('/home/assessments/quiz/question/delete/{questionId}', name: 'app_delete_question')]
+    public function deleteQuestion(
+        Request $request,
+        int $questionId,
+        QuizQuestionRepository $quizQuestionRepository
+    ): Response
+    {
+        $question = $quizQuestionRepository->find($questionId);
+        $quizQuestionRepository->remove($question, true);
+
+        return $this->redirectToRoute('app_quiz_questions_show');
+    }
+
+    #[Route('/home/assessments/quiz/question/edit/{questionId}', name: 'app_edit_question')]
+    public function editQuestion(
+        Request $request,
+        int $questionId,
+        QuizQuestionRepository $quizQuestionRepository
+    ): Response
+    {
+        $question = $quizQuestionRepository->find($questionId);
+        $form = $this->createForm(QuizQuestionsAddFormType::class, $question, [
+            'question_id' => $question->getId(),
+            'edit' => true,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $question = $form->getData();
+
+            if ($form->getConfig()->getOption('edit')) {
+                $quizQuestionRepository->save($question, true);
+            }
+
+            return $this->redirectToRoute('app_quiz_questions_show');
+        }
+
+        return $this->render('assessment/quiz_add_questions.html.twig', [
+            'quizQuestions' => $form->createView(),
+//            'quizQuestionsFromFileForm' => $quizQuestionsFromFileForm->createView()
+        ]);
     }
 }
