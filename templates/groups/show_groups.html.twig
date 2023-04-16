@@ -45,6 +45,9 @@
                                     Assign to yourself
                                 </a>
                             {% endif%}
+                                <a href="{{ path('app_group_show_students', { groupId: group.id}) }}">
+                                    Show students
+                                </a>
                         </td>
                     </tr>
                 {% endfor %}

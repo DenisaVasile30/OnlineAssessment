@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <label>Group id: {{ group.id }}</label><br>
+        <label>Group no: {{ group.groupNo }}</label><br>
+        <label>Created at: {{ group.createdDate|date('Y-m-d') }}</label>
+        <label>Faculty: {{ group.faculty }}</label>
+        <hr>
+    </div>
+    <div>
+        <label for="all-students-list">Select email to add: </label>
+        <select style="color: black" id="all-students-list">
+            {% for stud in allStudents %}
+                <option value="{{ stud.user.id }}">{{ stud.user.email }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <button>
+            <a href="#" id="add-existing-student-btn">
+                Add from existing students
+            </a>
+        </button>
+    </div>
+
+    <div>
+{#        <button>#}
+{#            <a href=""#}
+{#                {{ path('app_create_student_account', { groupId: group.id}) }}"#}
+{#            >#}
+{#                Create students account#}
+{#            </a>#}
+{#        </button>#}
+        <div>
+            <button id="create-student-account-btn">
+                Create students account
+            </button>
+        </div>
+        <div id="students-form-div" style="color: black">
+        </div>
+        <div>
+            <button id="save-students-btn">
+                Save
+            </button>
+        </div>
+    </div>
+    <div>
+        Assigned students:
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Unique identifier</th>
+            <th>Email</th>
+            <th>Enrollment date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for student in studentsList %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.user.email }}</td>
+                <td>{{ student.enrollmentDate|date('Y-m-d') }}</td>
+                <td>
+                    <a href="{{ path('app_group_remove_student', { groupId: group.id, studentId: student.id}) }}">
+                        Remove from group
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let routeUrl = '';
+            var allStudentsList = document.getElementById('all-students-list');
+            var addExistingStudentBtn = document.getElementById('add-existing-student-btn');
+            var group = {{ group|json_encode() }};
+
+            var createStudentsBtn = document.getElementById('create-student-account-btn');
+            var studentsFormDiv = document.getElementById('students-form-div');
+            var saveStudentsBtn = document.getElementById('save-students-btn');
+
+            allStudentsList.addEventListener("change", function () {
+                var selectedEmail = allStudentsList.value;
+                console.log(selectedEmail);
+                // Construct the route URL with the selected email value
+                var routeUrl = "{{ path('app_group_add_existing_student', {'groupId': 'group', 'userId': 'selectedEmail'}) }}";
+                routeUrl = routeUrl.replace('group', {{ group.id }});
+                routeUrl = routeUrl.replace('selectedEmail', (selectedEmail));
+
+
+                // Update the "Add from existing students" button URL
+                addExistingStudentBtn.href = routeUrl;
+            });
+
+            addExistingStudentBtn.addEventListener("click", function () {
+                // addExistingStudentBtn.href = routeUrl;
+                addExistingStudentBtn.click();
+            })
+
+            createStudentsBtn.addEventListener("click", function () {
+                var newStudentEmail = document.createElement("input");
+                newStudentEmail.type = "email";
+                newStudentEmail.name = "email";
+                newStudentEmail.id = "email";
+                newStudentEmail.placeholder = "Email";
+
+                var newStudentPassword = document.createElement("input");
+                newStudentPassword.type = "password";
+                newStudentPassword.name = "password";
+                newStudentPassword.id = "password";
+                newStudentPassword.placeholder = "Password";
+
+                studentsFormDiv.appendChild(newStudentEmail);
+                studentsFormDiv.appendChild(newStudentPassword);
+            });
+
+            saveStudentsBtn.addEventListener("click", function () {
+                var studentsForm = document.createElement("form");
+                studentsForm.method = "POST";
+                studentsForm.action = "{{ path('app_create_student_account', { groupId: group.id}) }}";
+
+                var emailInput = document.getElementById("email");
+                var passwordInput = document.getElementById("password");
+                if (emailInput.value && passwordInput.value) {
+                    var newEmailInput = document.createElement("input");
+                    newEmailInput.type = "hidden";
+                    newEmailInput.name = "email";
+                    newEmailInput.value = emailInput.value;
+
+                    var newPasswordInput = document.createElement("input");
+                    newPasswordInput.type = "hidden";
+                    newPasswordInput.name = "password";
+                    newPasswordInput.value = passwordInput.value;
+
+                    studentsForm.appendChild(newEmailInput);
+                    studentsForm.appendChild(newPasswordInput);
+                }
+
+                document.body.appendChild(studentsForm);
+                studentsForm.submit();
+            });
+
+        })
+    </script>
+{% endblock %}
