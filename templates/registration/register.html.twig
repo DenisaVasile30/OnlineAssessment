@@ -1,20 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
-
-{% block bread %}
-    → Register
-{% endblock %}
-
 {% block body %}
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="rounded-md p-2 border-red-300 bg-red-50 border dark:border-red-600 dark:bg-red-700 dark:text-white mb-4" role="alert">{{ flash_error }}</div>
     {% endfor %}
 
     {{ form_start(registrationForm) }}
-    <div class="text-xl">
-        Basic Information
-    </div>
     <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
         Enter your credentials
     </div>
@@ -55,8 +46,7 @@
 {#    {{ include ('/settings_profile/_profile_form.html.twig', { form: registrationForm.userProfile }) }}#}
 
     <div>
-        <button type="submit"
-                class="block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Register</button>
+        <button type="submit" class="save-button">Register</button>
     </div>
     {{ form_end(registrationForm) }}
 
