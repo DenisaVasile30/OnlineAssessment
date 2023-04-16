@@ -1,62 +1,51 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-    {{ form_start(scheduleAssessmentForm) }}
-    <div class="text-xl">
-        Schedule assessment:
-    </div>
+    {% if is_granted('ROLE_TEACHER') %}
+        {{ form_start(scheduleAssessmentForm) }}
+        <div class="label-elem">
+            Schedule assessment:
+        </div><br>
 
-    <div>
         {{ form_label(scheduleAssessmentForm.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
         {{ form_widget(scheduleAssessmentForm.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
         {{ form_errors(scheduleAssessmentForm.description) }}
-    </div>
 
-    <div>
-        {{ form_label(scheduleAssessmentForm.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-        {{ form_widget(scheduleAssessmentForm.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
+        {{ form_label(scheduleAssessmentForm.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium mr-4'}}) }}
+        {{ form_widget(scheduleAssessmentForm.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium mr-4'}})}}
         {{ form_errors(scheduleAssessmentForm.assigneeGroup) }}
-    </div>
 
-    <div>
         {{ form_label(scheduleAssessmentForm.subjectList, 'Subject/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-        {{ form_widget(scheduleAssessmentForm.subjectList, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_widget(scheduleAssessmentForm.subjectList, {'attr': {'class': 'subject-list'}})}}
         {{ form_errors(scheduleAssessmentForm.subjectList) }}
-    </div>
+        <br>
 
-    <div>
-    {{ form_label(scheduleAssessmentForm.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-    {{ form_widget(scheduleAssessmentForm.startAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-    {{ form_errors(scheduleAssessmentForm.startAt) }}
-    </div>
+        {{ form_label(scheduleAssessmentForm.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+        {{ form_widget(scheduleAssessmentForm.startAt, {'attr': {'class': 'date-element'}})}}
+        {{ form_errors(scheduleAssessmentForm.startAt) }}
+        <br>
 
-    <div>
         {{ form_label(scheduleAssessmentForm.endAt, 'Date to end at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-        {{ form_widget(scheduleAssessmentForm.endAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+        {{ form_widget(scheduleAssessmentForm.endAt, {'attr': {'class': 'date-element'}})}}
         {{ form_errors(scheduleAssessmentForm.endAt) }}
-    </div>
+        <br>
 
-    <div>
         {{ form_label(scheduleAssessmentForm.timeLimit, 'Time limit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
         {{ form_widget(scheduleAssessmentForm.timeLimit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
         {{ form_errors(scheduleAssessmentForm.timeLimit) }}
-    </div>
 
-    <div>
         {{ form_label(scheduleAssessmentForm.timeUnit, 'Time unit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
         {{ form_widget(scheduleAssessmentForm.timeUnit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
         {{ form_errors(scheduleAssessmentForm.timeUnit) }}
-    </div>
 
-    <div class="border-b border-gray-300"></div>
-    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
-        <button type="submit"
-                class="submit block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2">Save
-        </button>
-    </div>
+        <div class="border-b border-gray-300"></div>
+        <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
+            <button type="submit" class="save-button">
+                Schedule
+            </button>
+        </div>
         {{ form_end(scheduleAssessmentForm) }}
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}

@@ -139,3 +139,62 @@ th, td {
 .list-elem a {
     padding: 5px 0;
 }
+
+.subject-list {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    color: black;
+    background-color: #f3f4f6;
+}
+
+.subject-list option:nth-child(odd) {
+    background-color: #808080;
+}
+
+.subject-list option:nth-child(even) {
+    background-color: white;
+}
+
+.date-element {
+    display: block;
+    width: auto;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #374151;
+    background-color: #F3F4F6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.date-element:focus {
+    border-color: #4B5563;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.date-element::placeholder {
+    color: #9CA3AF;
+}
+
+.date-element::-webkit-datetime-edit-fields-wrapper {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.date-element::-webkit-datetime-edit-text {
+    color: #374151;
+}
+
+.date-element::-webkit-calendar-picker-indicator {
+    color: #9CA3AF;
+}
+
+.date-element::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

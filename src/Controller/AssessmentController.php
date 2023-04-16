@@ -32,6 +32,7 @@ use App\Repository\SupportedQuizRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -53,6 +54,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/add', name: 'app_add_subject')]
+    #[IsGranted('ROLE_TEACHER')]
     public function addSubject(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -95,6 +97,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/schedule', name: 'app_schedule_assessment')]
+    #[IsGranted('ROLE_TEACHER')]
     public function scheduleAssessment(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -145,7 +148,7 @@ class AssessmentController extends AbstractController
             $entityManager->persist($assessment);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_assessment');
+            return $this->redirectToRoute('app_show_assessments');
         } else {
 
             return $this->render('assessment/schedule_assessment.html.twig', [
@@ -155,6 +158,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/show', name: 'app_show_assessments')]
+    #[IsGranted('ROLE_TEACHER')]
     public function showAssessments(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -341,6 +345,7 @@ class AssessmentController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
         return $response;
+        return $response;
     }
 
     #[Route('/home/assessments/assessment/{assessmentId}/submitted/{userId}', name: 'app_show_submitted_assessment')]
@@ -420,6 +425,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/subject/edit/{subjectId}', name: 'app_edit_subject')]
+    #[IsGranted('ROLE_TEACHER')]
     public function editSubject(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -466,6 +472,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/subject/delete/{subjectId}', name: 'app_delete_subject')]
+    #[IsGranted('ROLE_TEACHER')]
     public function deleteSubject(
         Request $request,
         EntityManagerInterface $entityManager,
