@@ -11,6 +11,7 @@ use App\Repository\GroupRepository;
 use App\Repository\TicketAnswerRepository;
 use App\Repository\TicketRepository;
 use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SupportController extends AbstractController
 {
     #[Route('/support', name: 'app_support')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function loadTickets(
         TicketRepository $ticketRepository,
         GroupRepository $groupRepository
@@ -43,6 +45,7 @@ class SupportController extends AbstractController
     }
 
     #[Route('/support/{id}', name: 'app_show_one_ticket', requirements: ['id' => '\d+'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function loadOneTicket(
         Request $request,
         int $id,
@@ -76,6 +79,7 @@ class SupportController extends AbstractController
     }
 
     #[Route('/support/new', name: 'app_create_ticket')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function createTicket(
         Request $request,
         UserRepository $userRepository,

@@ -46,6 +46,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class AssessmentController extends AbstractController
 {
     #[Route('/home/assessment', name: 'app_assessment')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function index(): Response
     {
         return $this->render('assessment/assessment.html.twig', [
@@ -54,6 +55,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/add', name: 'app_add_subject')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[IsGranted('ROLE_TEACHER')]
     public function addSubject(
         Request $request,
@@ -97,6 +99,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/schedule', name: 'app_schedule_assessment')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[IsGranted('ROLE_TEACHER')]
     public function scheduleAssessment(
         Request $request,
@@ -158,7 +161,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/show', name: 'app_show_assessments')]
-    #[IsGranted('ROLE_TEACHER')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showAssessments(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -189,6 +192,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function startAssessment(
         Request $request,
         int $assessment,
@@ -331,6 +335,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/startAssessment/download/{subject}', name: 'app_download_subject_content')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function downloadSubjectContent(
         Request $request,
         int $subject,
@@ -349,6 +354,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/assessment/{assessmentId}/submitted/{userId}', name: 'app_show_submitted_assessment')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showSubmittedAssessment(
         Request $request,
         int $assessmentId,
@@ -381,6 +387,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessments/assessment/show/results/{assessmentId}', name: 'app_assessment_all_results')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showAllQuizResults(
         Request $request,
         int $assessmentId,
@@ -409,6 +416,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/subjects/show', name: 'app_show_subject')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function displaySubjects(
         Request $request,
         TeacherRepository $teacherRepository,
@@ -425,6 +433,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/subject/edit/{subjectId}', name: 'app_edit_subject')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[IsGranted('ROLE_TEACHER')]
     public function editSubject(
         Request $request,
@@ -472,6 +481,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/subject/delete/{subjectId}', name: 'app_delete_subject')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[IsGranted('ROLE_TEACHER')]
     public function deleteSubject(
         Request $request,
@@ -489,6 +499,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/disable/{assessmentId}', name: 'app_assessment_disable')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function disableAssessment(
         Request $request,
         int $assessmentId,
@@ -504,6 +515,7 @@ class AssessmentController extends AbstractController
     }
 
     #[Route('/home/assessment/enable/{assessmentId}', name: 'app_assessment_enable')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function enableAssessment(
         Request $request,
         int $assessmentId,
