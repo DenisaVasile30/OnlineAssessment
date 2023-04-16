@@ -1,49 +1,63 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <br><br>
     <div>
-        <div>
-            <span style="margin-right: 170px">Ticket Id:  {{ ticket.id }}</span>
-            <span>Status:  {{ ticket.ticketStatus }}</span>
-        </div>
-        <div>
-            <span style="margin-right: 70px">Issuer:  {{ ticket.issuedBy.email }}</span>
-            <span>Issued at:  {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</span>
-        </div>
-        <div>
-            {% if ticket.multipleAssignTo is not null and ticket.multipleAssignTo is not empty %}
-                <span>{{ 'Assigned to: Group '~ticket.multipleAssignTo['Group'] }}</span>
-            {% else %}
-                <span style="margin-right: 70px">Assigned to:  {{ ticket.assignedTo.email }}</span>
-            {% endif %}
-        </div>
-        <div>
-            <span>Subject: </span>
-            <span>{{ ticket.type }} </span>
+        <div class="box">
+            <div style="width: 100%">
+                <span style="width: 50%">Ticket Id:  {{ ticket.id }}</span>
+                <span style="width: 50%; float: right">Status:  {{ ticket.ticketStatus }}</span>
+            </div>
+            <div>
+                <span style="width: 50%">Issuer:  {{ ticket.issuedBy.email }}</span>
+                <span style="width: 50%; float: right">Issued at:  {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</span>
+            </div>
+            <div>
+                {% if ticket.multipleAssignTo is not null and ticket.multipleAssignTo is not empty %}
+                    <span>{{ 'Assigned to: Group '~ticket.multipleAssignTo['Group'] }}</span>
+                {% else %}
+                    <span style="margin-right: 70px">Assigned to:  {{ ticket.assignedTo.email }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <span>Subject: </span>
+                <span>{{ ticket.type }} </span>
+            </div>
         </div>
         <hr style="margin-top: 20px; margin-bottom: 20px">
         <div>
-            <label>{{ ticket.issuedBy.email }}</label>
-            <textarea readonly style="width: 100%; color: black; height: auto">
+            {% if ticket.issuedBy.email == app.user.email %}
+                <label class="ticket-label-right">{{ ticket.issuedBy.email }} at {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</label>
+                <textarea class="textarea-ticket ticket-owner" readonly>
                             {{ ticket.ticketContent }}
-            </textarea>
+                </textarea>
+            {% else %}
+                <label class="ticket-label-left">{{ ticket.issuedBy.email }} at {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</label>
+                <textarea class="textarea-ticket ticket-participant" readonly>
+                            {{ ticket.ticketContent }}
+                </textarea>
+            {% endif %}
         </div>
         {% if answersList is defined %}
             <div>
                 {% for answer in answersList %}
-                <div>
-                    <label>{{ answer.answerBy }} at {{ answer.addedAt|date('Y-m-d H:i:s') }}</label>
-                    <textarea readonly style="width: 100%; color: black; height: auto">
+                    {% if answer.answerBy == app.user.email %}
+                        <label class="ticket-label-right">{{ answer.answerBy }} at {{ answer.addedAt|date('Y-m-d H:i:s') }}</label>
+                        <textarea class="textarea-ticket ticket-owner" readonly>
                             {{ answer.answer }}
-                    </textarea>
-                </div>
+                        </textarea>
+                    {% else %}
+                        <label class="ticket-label-left">{{ answer.answerBy }} at {{ answer.addedAt|date('Y-m-d H:i:s') }}</label>
+                        <textarea class="textarea-ticket ticket-participant">
+                            {{ answer.answer }}
+                        </textarea>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endif %}
         <div>
             {{ form_start(answerForm) }}
             {{ include('support/answer_form.html.twig') }}
-
             {{ form_end(answerForm) }}
         </div>
     </div>

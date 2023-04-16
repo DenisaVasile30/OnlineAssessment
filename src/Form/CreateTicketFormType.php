@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Ticket;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,7 +15,12 @@ class CreateTicketFormType extends AbstractType
     {
         $builder
             ->add('type')
-            ->add('ticketContent')
+            ->add('ticketContent', TextareaType::class, [
+                'attr' => [
+                    'rows' => 10
+                ],
+            ])
+//            ->add('ticketContent')
             ->add('assignedTo', ChoiceType::class, [
                 'label' => 'Assign To',
                 'required' => true,
