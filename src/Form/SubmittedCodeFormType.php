@@ -16,7 +16,7 @@ class SubmittedCodeFormType extends AbstractType
         $builder
             ->add('codeArea', TextareaType::class, [
                 'attr' => [
-                    'rows' => 20
+                    'rows' => 15
                 ],
             ])
             ->add('run', SubmitType::class, [

@@ -2,94 +2,61 @@
 
 {% block body %}
 {#    to do: timer for startAt and EndAt, if the time has passed stop assessment#}
-    <div>
-        <div>
+    <br>
+    <div class="box">
+        <div class="label-elem">
             {{ requiredAssessment.description }}
         </div>
+        <br>
+        {#                     TO DO: add programming language in assessment#}
+        <label class="label-elem">Programming language to use: C </label><br>
         <div>
-            {#                     TO DO: add programming language in assessment#}
-            <label>Programming language to use: C++ </label>
-        </div>
-        <div>
-            {% for requiredSubject in requiredSubjects %}
-                <hr>
-            <div>
-                <div>
-                    <span>Requirement: </span>
-                </div>
-                <div>
-                    {{ requiredSubject.subject }}
-                </div>
-                <div>
+            <div class="box">
+                {% for requiredSubject in requiredSubjects %}
+                    <label class="label-elem">
+                        {{ 'Discipline:    '~requiredSubject.subject }}
+                    </label><br>
                     {% if requiredSubject.subjectRequirements is not null %}
-                        <label>Additional information:</label>
+                        <label class="label-elem">Additional information:</label>
                         <span>{{ requiredSubject.subjectRequirements }}</span>
                     {% else %}
-                        <label>No specific requirements</label>
+                        <label>No specific requirements</label><br><br>
                     {% endif %}
-                </div>
-                <div>
                     {% if requiredSubject.subjectContent is not null %}
-                        <label>Resolve the following:</label>
+                        <label class="label-elem">Resolve the following:</label><br>
                         <div>
                             <span>{{ requiredSubject.subjectContent }}</span>
                         </div>
                     {% endif %}
                     {% if requiredSubject.subjectContent is defined %}
-{#                        add span with the content#}
-                        <div>
-                            <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
-                        </div>
-                        <button id="toggle-{{ requiredSubject.id }}" onclick="toggleContent('{{ requiredSubject.id }}')">View Content File</button>
-                        <div id="{{ requiredSubject.id }}" aria-readonly="true" >
+                        <button class="save-button" id="toggle-{{ requiredSubject.id }}"
+                                onclick="toggleContent('{{ requiredSubject.id }}')">
+                            Hide Content File
+                        </button>
+                        <div class="label-elem" id="{{ requiredSubject.id }}" aria-readonly="true">
                             {{ filesContent[requiredSubject.id]|raw }}
                         </div>
+                        <button class="save-button">
+                            <a href="{{ path('app_download_subject_content', { subject: (requiredSubject.id) }) }}">Download subject content</a>
+                        </button>
                     {% endif %}
-                </div>
-                <hr>
+                {% endfor %}
             </div>
-            {% endfor %}
-                <div>
-                    <label>Write below the solution</label>
-                    {{ form_start(submittedCode) }}
-                    <div>
-                        {{ form_widget(submittedCode.run, { 'label': 'Run' }) }}
-                    </div>
-                    <div>
-                        {{ form_widget(submittedCode.submit, { 'label': 'Submit' }) }}
-                    </div>
-
-                </div>
-                <div id="parent-div">
-                    </div>
-                    <div>
-                        <div>
-                        <div id="dropdown-autocomplete" style="color: black">
-                        </div>
-                        {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                        {{ form_errors(submittedCode.codeArea) }}
-                    </div>
-                </div>
+            <br>
+            <div class="box">
+                <label class="label-elem">Write below the solution:</label><br>
+                {{ form_start(submittedCode) }}
+                {{ form_widget(submittedCode.run, { 'label': 'Run', 'attr': {'class': 'save-button'} }) }}
+                {{ form_widget(submittedCode.submit, { 'label': 'Submit', 'attr': {'class': 'save-button' }}) }}
+                <div id="dropdown-autocomplete" style="color: black"></div>
+                {{ form_widget(submittedCode.codeArea, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                {{ form_errors(submittedCode.codeArea) }}
                 {{ form_end(submittedCode) }}
-                <div>
-                    <label>Resulted output:</label>
-                    <div>
-                        <textarea style="width: 100%; color: black; height: 150px">
-                            {{ responseMessage }}
-                        </textarea>
-                    </div>
-                </div>
-            <div class="ui-widget">
-{#                <textarea></textarea>#}
-            <label for="tags">Tags: </label>
-            <input id="tags" style="color: black">
-            <div>
-                <label for="myInput">Last try: </label>
-                <input id="inp" style="color: black">
+                <label class="label-elem">Resulted output:</label><br><br>
+                <textarea style="width: 100%; color: black; height: 150px">
+                    {{ responseMessage }}
+                </textarea>
             </div>
-                <div>
-                    <textarea id="text-area1" class="text-area1"></textarea>
-                </div>
         </div>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
             <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -97,9 +64,6 @@
             <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
             <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
         </div>
-
-
-
     </div>
 {% endblock  %}
 
@@ -276,12 +240,6 @@
 
                 return text.lastIndexOf(" ") + 1;
             }
-            var suggests = ["head", "hello", "heart", "health"];
-            $("#text-area1").asuggest(suggests, {
-                'autoComplete': false,
-                'cycleOnTab': true
-            });
-
         });
 
 

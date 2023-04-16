@@ -193,6 +193,7 @@ class AssessmentController extends AbstractController
 
     #[Route('/home/assessments/startAssessment/{assessment}', name: 'app_start_assessment')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_STUDENT')]
     public function startAssessment(
         Request $request,
         int $assessment,
@@ -388,6 +389,7 @@ class AssessmentController extends AbstractController
 
     #[Route('/home/assessments/assessment/show/results/{assessmentId}', name: 'app_assessment_all_results')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function showAllQuizResults(
         Request $request,
         int $assessmentId,
@@ -500,6 +502,7 @@ class AssessmentController extends AbstractController
 
     #[Route('/home/assessment/disable/{assessmentId}', name: 'app_assessment_disable')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function disableAssessment(
         Request $request,
         int $assessmentId,
@@ -516,6 +519,7 @@ class AssessmentController extends AbstractController
 
     #[Route('/home/assessment/enable/{assessmentId}', name: 'app_assessment_enable')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function enableAssessment(
         Request $request,
         int $assessmentId,

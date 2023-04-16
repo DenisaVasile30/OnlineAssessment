@@ -1,98 +1,94 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <br>
     {% if submittedAssessments == null %}
-    <div> This was not attempted yet!</div>
+    <div class="label-elem box"> This was not attempted yet!</div>
     {% else %}
-        <div>
-            <label>Assessment Id:  {{ requiredAssessment.id }}</label>
+        <div class="box">
+            <span class="label-elem">Assessment Id:  {{ requiredAssessment.id }}</span><br>
+            <span class="label-elem" style="float: left">
+                Discipline:  {{ requiredAssessment.subject.subject }}
+            </span>
+            <span class="label-elem" style="margin-left: 120px; text-align: right">
+                Duration:  {{ requiredAssessment.timeLimit~' '~requiredAssessment.timeUnit }}
+            </span>
             <br>
-            <label>Description:  {{ requiredAssessment.description }}</label>
-            <br>
-            <label>Start at:  {{ requiredAssessment.startAt|date('d/m/Y') }}</label>
-            <br>
-            <label>End at:  {{ requiredAssessment.endAt|date('d/m/Y') }}</label>
-            <br>
-            <label>Duration:  {{ requiredAssessment.timeLimit~' '~requiredAssessment.timeUnit }}</label>
-            <br>
-            <label>Assigned Groups:
+            <span class="label-elem">Start at:  {{ requiredAssessment.startAt|date('d/m/Y') }}</span>
+            <span class="label-elem" style="margin-left: 120px; text-align: right">End at:  {{ requiredAssessment.endAt|date('d/m/Y') }}</span><br>
+            <label class="label-elem">Assigned Groups:
                 {% for group in requiredAssessment.assigneeGroup %}
                     {{ group~' ' }}
                 {% endfor %}
-            </label>
-            <br>
-            <br>
-            <label>Subject:  {{ requiredAssessment.subject.id~' '~requiredAssessment.subject.description }}</label>
-            <br>
-            <label>Discipline:  {{ requiredAssessment.subject.subject }}</label>
-            <br>
-            <hr>
-        </div>
-        <div>
-            <button>
-                <a href="{{ path('app_download_subject_content', { subject: (requiredAssessment.subject.id) }) }}">Download subject content</a>
+            </label><br>
+            <label class="label-elem">Subject:  {{ requiredAssessment.subject.id~' '~requiredAssessment.subject.description }}</label><br>
+            <label class="label-elem">Description:  {{ requiredAssessment.description }}</label><br>
+            <button class="save-button">
+                <a href="{{ path('app_download_subject_content', { subject: (requiredAssessment.subject.id) }) }}">
+                    Download subject content
+                </a>
             </button>
         </div>
-        <label>Completed by</label>
         <br>
-        <div>
+        <label class="label-elem">Attempted by:</label>
+        <br>
+        <br>
             <table style="width: 100%">
                 <thead>
-                <tr>
-                    <th>Unique identifier </th>
-                    <th>Student id</th>
-                    <th>Group</th>
-                    <th>Email</th>
-                    <th>Started at</th>
-                    <th>Ended at</th>
-                    <th>Spent time</th>
-                    <th>Compiled successfully</th>
-                    <th>Found errors</th>
-                    <th>Action</th>
-                </tr>
+                    <tr>
+                        <th>Unique identifier </th>
+                        <th>Student id</th>
+                        <th>Group</th>
+                        <th>Email</th>
+                        <th>Started at</th>
+                        <th>Ended at</th>
+                        <th>Spent time</th>
+                        <th>Compiled successfully</th>
+                        <th>Found errors</th>
+                        <th>Action</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {% for submittedAssessment in submittedAssessments %}
-                    <div>
-                        <tr>
-                            <td>{{ submittedAssessment.id }}</td>
-                            <td>{{ submittedAssessment.submittedBy.id }}</td>
-                            {% for group in groups %}
-                                {% if group.id == submittedAssessment.submittedBy.student.groupId %}
-                                    <td>{{ group.groupNo }}</td>
-                                {% endif %}
-                            {% endfor %}
-                            <td>{{ submittedAssessment.submittedBy.email }}</td>
-                            <td>{{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}</td>
-                            <td>{{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}</td>
-                            <td>{{ submittedAssessment.timeSpent|date('H:i:s') }}</td>
-                            <td>
-                                {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
-                                    Yes
-                                {% else %}
-                                    No
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
-                                    {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
-                                        {{ error ~','}}
-                                    {% endfor %}
-                                {% else %}
-                                    <label>No errors found</label><br>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{{ path('app_show_submitted_assessment', { assessmentId: requiredAssessment.id, userId: submittedAssessment.submittedBy.id }) }}">
-                                    View detailed
-                                </a>
-                            </td>
-                        </tr>
-                    </div>
-                {% endfor %}
+                    {% for submittedAssessment in submittedAssessments %}
+                        <div>
+                            <tr>
+                                <td>{{ submittedAssessment.id }}</td>
+                                <td>{{ submittedAssessment.submittedBy.id }}</td>
+                                {% for group in groups %}
+                                    {% if group.id == submittedAssessment.submittedBy.student.groupId %}
+                                        <td>{{ group.groupNo }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                                <td>{{ submittedAssessment.submittedBy.email }}</td>
+                                <td>{{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}</td>
+                                <td>{{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}</td>
+                                <td>{{ submittedAssessment.timeSpent|date('H:i:s') }}</td>
+                                <td>
+                                    {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
+                                        {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
+                                            {{ error ~','}}
+                                        {% endfor %}
+                                    {% else %}
+                                        <label>No errors found</label><br>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ path('app_show_submitted_assessment', { assessmentId: requiredAssessment.id, userId: submittedAssessment.submittedBy.id }) }}">
+                                        View detailed
+                                    </a>
+                                </td>
+                            </tr>
+                        </div>
+                    {% endfor %}
                 </tbody>
             </table>
         {% endif %}
-    </div>
 
 {% endblock %}
