@@ -1,51 +1,46 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
-    <div>
-        <a href="{{ path('app_add_subject') }}">
-            Add new subject
-        </a>
+    <div class="box" style="width: 100%">
+        <div class="label-elem" style="width: 30%">Assessments:</div>
+        <div class="list-elem">
+            {% if is_granted('ROLE_TEACHER') %}
+                <a href="{{ path('app_add_subject') }}">
+                    Add new subject
+                </a>
+                <a href="{{ path('app_show_subject') }}">
+                    Show all subjects
+                </a>
+                <a href="{{ path('app_schedule_assessment') }}">
+                    Schedule assessment
+                </a>
+            {% endif %}
+            <a href="{{ path('app_show_assessments') }}">
+                Show Assessments
+            </a>
+        </div>
     </div>
 
-    <div>
-        <a href="{{ path('app_show_subject') }}">
-            Show all subjects
-        </a>
-    </div>
+    </br><br>
 
-    <div>
-        <a href="{{ path('app_schedule_assessment') }}">
-            Schedule assessment
-        </a>
+    <div class="box" style="width: 100%">
+        <div class="label-elem" style="width: 30%">Quizzes:</div>
+        <div class="list-elem">
+            {% if is_granted('ROLE_TEACHER') %}
+                <a href="{{ path('app_quiz_questions') }}">
+                    Load quiz questions
+                </a>
+                <a href="{{ path('app_quiz_create') }}">
+                    Create quiz
+                </a>
+                <a href="{{ path('app_quiz_questions_show') }}">
+                    Quiz Questions
+                </a>
+            {% endif %}
+            <a href="{{ path('app_show_quizzes') }}">
+                Show quizzes
+            </a>
+        </div>
     </div>
-
-    <div>
-        <a href="{{ path('app_show_assessments') }}">Assessments</a>
-    </div>
-    </br>
-    <hr>
-    <div>
-        <a href="{{ path('app_quiz_questions') }}">
-            Load quiz questions
-        </a>
-    </div>
-
-    <div>
-        <a href="{{ path('app_quiz_create') }}">
-            Create quiz
-        </a>
-    </div>
-
-    <div>
-        <a href="{{ path('app_quiz_questions_show') }}">
-            Quiz Questions
-        </a>
-    </div>
-
-    <div>
-        <a href="{{ path('app_show_quizzes') }}">Show quizzes</a>
-    </div>
-
 
 {% endblock %}
