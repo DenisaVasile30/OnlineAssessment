@@ -24,6 +24,7 @@ use App\Repository\SupportedQuizRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -36,6 +37,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class QuizController extends AbstractController
 {
     #[Route('/home/assessment/quiz/questions', name: 'app_quiz_questions')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function addQuizQuestions(
         Request $request,
         TeacherRepository $teacherRepository,
@@ -204,6 +207,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessment/quiz/questions/show', name: 'app_quiz_questions_show')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function displayQuizQuestions(
         Request $request,
         TeacherRepository $teacherRepository,
@@ -220,6 +225,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessment/quiz/questions/show/filter', name: 'app_quiz_questions_filter')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function filterQuizQuestions(
         Request $request,
         QuizQuestionRepository $questionRepository,
@@ -258,6 +265,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessment/quiz/create', name: 'app_quiz_create')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function createQuiz(
         Request $request,
         QuizQuestionRepository $questionRepository,
@@ -375,6 +384,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quizzes/show', name: 'app_show_quizzes')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showQuizzes(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -405,6 +415,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/startQuiz/{quiz}', name: 'app_start_quiz')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function startQuiz(
         Request $request,
         int $quiz,
@@ -552,6 +563,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/{quiz}/submitted{id}', name: 'app_show_submitted_one')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showSubmittedQuiz(
         Request $request,
         int $quiz,
@@ -586,6 +598,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/results/{quiz}/{user}', name: 'app_quiz_view_one_result')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function showResultsQuiz(
         Request $request,
         int $quiz,
@@ -631,6 +644,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/show/results/{quiz}', name: 'app_quiz_all_results')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function showAllQuizResults(
         Request $request,
         int $quiz,
@@ -653,6 +668,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/{quizId}/download/timeSpentReport/', name: 'app_quiz_download_time_spent_report')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_STUDENT')]
     public function downloadTimeSpentQuizReport(
         Request $request,
         int $quizId,
@@ -700,6 +717,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/question/delete/{questionId}', name: 'app_delete_question')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function deleteQuestion(
         Request $request,
         int $questionId,
@@ -713,6 +732,8 @@ class QuizController extends AbstractController
     }
 
     #[Route('/home/assessments/quiz/question/edit/{questionId}', name: 'app_edit_question')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function editQuestion(
         Request $request,
         int $questionId,

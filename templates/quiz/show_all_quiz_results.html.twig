@@ -1,82 +1,98 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-        <label>Quiz Id:  {{ requiredQuiz.id }}</label>
+    {% if is_granted('ROLE_TEACHER') %}
+        <div class="box">
+            <span class="label-elem">
+                Quiz Id:  {{ requiredQuiz.id }}
+            </span>
+            <br>
+            <span class="label-elem">
+                Questions category:  {{ requiredQuiz.category }}
+            </span>
+            <span class="label-elem" style="margin-left: 120px; text-align: right">
+                Description:  {{ requiredQuiz.description }}
+            </span>
+            <br>
+            <span class="label-elem">
+                Start at:  {{ requiredQuiz.startAt|date('d/m/Y') }}
+            </span>
+            <span class="label-elem" style="margin-left: 120px; text-align: right">
+                End at:  {{ requiredQuiz.endAt|date('d/m/Y') }}
+            </span>
+            <br>
+            <span class="label-elem">
+                Duration:  {{ requiredQuiz.timeLimit~' '~requiredQuiz.timeUnit }}
+            </span>
+            <span class="label-elem" style="margin-left: 120px; text-align: right">
+                Assigned Groups:
+                {% for group in requiredQuiz.assigneeGroup %}
+                    {{ group~' ' }}
+                {% endfor %}
+            </span>
+            <br>
+            <span class="label-elem">
+                Number of questions:  {{ requiredQuiz.questionsNo }}
+            </span>
+            <br>
+            <span class="label-elem">
+                Maximum grade:  {{ requiredQuiz.maxGrade~' ('~requiredQuiz.maxPoints~' points)' }}
+            </span>
+            {#         to do: add reports data#}
+            <br><br>
+            <hr>
+            <div>
+                <button class="save-button">
+                    <a href="{{ path('app_quiz_download_time_spent_report', {quizId: requiredQuiz.id}) }}">
+                        Download time spent report
+                    </a></button>
+            </div>
+        </div>
         <br>
-        <label>Description:  {{ requiredQuiz.description }}</label>
-        <br>
-        <label>Questions category:  {{ requiredQuiz.category }}</label>
-        <br>
-        <label>Start at:  {{ requiredQuiz.startAt|date('d/m/Y') }}</label>
-        <br>
-        <label>End at:  {{ requiredQuiz.endAt|date('d/m/Y') }}</label>
-        <br>
-        <label>Duration:  {{ requiredQuiz.timeLimit~' '~requiredQuiz.timeUnit }}</label>
-        <br>
-        <label>Assigned Groups:
-            {% for group in requiredQuiz.assigneeGroup %}
-                {{ group~' ' }}
-            {% endfor %}
-            {{ requiredQuiz.endAt|date('d/m/Y') }}
-        </label>
-        <br>
-        <label>Number of questions:  {{ requiredQuiz.questionsNo }}</label>
-        <br>
-        <label>Maximum grade:  {{ requiredQuiz.maxGrade~' ('~requiredQuiz.maxPoints~' points)' }}</label>
-{#         to do: add reports data#}
-        <br>
-        <hr>
-    </div>
-    <div>
-        <button>
-            <a href="{{ path('app_quiz_download_time_spent_report', {quizId: requiredQuiz.id}) }}">
-                Download time spent report
-            </a></button>
-    </div>
-    <label>Completed by</label>
-    <br>
-    <div>
-        <table style="width: 100%">
-            <thead>
-            <tr>
-                <th>Unique identifier </th>
-                <th>Student id</th>
-                <th>Group</th>
-                <th>Email</th>
-                <th>Started at</th>
-                <th>Ended at</th>
-                <th>Grade</th>
-                <th>Spent time</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for submittedQuiz in submittedQuizzes %}
-                <div>
-                    <tr>
-                        <td>{{ submittedQuiz.id }}</td>
-                        <td>{{ submittedQuiz.supportedBy.id }}</td>
-                        {% for group in groups %}
-                            {% if group.id == submittedQuiz.supportedBy.student.groupId %}
-                                <td>{{ group.groupNo }}</td>
-                            {% endif %}
-                        {% endfor %}
-                        <td>{{ submittedQuiz.supportedBy.email }}</td>
-                        <td>{{ submittedQuiz.startedAt|date('Y-m-d H:i:s') }}</td>
-                        <td>{{ submittedQuiz.endedAt|date('Y-m-d H:i:s') }}</td>
-                        <td>{{ submittedQuiz.obtainedGrade~' / '~requiredQuiz.maxGrade }}</td>
-                        <td>{{ submittedQuiz.totalTimeSpent|date('i:s') }}</td>
-                        <td>
-                            <a href="{{ path('app_quiz_view_one_result', { quiz: requiredQuiz.id, user: submittedQuiz.supportedBy.id }) }}">
-                                View detailed
-                            </a>
-                        </td>
-                    </tr>
-                </div>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
 
+        <label class="label-elem">Completed by</label>
+        <br><br>
+        <div>
+            <table style="width: 100%">
+                <thead>
+                <tr>
+                    <th>Unique identifier </th>
+                    <th>Student id</th>
+                    <th>Group</th>
+                    <th>Email</th>
+                    <th>Started at</th>
+                    <th>Ended at</th>
+                    <th>Grade</th>
+                    <th>Spent time</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for submittedQuiz in submittedQuizzes %}
+                    <div>
+                        <tr>
+                            <td>{{ submittedQuiz.id }}</td>
+                            <td>{{ submittedQuiz.supportedBy.id }}</td>
+                            {% for group in groups %}
+                                {% if group.id == submittedQuiz.supportedBy.student.groupId %}
+                                    <td>{{ group.groupNo }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td>{{ submittedQuiz.supportedBy.email }}</td>
+                            <td>{{ submittedQuiz.startedAt|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ submittedQuiz.endedAt|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ submittedQuiz.obtainedGrade~' / '~requiredQuiz.maxGrade }}</td>
+                            <td>{{ submittedQuiz.totalTimeSpent|date('i:s') }}</td>
+                            <td>
+                                <a href="{{ path('app_quiz_view_one_result', { quiz: requiredQuiz.id, user: submittedQuiz.supportedBy.id }) }}">
+                                    View detailed
+                                </a>
+                            </td>
+                        </tr>
+                    </div>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 {% endblock %}

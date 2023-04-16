@@ -1,40 +1,39 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
     {{ form_start(supportQuiz) }}
-
         {% if remainingTime != null %}
             <div>
-                <label>Remaining Time: </label>
-                <span id="remaining-time">{{ remainingTime | date('i:s') }}</span>
+                <label class="label-elem">Remaining Time: </label>
+                <span class="label-elem" id="remaining-time">{{ remainingTime | date('i:s') }}</span>
                 <input type="text" id="remainingTime" name="remainingTime" value="{{ remainingTime }}" style="visibility: hidden">
                 <input type="text" id="started-time" name="started-time" value="{{ remainingTime }}" style="visibility: hidden">
                 <input type="text" id="seconds-spent" name="seconds-spent" value="" style="visibility: hidden">
             </div>
         {% endif %}
-        <fieldset>
-        <div>
-            <label>{{ (index + 1)~'. '~question.questionContent }}</label>
-        </div>
-        <div>
-            <input type="radio" id="choiceA" name="answerOption" value="{{ question.choiceA }}" checked>
-            <label for="{{ question.choiceA }}">{{ 'a. '~question.choiceA }}</label>
-        </div>
-        <div>
-            <input type="radio" id="choiceB" name="answerOption" value="{{ question.choiceB }}">
-            <label for="{{ question.choiceB }}">{{ 'b. '~question.choiceB }}</label>
-        </div>
-        <div>
-            <input type="radio" id="choiceC" name="answerOption" value="{{ question.choiceC }}">
-            <label for="{{ question.choiceC }}">{{ 'c. '~question.choiceC }}</label>
-        </div>
-        <div>
-            <input type="radio" id="choiceD" name="answerOption" value="{{ question.choiceD }}">
-            <label for="{{ question.choiceD }}">{{ 'd. '~question.choiceD }}</label>
-        </div>
+        <br>
+        <fieldset class="box">
+            <label class="label-elem">{{ (index + 1)~'. '~question.questionContent }}</label><br>
+            <div>
+                <input type="radio" id="choiceA" name="answerOption" value="{{ question.choiceA }}" checked>
+                <label for="{{ question.choiceA }}">{{ 'a. '~question.choiceA }}</label>
+            </div>
+            <div>
+                <input type="radio" id="choiceB" name="answerOption" value="{{ question.choiceB }}">
+                <label for="{{ question.choiceB }}">{{ 'b. '~question.choiceB }}</label>
+            </div>
+            <div>
+                <input type="radio" id="choiceC" name="answerOption" value="{{ question.choiceC }}">
+                <label for="{{ question.choiceC }}">{{ 'c. '~question.choiceC }}</label>
+            </div>
+            <div>
+                <input type="radio" id="choiceD" name="answerOption" value="{{ question.choiceD }}">
+                <label for="{{ question.choiceD }}">{{ 'd. '~question.choiceD }}</label>
+            </div>
             <input type="text" id="index" name="index" value="{{ index }}" style="visibility: hidden">
-
+            <br>
+            {{ form_widget(supportQuiz.next, { 'label': 'Next', 'attr': {'class': 'general-button'} }) }}
+            {{ form_widget(supportQuiz.submit, { 'label': 'Submit', 'attr': {'class': 'general-button' }}) }}
         </fieldset>
 
     {{ form_end(supportQuiz) }}

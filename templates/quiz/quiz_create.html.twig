@@ -1,82 +1,63 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% if is_granted('ROLE_TEACHER') %}
     <div>
-        <div class="text-xl">
+        <label class="label-elem">
             Create new quiz:
-        </div>
+        </label><br><br>
         {{ form_start(createQuiz) }}
+            {{ form_label(createQuiz.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.description) }}
 
-            <div>
-                {{ form_label(createQuiz.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.description) }}
-            </div>
+            {{ form_label(createQuiz.questionsSource, 'Questions source', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.questionsSource, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.questionsSource) }}
 
-            <div>
-                {{ form_label(createQuiz.questionsSource, 'Questions source', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.questionsSource, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.questionsSource) }}
-            </div>
+            {{ form_label(createQuiz.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.category) }}
 
-            <div>
-                {{ form_label(createQuiz.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.category) }}
-            </div>
+            {{ form_label(createQuiz.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
+            {{ form_errors(createQuiz.assigneeGroup) }}
 
-            <div>
-                {{ form_label(createQuiz.assigneeGroup, 'Assignee Group/s', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
-                {{ form_errors(createQuiz.assigneeGroup) }}
-            </div>
+            {{ form_label(createQuiz.questionsNo, 'Questions no', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.questionsNo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.questionsNo) }}
 
-            <div>
-                {{ form_label(createQuiz.questionsNo, 'Questions no', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.questionsNo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.questionsNo) }}
-            </div>
+            {{ form_label(createQuiz.maxGrade, 'Maximum grade', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.maxGrade, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.maxGrade) }}
 
-            <div>
-                {{ form_label(createQuiz.maxGrade, 'Maximum grade', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.maxGrade, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.maxGrade) }}
-            </div>
+            {{ form_label(createQuiz.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.startAt, {'attr': {'class': 'date-element'}})}}
+            {{ form_errors(createQuiz.startAt) }}
+            <br>
 
-            <div>
-                {{ form_label(createQuiz.startAt, 'Date to start at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.startAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.startAt) }}
-            </div>
+            {{ form_label(createQuiz.endAt, 'Date to end at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.endAt, {'attr': {'class': 'date-element'}})}}
+            {{ form_errors(createQuiz.endAt) }}
+            <br>
 
-            <div>
-                {{ form_label(createQuiz.endAt, 'Date to end at', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.endAt, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.endAt) }}
-            </div>
+            {{ form_label(createQuiz.timeLimit, 'Time limit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.timeLimit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.timeLimit) }}
 
-            <div>
-                {{ form_label(createQuiz.timeLimit, 'Time limit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.timeLimit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.timeLimit) }}
-            </div>
-
-            <div>
-                {{ form_label(createQuiz.timeUnit, 'Time unit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                {{ form_widget(createQuiz.timeUnit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                {{ form_errors(createQuiz.timeUnit) }}
-            </div>
+            {{ form_label(createQuiz.timeUnit, 'Time unit', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.timeUnit, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+            {{ form_errors(createQuiz.timeUnit) }}
 
             <div id="questions">
                 {{ include ('quiz/_quiz_questions_show.html.twig') }}
             </div>
 
-            <div>
-                {{ form_widget(createQuiz.save, {'attr': {'class': 'block w-full shadow-sm border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white rounded-md border p-2 mt-4 mb-2'}}) }}
-            </div>
+            {{ form_widget(createQuiz.save, {'attr': {'class': 'save-button'}}) }}
 
         {{ form_end(createQuiz) }}
     </div>
+    {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
@@ -163,7 +144,6 @@
                     });
                 }
             });
-
         })
     </script>
 {% endblock %}
