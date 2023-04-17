@@ -1,78 +1,84 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-        <label>Group id: {{ group.id }}</label><br>
-        <label>Group no: {{ group.groupNo }}</label><br>
-        <label>Created at: {{ group.createdDate|date('Y-m-d') }}</label>
-        <label>Faculty: {{ group.faculty }}</label>
-        <hr>
-    </div>
-    <div>
-        <label for="all-students-list">Select email to add: </label>
-        <select style="color: black" id="all-students-list">
-            {% for stud in allStudents %}
-                <option value="{{ stud.user.id }}">{{ stud.user.email }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div>
-        <button>
-            <a href="#" id="add-existing-student-btn">
+    {% if is_granted('ROLE_TEACHER') %}
+        <br>
+        <div class="box">
+            <label class="label-elem">
+                Group id: {{ group.id }}
+            </label><br>
+            <label class="label-elem">
+                Group no: {{ group.groupNo }}
+            </label><br>
+            <label class="label-elem">
+                Created at: {{ group.createdDate|date('Y-m-d') }}
+            </label><br>
+            <label class="label-elem"
+            >Faculty: {{ group.faculty }}
+            </label>
+            <br>
+        </div>
+        <br>
+        <div class="box">
+            <label class="label-elem">
                 Add from existing students
-            </a>
-        </button>
-    </div>
+            </label><br><br>
+            <label for="all-students-list" class="label-elem" style="margin-right: 25px; margin-left: 40px">
+                Select email to add:
+            </label>
+            <select style="color: black" id="all-students-list">
+                {% for stud in allStudents %}
+                    <option value="{{ stud.user.id }}">{{ stud.user.email }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <button class="save-button">
+                <a href="#" id="add-existing-student-btn">
+                    Add selected student to group {{ group.groupNo }}
+                </a>
+            </button>
+        </div>
+        <br>
 
-    <div>
-{#        <button>#}
-{#            <a href=""#}
-{#                {{ path('app_create_student_account', { groupId: group.id}) }}"#}
-{#            >#}
-{#                Create students account#}
-{#            </a>#}
-{#        </button>#}
-        <div>
+        <div class="box">
             <button id="create-student-account-btn">
                 Create students account
             </button>
-        </div>
-        <div id="students-form-div" style="color: black">
-        </div>
-        <div>
-            <button id="save-students-btn">
+            <div id="students-form-div" style="color: black">
+            </div>
+            <button id="save-students-btn" class="save-button">
                 Save
             </button>
         </div>
-    </div>
-    <div>
-        Assigned students:
-    </div>
-    <table>
-        <thead>
-        <tr>
-            <th>Unique identifier</th>
-            <th>Email</th>
-            <th>Enrollment date</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for student in studentsList %}
-            <tr>
-                <td>{{ student.id }}</td>
-                <td>{{ student.user.email }}</td>
-                <td>{{ student.enrollmentDate|date('Y-m-d') }}</td>
-                <td>
-                    <a href="{{ path('app_group_remove_student', { groupId: group.id, studentId: student.id}) }}">
-                        Remove from group
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 
+        <label class="label-elem">
+            Assigned group students:
+        </label><br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Unique identifier</th>
+                    <th>Email</th>
+                    <th>Enrollment date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for student in studentsList %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.user.email }}</td>
+                    <td>{{ student.enrollmentDate|date('Y-m-d') }}</td>
+                    <td>
+                        <a href="{{ path('app_group_remove_student', { groupId: group.id, studentId: student.id}) }}">
+                            Remove from group
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
@@ -106,47 +112,110 @@
                 addExistingStudentBtn.click();
             })
 
+            // createStudentsBtn.addEventListener("click", function () {
+            //     var newStudentEmail = document.createElement("input");
+            //     newStudentEmail.type = "email";
+            //     newStudentEmail.name = "email";
+            //     newStudentEmail.id = "email";
+            //     newStudentEmail.placeholder = "Email";
+            //
+            //     var newStudentPassword = document.createElement("input");
+            //     newStudentPassword.type = "password";
+            //     newStudentPassword.name = "password";
+            //     newStudentPassword.id = "password";
+            //     newStudentPassword.placeholder = "Password";
+            //
+            //     studentsFormDiv.appendChild(newStudentEmail);
+            //     studentsFormDiv.appendChild(newStudentPassword);
+            // });
+
             createStudentsBtn.addEventListener("click", function () {
+                var emailInputs = [];
+                var passwordInputs = [];
+
                 var newStudentEmail = document.createElement("input");
                 newStudentEmail.type = "email";
                 newStudentEmail.name = "email";
-                newStudentEmail.id = "email";
                 newStudentEmail.placeholder = "Email";
 
                 var newStudentPassword = document.createElement("input");
                 newStudentPassword.type = "password";
                 newStudentPassword.name = "password";
-                newStudentPassword.id = "password";
                 newStudentPassword.placeholder = "Password";
 
+                emailInputs.push(newStudentEmail);
+                passwordInputs.push(newStudentPassword);
+
+                var br = document.createElement("br");
                 studentsFormDiv.appendChild(newStudentEmail);
+                studentsFormDiv.appendChild(br); // Add a line break
                 studentsFormDiv.appendChild(newStudentPassword);
+                studentsFormDiv.appendChild(br.cloneNode());
             });
+
+            {#saveStudentsBtn.addEventListener("click", function () {#}
+            {#    var studentsForm = document.createElement("form");#}
+            {#    studentsForm.method = "POST";#}
+            {#    studentsForm.action = "{{ path('app_create_student_account', { groupId: group.id}) }}";#}
+
+            {#    var emailInput = document.getElementById("email");#}
+            {#    var passwordInput = document.getElementById("password");#}
+            {#    if (emailInput.value && passwordInput.value) {#}
+            {#        var newEmailInput = document.createElement("input");#}
+            {#        newEmailInput.type = "hidden";#}
+            {#        newEmailInput.name = "email";#}
+            {#        newEmailInput.value = emailInput.value;#}
+
+            {#        var newPasswordInput = document.createElement("input");#}
+            {#        newPasswordInput.type = "hidden";#}
+            {#        newPasswordInput.name = "password";#}
+            {#        newPasswordInput.value = passwordInput.value;#}
+
+            {#        studentsForm.appendChild(newEmailInput);#}
+            {#        studentsForm.appendChild(newPasswordInput);#}
+            {#    }#}
+
+            {#    document.body.appendChild(studentsForm);#}
+            {#    studentsForm.submit();#}
+            {#});#}
 
             saveStudentsBtn.addEventListener("click", function () {
                 var studentsForm = document.createElement("form");
                 studentsForm.method = "POST";
                 studentsForm.action = "{{ path('app_create_student_account', { groupId: group.id}) }}";
 
-                var emailInput = document.getElementById("email");
-                var passwordInput = document.getElementById("password");
-                if (emailInput.value && passwordInput.value) {
-                    var newEmailInput = document.createElement("input");
-                    newEmailInput.type = "hidden";
-                    newEmailInput.name = "email";
-                    newEmailInput.value = emailInput.value;
+                var emailInputs = document.getElementsByName("email");
+                var passwordInputs = document.getElementsByName("password");
+                var allInputsSet = true;
 
-                    var newPasswordInput = document.createElement("input");
-                    newPasswordInput.type = "hidden";
-                    newPasswordInput.name = "password";
-                    newPasswordInput.value = passwordInput.value;
-
-                    studentsForm.appendChild(newEmailInput);
-                    studentsForm.appendChild(newPasswordInput);
+                for (var i = 0; i < emailInputs.length; i++) {
+                    if (emailInputs[i].value.trim() === '' || passwordInputs[i].value.trim() === '') {
+                        allInputsSet = false;
+                        break;
+                    }
                 }
 
-                document.body.appendChild(studentsForm);
-                studentsForm.submit();
+                if (allInputsSet) {
+                    for (var i = 0; i < emailInputs.length; i++) {
+                        var newEmailInput = document.createElement("input");
+                        newEmailInput.type = "hidden";
+                        newEmailInput.name = "emails[]";
+                        newEmailInput.value = emailInputs[i].value;
+
+                        var newPasswordInput = document.createElement("input");
+                        newPasswordInput.type = "hidden";
+                        newPasswordInput.name = "passwords[]";
+                        newPasswordInput.value = passwordInputs[i].value;
+
+                        studentsForm.appendChild(newEmailInput);
+                        studentsForm.appendChild(newPasswordInput);
+                    }
+
+                    document.body.appendChild(studentsForm);
+                    studentsForm.submit();
+                } else {
+                    alert('Please set all email and password combinations before saving!');
+                }
             });
 
         })

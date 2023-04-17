@@ -1,26 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-        <button>
+    <br>
+    {% if is_granted('ROLE_TEACHER') %}
+        <button class="general-button">
             <a href="{{ path('app_new_group') }}">
                 Create new group
             </a>
-        </button>
-    </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Unique identifier</th>
-                        <th>Group no</th>
-                        <th>Created date</th>
-                        <th>Faculty</th>
-                        <th>No of students</th>
-                        <th>Assigned</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+        </button><br><br>
+        <label class="label-elem">
+            Existing groups:
+        </label><br><br>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Unique identifier</th>
+                    <th>Group no</th>
+                    <th>Created date</th>
+                    <th>Faculty</th>
+                    <th>No of students</th>
+                    <th>Assigned</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for group in groups %}
                     <tr>
                         <td>{{ group.id }}</td>
@@ -51,7 +55,7 @@
                         </td>
                     </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

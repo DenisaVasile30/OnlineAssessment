@@ -10,6 +10,7 @@ use App\Repository\GroupRepository;
 use App\Repository\StudentRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class GroupController extends AbstractController
 {
     #[Route('/home/groups', name: 'app_show_groups')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function index(
         GroupRepository $groupRepository,
         StudentRepository $studentRepository
@@ -41,6 +44,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/assign/{groupNo}', name: 'app_assign_group')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function assignGroup(
         GroupRepository $groupRepository,
         int $groupNo,
@@ -61,6 +66,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/unassign/{groupNo}', name: 'app_unassign_group')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function unassignGroup(
         GroupRepository $groupRepository,
         int $groupNo,
@@ -84,6 +91,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/new', name: 'app_new_group')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function createGroup(
         Request $request,
         GroupRepository $groupRepository
@@ -110,6 +119,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/students/show/{groupId}', name: 'app_group_show_students')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function showStudentsFromGroup(
         Request $request,
         int $groupId,
@@ -129,6 +140,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/{groupId}/students/remove/{studentId}', name: 'app_group_remove_student')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function removeStudentFromGroup(
         Request $request,
         int $groupId,
@@ -145,14 +158,18 @@ class GroupController extends AbstractController
         $targetStudent[0]->setGroup(null);
         $studentRepository->save($targetStudent[0], true);
         $studentsList = $studentRepository->getStudentsFromGroup($group);
+        $allStudents = $studentRepository->findAll();
 
         return $this->render('groups/show_students_from_group.html.twig', [
             'group' => $group,
             'studentsList' => $studentsList,
+            'allStudents' => $allStudents,
         ]);
     }
 
     #[Route('/home/{groupId}s/groups/students/add/existing/{userId}', name: 'app_group_add_existing_student')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function addGroupForExistingStudent(
         Request $request,
         int $groupId,
@@ -177,6 +194,8 @@ class GroupController extends AbstractController
     }
 
     #[Route('/home/groups/{groupId}/students/create/account', name: 'app_create_student_account')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
     public function createStudentAccount(
         Request $request,
         int $groupId,
@@ -187,28 +206,35 @@ class GroupController extends AbstractController
     ): Response
     {
         $group = $groupRepository->find($groupId);
-        $emailToSet = $request->request->get('email');
-        $passwordToSet = $request->request->get('password');
+        $postedData = $request->request->all();
+        $emailsToSet = $postedData['emails'];
+        $passwordsToSet = $postedData['passwords'];
 
-        if ($emailToSet && $passwordToSet) {
-            $user = new User();
-            $user->setEmail($emailToSet);
-            $user->setRoles(['ROLE_STUDENT']);
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                $user,
-                $passwordToSet
-            )
-            );
+        foreach ($emailsToSet as $k => $email) {
+            foreach ($passwordsToSet as $key => $password) {
+                if ($k == $key) {
+                    if ($email && $password) {
+                        $user = new User();
+                        $user->setEmail($email);
+                        $user->setRoles(['ROLE_STUDENT']);
+                        $user->setPassword(
+                            $userPasswordHasher->hashPassword(
+                                $user,
+                                $password
+                            )
+                        );
 
-            $userRepository->save($user, true);
+                        $userRepository->save($user, true);
 
-            $student = new Student();
-            $student->setUser($user);
-            $student->setEnrollmentDate(new \DateTime());
-            $student->setGroup($group);
+                        $student = new Student();
+                        $student->setUser($user);
+                        $student->setEnrollmentDate(new \DateTime());
+                        $student->setGroup($group);
 
-            $studentRepository->save($student, true);
+                        $studentRepository->save($student, true);
+                    }
+                }
+            }
         }
 
         return $this->redirectToRoute('app_group_show_students', [

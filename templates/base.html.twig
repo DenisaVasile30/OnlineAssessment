@@ -40,6 +40,11 @@
                     <div class="ml-2">
                         <a href="{{ path('app_assessment') }}">Assessments</a>
                     </div>
+                    {% if is_granted('ROLE_TEACHER') %}
+                        <div class="ml-2">
+                            <a href="{{ path('app_show_groups') }}">Manage Groups</a>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
