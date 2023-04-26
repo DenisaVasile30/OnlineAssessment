@@ -198,3 +198,19 @@ th, td {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.correct-answer-input {
+    background-color: darkgreen!important;
+    display: inline-block!important; /* optional, if you want the label to take up the full width of its container */
+    padding-left: 5px!important; /* optional, adjust to your liking */
+    padding-right: 5px!important; /* optional, adjust to your liking */
+    border-radius: 5px!important; /* optional, if you want rounded corners */
+}
+
+.wrong-answer-input {
+    background-color: darkred!important;
+    display: inline-block!important; /* optional, if you want the label to take up the full width of its container */
+    padding-left: 5px!important; /* optional, adjust to your liking */
+    padding-right: 5px!important; /* optional, adjust to your liking */
+    border-radius: 5px!important; /* optional, if you want rounded corners */
+}

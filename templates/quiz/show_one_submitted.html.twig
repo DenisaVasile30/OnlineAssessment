@@ -53,29 +53,79 @@
                                         {% if q.choiceA == question.providedAnswer%}
                                 checked
                                         {% endif %}>
-                                <label>{{ q.choiceA }}</label>
+                                <label
+                                        {% if q.correctAnswer == q.choiceA and q.choiceA == question.providedAnswer %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer != question.providedAnswer and q.choiceA == question.providedAnswer %}
+                                            class="wrong-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer == q.choiceA %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                >
+                                    {{ q.choiceA }}
+                                </label>
                                 </br>
                                 <input type="radio" readonly value="{{ q.choiceB }}"
                                         {% if q.choiceB == question.providedAnswer%}
-                                checked
+                                            checked
                                         {% endif %}>
-                                <label>{{ q.choiceB }}</label>
+                                <label
+                                        {% if q.correctAnswer == q.choiceB and q.choiceB == question.providedAnswer %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer != question.providedAnswer and q.choiceB == question.providedAnswer %}
+                                            class="wrong-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer == q.choiceB %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                >
+                                    {{ q.choiceB }}
+                                </label>
                                 </br>
                                 <input type="radio" readonly value="{{ q.choiceC }}"
                                         {% if q.choiceC == question.providedAnswer%}
                                 checked
                                         {% endif %}>
-                                <label>{{ q.choiceC }}</label>
+                                <label
+                                        {% if q.correctAnswer == q.choiceC and q.choiceC == question.providedAnswer %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer != question.providedAnswer and q.choiceC == question.providedAnswer %}
+                                            class="wrong-answer-input"
+                                        {% endif %}
+                                        {% if q.correctAnswer == q.choiceC %}
+                                            class="correct-answer-input"
+                                        {% endif %}
+                                >
+                                    {{ q.choiceC }}
+                                </label>
                                 </br>
-                                <input type="radio" readonly value="{{ q.choiceD }}"
-                                        {% if q.choiceD == question.providedAnswer%}
-                                checked
-                                        {% endif %}>
-                                <label>{{ q.choiceD }}</label>
-                                </br>
-                                </br>
-                                <label style="color: darkgreen">Correct answer: {{ q.correctAnswer }}</label>
-                                </br>
+                                {% if q.choiceD is defined and q.choiceD != ' ' %}
+                                    <input type="radio" readonly value="{{ q.choiceD }}"
+                                            {% if q.choiceD == question.providedAnswer%}
+                                    checked
+                                            {% endif %}>
+                                    <label
+                                            {% if q.correctAnswer == q.choiceD and q.choiceD == question.providedAnswer %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer != question.providedAnswer and q.choiceD == question.providedAnswer %}
+                                                class="wrong-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer == q.choiceD %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                    >
+                                        {{ q.choiceD }}
+                                    </label>
+                                    </br>
+                                    {% endif %}
+{#                                </br>#}
+{#                                <label style="color: darkgreen">Correct answer: {{ q.correctAnswer }}</label>#}
+{#                                </br>#}
                                 {% set index = index + 1  %}
                             </div>
                         {% endif %}

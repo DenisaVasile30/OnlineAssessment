@@ -52,6 +52,9 @@ class QuizController extends AbstractController
             $teacher = $teacherRepository->getTeacher($userId);
             $quizQuestions->setCreatedAt(new \DateTime());
             $quizQuestions->setIssuedBy($teacher[0]);
+            if (!$quizForm->get('choiceD')) {
+                $quizQuestions->setChoiceD('');
+            }
 
             $questionRepository->save($quizQuestions, true);
 
@@ -449,10 +452,13 @@ class QuizController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 //            dd('here');
             if ($form->get('next')->isClicked()) {
-                $remainingTime = $request->request->get('remainingTime');
-                $secondsSpent = $request->request->get('seconds-spent');
-                $index = $request->request->get('index');
                 $question = new SupportedQuizDetails();
+                if ($remainingTime) {
+                    $remainingTime = $request->request->get('remainingTime');
+                    $secondsSpent = $request->request->get('seconds-spent');
+                    $question->setTimeSpent($secondsSpent);
+                }
+                $index = $request->request->get('index');
                 $question->setQuizId($requiredQuiz->getId());
                 $question->setQuestionId($questions[$index]->getId());
                 $correctAnswer = $questions[$index]->getCorrectAnswer();
@@ -465,7 +471,6 @@ class QuizController extends AbstractController
                 } else {
                     $question->setObtainedScore(0);
                 }
-                $question->setTimeSpent($secondsSpent);
                 /**@var User $user*/
                 $user = $this->getUser();
 
