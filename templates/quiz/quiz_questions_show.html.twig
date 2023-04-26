@@ -11,10 +11,10 @@
                 <th>Category</th>
                 <th>Optional description</th>
                 <th>Content</th>
-                <th>Choice A</th>
-                <th>Choice B</th>
-                <th>Choice C</th>
-                <th>Choice D</th>
+{#                <th>Choice A</th>#}
+{#                <th>Choice B</th>#}
+{#                <th>Choice C</th>#}
+{#                <th>Choice D</th>#}
                 <th>Correct answer</th>
                 <th>Issued by</th>
                 <th>Created At</th>
@@ -44,18 +44,18 @@
                     <th>
                         <input type="text" placeholder="'Filter" style="color:black" name="questionContent">
                     </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="choiceA">
-                    </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="choiceB">
-                    </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="choiceC">
-                    </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="choiceD">
-                    </th>
+{#                    <th>#}
+{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceA">#}
+{#                    </th>#}
+{#                    <th>#}
+{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceB">#}
+{#                    </th>#}
+{#                    <th>#}
+{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceC">#}
+{#                    </th>#}
+{#                    <th>#}
+{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceD">#}
+{#                    </th>#}
                     <th>
                         <input type="text" placeholder="'Filter" style="color:black" name="correctAnswer">
                     </th>
@@ -75,13 +75,28 @@
                         <td>{{ question.id }}</td>
                         <td>{{ question.category }}</td>
                         <td>{{ question.optionalDescription }}</td>
-                        <td>{{ question.questionContent }}</td>
-                        <td>{{ question.choiceA }}</td>
-                        <td>{{ question.choiceB }}</td>
-                        <td>{{ question.choiceC }}</td>
-{#                        {%  if question.choiceD is defined and question.choiceD is not null %}#}
-                            <td>{{ question.choiceD }}</td>
-{#                        {%  endif %}#}
+                        <td>{{ question.questionContent }}
+                            <button class="save-button" id="toggle-choices-{{ question.id }}"
+                                    onclick="toggleChoices('{{ question.id }}')">
+                                Display Choices
+                            </button>
+                            <br><br>
+                            <div id="choices-{{ question.id }}" style="display: none">
+                                a. {{ question.choiceA }}
+                                <br>
+                                b. {{ question.choiceB }}
+                                <br>
+                                c. {{ question.choiceC }}
+                                <br>
+                                d. {{ question.choiceD }}
+                                <br>
+                            </div>
+                        </td>
+
+{#                        <td>{{ question.choiceA }}</td>#}
+{#                        <td>{{ question.choiceB }}</td>#}
+{#                        <td>{{ question.choiceC }}</td>#}
+{#                        <td>{{ question.choiceD }}</td>#}
                         <td>{{ question.correctAnswer }}</td>
                         <td>{{ question.issuedBy.user.email }}</td>
                         <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>
@@ -110,6 +125,19 @@
             var buttonText = document.querySelector('#filter-btn div').textContent;
             document.querySelector('#action').value = buttonText;
         };
+
+        function toggleChoices(questionId) {
+            var contentDiv = document.getElementById('choices-' + questionId);
+            var toggleButton = document.getElementById('toggle-choices-' + questionId);
+
+            if (contentDiv.style.display === 'none') {
+                contentDiv.style.display = 'block';
+                toggleButton.textContent = 'Hide Choices';
+            } else {
+                contentDiv.style.display = 'none';
+                toggleButton.textContent = 'Show Choices';
+            }
+        }
     </script>
 
 {% endblock %}
