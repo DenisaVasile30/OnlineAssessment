@@ -79,7 +79,9 @@
                         <td>{{ question.choiceA }}</td>
                         <td>{{ question.choiceB }}</td>
                         <td>{{ question.choiceC }}</td>
-                        <td>{{ question.choiceD }}</td>
+{#                        {%  if question.choiceD is defined and question.choiceD is not null %}#}
+                            <td>{{ question.choiceD }}</td>
+{#                        {%  endif %}#}
                         <td>{{ question.correctAnswer }}</td>
                         <td>{{ question.issuedBy.user.email }}</td>
                         <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>

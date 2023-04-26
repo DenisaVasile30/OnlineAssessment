@@ -4,8 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Group;
 use App\Entity\Student;
+use App\Entity\Teacher;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<Student>
@@ -84,5 +87,21 @@ class StudentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
         ;
+    }
+
+    public function getStudentAssignedByTeacherId(User $user, Teacher $teacher)
+    {
+        $groupNos = $teacher->getAssignedGroups();
+
+        return $this->createQueryBuilder('st')
+            ->leftJoin('st.user', 'u')
+            ->leftJoin('st.group', 'gr')
+            ->join('App\Entity\Teacher', 't', Query\Expr\Join::WITH, 'JSON_CONTAINS(:groupNos, gr.groupNo) = 1')
+            ->andWhere('t.user = :user')
+            ->setParameter('user', $user)
+            ->setParameter('groupNos', json_encode($groupNos))
+            ->orderBy('gr.groupNo', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -33,7 +33,7 @@ class QuizQuestion
     #[ORM\Column(type: 'string', length: 500, nullable: false)]
     private string $choiceC;
 
-    #[ORM\Column(type: 'string', length: 500, nullable: false)]
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private string $choiceD;
 
     #[ORM\Column(type: 'string', length: 500, nullable: false)]
@@ -129,12 +129,12 @@ class QuizQuestion
         return $this;
     }
 
-    public function getChoiceD(): string
+    public function getChoiceD(): ?string
     {
         return $this->choiceD;
     }
 
-    public function setChoiceD(string $choiceD): self
+    public function setChoiceD(?string $choiceD): self
     {
         $this->choiceD = $choiceD;
 

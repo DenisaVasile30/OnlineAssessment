@@ -28,7 +28,8 @@ class GroupController extends AbstractController
     ): Response
     {
         $teacherAssignedGroups = $this->getUser()->getTeacher()->getAssignedGroups();
-//        $groups = $groupRepository->getGroups($teacherAssignedGroups);
+//        $studentAssigned = $studentRepository->getStudentAssignedByTeacherId($this->getUser(), $this->getUser()->getTeacher());
+//        dd($studentAssigned);
         $groups = $groupRepository->findAll();
         $studentsNoList = [];
         foreach ($groups as $group) {

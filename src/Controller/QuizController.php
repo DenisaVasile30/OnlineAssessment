@@ -11,14 +11,10 @@ use App\Form\CreateQuizFormType;
 use App\Form\QuizQuestionsAddFormType;
 use App\Form\QuizQuestionsFromFileFormType;
 use App\Form\StartQuizFormType;
-use App\Form\SubjectFormType;
-use App\Repository\AssessmentRepository;
-use App\Repository\AssignedSubjectsRepository;
 use App\Repository\CreatedQuizRepository;
 use App\Repository\GroupRepository;
 use App\Repository\QuizQuestionRepository;
 use App\Repository\StudentRepository;
-use App\Repository\SubjectRepository;
 use App\Repository\SupportedQuizDetailsRepository;
 use App\Repository\SupportedQuizRepository;
 use App\Repository\TeacherRepository;
@@ -26,7 +22,6 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,17 +108,17 @@ class QuizController extends AbstractController
             throw new \Exception('Invalid TXT file structure!'
                 . 'Required structure: '
                 . '    On separate lines:'
-                .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                .   'Question content, answer A, answer B, answer C, correct answer(full-text)'
                 .   'Questions must be separated by an empty line!'
             );
         }
         foreach ($arrayContent as $key => $questionContent) {
             $arrayQuestionContent = explode("\r\n", $questionContent);
-            if (count($arrayQuestionContent) != 6) {
+            if (count($arrayQuestionContent) != 5) {
                 throw new \Exception('Invalid structure at question no ' . $key
                     . ' Required structure: '
                     . '    On separate lines:'
-                    .   'Question content, answer A, answer B, answer C, answer D, correct answer(full-text)'
+                    .   'Question content, answer A, answer B, answer C, correct answer(full-text)'
                     .   'Questions must be separated by an empty line!'
                 );
             }
@@ -135,7 +130,7 @@ class QuizController extends AbstractController
                 }
             }
             if (
-                !in_array($arrayQuestionContent[5], array_slice($arrayQuestionContent, 1, 4, true))
+                !in_array($arrayQuestionContent[4], array_slice($arrayQuestionContent, 1, 3, true))
             ) {
                 throw new \Exception('Invalid value for correct answer at question no ' . $key
                     . '. The correct answer should match a previous given choice! '
@@ -189,11 +184,10 @@ class QuizController extends AbstractController
                 } elseif ($keyQuestion == 3) {
                     $question->setChoiceC($valueQuestion);
                 } elseif ($keyQuestion == 4) {
-                    $question->setChoiceD($valueQuestion);
-                } elseif ($keyQuestion == 5) {
                     $question->setCorrectAnswer($valueQuestion);
                 }
             }
+            $question->setChoiceD('');
             $userId = $this->getUser()->getIdentifierId();
             $teacher = $teacherRepository->getTeacher($userId);
             $question->setIssuedBy($teacher[0]);
