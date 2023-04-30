@@ -2,9 +2,9 @@
 
 {% block body %}
     <br>
-    {% if submittedQuiz == null %}
-    <div class="label-elem"> No results found</div><br>
-    <div class="label-elem"> The quiz was not attempted by students yet!</div>
+    {% if submittedQuiz is defined and submittedQuiz == null %}
+        <div class="label-elem"> No results found</div><br>
+        <div class="label-elem"> The quiz was not attempted by students yet!</div>
     {% else %}
         {% if is_granted('ROLE_TEACHER') %}
         <div class="box">

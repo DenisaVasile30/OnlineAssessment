@@ -269,7 +269,8 @@ class QuizController extends AbstractController
         QuizQuestionRepository $questionRepository,
         TeacherRepository $teacherRepository,
         UserRepository $userRepository,
-        CreatedQuizRepository $createdQuizRepository
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository
     ): Response
     {
         $createdQuiz = new CreatedQuiz();
@@ -296,9 +297,9 @@ class QuizController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $selectedCategory = $form->get('category')->getData();
+            $selectedSource = $form->get('questionsSource')->getData();
             if (!$form->get('save')->isClicked()) {
-                $selectedCategory = $form->get('category')->getData();
-                $selectedSource = $form->get('questionsSource')->getData();
                 if ($selectedSource == 'Mixed') {
                     $quizQuestions = $questionRepository->findBy(['issuedBy' => $teacher[0]->getId()]);
                 } elseif (strlen($selectedCategory) != 0 ) {
@@ -326,45 +327,108 @@ class QuizController extends AbstractController
 
 //                first scenario
 //                only for manually selected questions
-                $selectedQuestionsIds = json_decode($request->request->get('questionsIdsFromSelect'), true);
-                $postedScores = json_decode($request->request->get('questionsScores'), true);
-//                dd($postedScores);
-                $scores = [];
-                foreach ($postedScores as $k => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $key => $score) {
-                            $scores[$key] = $score;
-                        }
-                    }
-                }
-
                 $questionsScores = [];
                 $postedPointsTotal = 0;
                 $questionsWithScore = 0;
-//                $questionsNo = count($selectedQuestionsIds);
-                foreach ($scores as $keyScore => $scoreValue) {
-                    if (strlen(trim($scoreValue)) > 0) {
-                        $postedPointsTotal += (int)$scoreValue;
-                        $questionsWithScore++;
-                    }
-                }
-//                dd($selectedQuestionsIds);
-                $remainedPoints = 100 - $postedPointsTotal;
-                $scorePerQuestion = $remainedPoints / (count($selectedQuestionsIds) - $questionsWithScore);
-                foreach ($selectedQuestionsIds as $questionsId) {
-                    $found = false;
-                    foreach ($scores as $keyScore => $scoreValue) {
-                        if ($questionsId == $keyScore) {
-                            $questionsScores[$questionsId] = (int)$scoreValue;
-                            $found = true;
+                if ($selectedSource == 'Selected Questions') {
+                    $selectedQuestionsIds = json_decode($request->request->get('questionsIdsFromSelect'), true);
+                    $postedScores = json_decode($request->request->get('questionsScores'), true);
+                    $scores = [];
+                    if ($postedScores) {
+                        foreach ($postedScores as $k => $value) {
+                            if (is_array($value)) {
+                                foreach ($value as $key => $score) {
+                                    $scores[$key] = $score;
+                                }
+                            }
+                        }
+                        foreach ($scores as $keyScore => $scoreValue) {
+                            if (strlen(trim($scoreValue)) > 0) {
+                                $postedPointsTotal += (int)$scoreValue;
+                                $questionsWithScore++;
+                            }
                         }
                     }
-                    if (!$found) {
-                        $questionsScores[$questionsId] = $scorePerQuestion;
+                    $remainedPoints = 100 - $postedPointsTotal;
+                    $scorePerQuestion = $remainedPoints / (count($selectedQuestionsIds) - $questionsWithScore);
+                    foreach ($selectedQuestionsIds as $questionsId) {
+                        $found = false;
+                        foreach ($scores as $keyScore => $scoreValue) {
+                            if ($questionsId == $keyScore) {
+                                $questionsScores[$questionsId] = (int)$scoreValue;
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
+                            $questionsScores[$questionsId] = $scorePerQuestion;
+                        }
+                    }
+                    $createdQuiz->setQuestionsList($questionsScores);
+
+                } elseif (
+                    $selectedSource == 'Random from Category'
+                    && $selectedCategory
+                ) {
+                    //        retrieve random questions from Category
+                    $questionsNo = $form->get('questionsNo')->getData();
+                    $questionsIdsByCategory = $quizQuestionRepository->getQuestionsIdsByCategory($selectedCategory);
+                    $randomIds = $this->getRandomIdsFromArray($questionsNo, $questionsIdsByCategory);
+
+                    $remainedPoints = 100;
+                    $scorePerQuestion = $remainedPoints / $questionsNo;
+                    foreach ($randomIds as $questionsId) {
+                            $questionsScores[$questionsId] = $scorePerQuestion;
+                    }
+                    $createdQuiz->setQuestionsList($questionsScores);
+                } elseif ($selectedSource == 'Mixed') {
+                    $selectedQuestionsIds = json_decode($request->request->get('questionsIdsFromSelect'), true);
+                    if ($selectedQuestionsIds) {
+                        $postedScores = json_decode($request->request->get('questionsScores'), true);
+                        $scores = [];
+                        if ($postedScores) {
+                            foreach ($postedScores as $k => $value) {
+                                if (is_array($value)) {
+                                    foreach ($value as $key => $score) {
+                                        $scores[$key] = $score;
+                                    }
+                                }
+                            }
+                            foreach ($scores as $keyScore => $scoreValue) {
+                                if (strlen(trim($scoreValue)) > 0) {
+                                    $postedPointsTotal += (int)$scoreValue;
+                                    $questionsWithScore++;
+                                }
+                            }
+                        }
+                        $remainedPoints = 100 - $postedPointsTotal;
+                        $scorePerQuestion = $remainedPoints / (count($selectedQuestionsIds) - $questionsWithScore);
+                        foreach ($selectedQuestionsIds as $questionsId) {
+                            $found = false;
+                            foreach ($scores as $keyScore => $scoreValue) {
+                                if ($questionsId == $keyScore) {
+                                    $questionsScores[$questionsId] = (int)$scoreValue;
+                                    $found = true;
+                                }
+                            }
+                            if (!$found) {
+                                $questionsScores[$questionsId] = $scorePerQuestion;
+                            }
+                        }
+                        $createdQuiz->setQuestionsList($questionsScores);
+                    } else {
+                        $questionsNo = $form->get('questionsNo')->getData();
+                        $questionsIds = $quizQuestionRepository->getQuestionsIds($selectedCategory);
+                        $randomIds = $this->getRandomIdsFromArray($questionsNo, $questionsIds);
+
+                        $remainedPoints = 100;
+                        $scorePerQuestion = $remainedPoints / $questionsNo;
+                        foreach ($randomIds as $questionsId) {
+                            $questionsScores[$questionsId] = $scorePerQuestion;
+                        }
+                        $createdQuiz->setQuestionsList($questionsScores);
                     }
                 }
 
-                $createdQuiz->setQuestionsList($questionsScores);
                 $createdQuiz->setCategory($form->get('category')->getData());
                 $createdQuiz->setCreatedBy($teacher[0]);
                 $createdQuiz->setMaxGrade($form->get('maxGrade')->getData());
@@ -447,7 +511,7 @@ class QuizController extends AbstractController
             ]);
         }
 
-
+//        dd($requiredQuiz);
         //        get all questionsIds
         $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
         $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
@@ -776,5 +840,19 @@ class QuizController extends AbstractController
             'quizQuestions' => $form->createView(),
 //            'quizQuestionsFromFileForm' => $quizQuestionsFromFileForm->createView()
         ]);
+    }
+
+    private function getRandomIdsFromArray(int $questionsNo, array $questionsIdsByCategory): array
+    {
+        $randomIds = [];
+        while (count($randomIds) < $questionsNo) {
+            $randomIndex = rand(0, count($questionsIdsByCategory) - 1);
+            $randomId = $questionsIdsByCategory[$randomIndex];
+            if (!in_array($randomId, $randomIds)) {
+                $randomIds[] = $randomId;
+            }
+        }
+
+        return $randomIds;
     }
 }

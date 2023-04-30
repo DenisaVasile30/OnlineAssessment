@@ -107,4 +107,26 @@ class QuizQuestionRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getQuestionsIdsByCategory(String $category): array
+    {
+        $ids = $this->createQueryBuilder('q')
+            ->select('q.id')
+            ->andWhere('q.category = :category')
+            ->setParameter('category', $category)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map('current', $ids);
+    }
+
+    public function getQuestionsIds(String $category): array
+    {
+        $ids = $this->createQueryBuilder('q')
+            ->select('q.id')
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map('current', $ids);
+    }
 }

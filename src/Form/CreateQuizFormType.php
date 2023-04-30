@@ -46,8 +46,8 @@ class CreateQuizFormType extends AbstractType
             ->add('questionsSource', ChoiceType::class, [
                 'choices'  => [
                     'Random from Category' => 'Random from Category',
-                    'From Category' => 'From Category',
                     'Mixed' => 'Mixed',
+                    'Selected Questions' => 'Selected Questions',
                 ],
             ])
             ->add('startAt')
