@@ -1,7 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if is_granted('ROLE_TEACHER') %}
+    <br>
+    {% if submittedQuiz == null %}
+    <div class="label-elem"> No results found</div><br>
+    <div class="label-elem"> The quiz was not attempted by students yet!</div>
+    {% else %}
+        {% if is_granted('ROLE_TEACHER') %}
         <div class="box">
             <span class="label-elem">
                 Quiz Id:  {{ requiredQuiz.id }}
@@ -94,5 +99,6 @@
                 </tbody>
             </table>
         </div>
+    {% endif %}
     {% endif %}
 {% endblock %}

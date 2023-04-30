@@ -32,6 +32,9 @@ class CreatedQuiz
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $timeUnit = null;
 
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $practiceQuiz = false;
+
     #[ORM\Column]
     private array $assigneeGroup = [];
 
@@ -235,5 +238,21 @@ class CreatedQuiz
     public function setMaxPoints(?int $maxPoints): void
     {
         $this->maxPoints = $maxPoints;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPracticeQuiz(): ?bool
+    {
+        return $this->practiceQuiz;
+    }
+
+    /**
+     * @param bool|null $practiceQuiz
+     */
+    public function setPracticeQuiz(?bool $practiceQuiz): void
+    {
+        $this->practiceQuiz = $practiceQuiz;
     }
 }

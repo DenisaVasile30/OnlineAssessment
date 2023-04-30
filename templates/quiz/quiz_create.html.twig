@@ -23,6 +23,10 @@
             {{ form_widget(createQuiz.assigneeGroup, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
             {{ form_errors(createQuiz.assigneeGroup) }}
 
+            {{ form_label(createQuiz.practiceQuiz, 'Is practice quiz?', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+            {{ form_widget(createQuiz.practiceQuiz, {'attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}})}}
+            {{ form_errors(createQuiz.practiceQuiz) }}
+
             {{ form_label(createQuiz.questionsNo, 'Questions no', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
             {{ form_widget(createQuiz.questionsNo, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
             {{ form_errors(createQuiz.questionsNo) }}

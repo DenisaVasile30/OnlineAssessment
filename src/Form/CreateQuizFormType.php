@@ -32,6 +32,15 @@ class CreateQuizFormType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
             ])
+            ->add('practiceQuiz', ChoiceType::class, [
+                'required' => false,
+                'choices' => [
+                    'No' =>'No',
+                    'Yes' => 'Yes'
+                ],
+                'expanded' => false,
+                'multiple' => false,
+            ])
             ->add('questionsNo')
             ->add('maxGrade')
             ->add('questionsSource', ChoiceType::class, [

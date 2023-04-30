@@ -318,6 +318,11 @@ class QuizController extends AbstractController
                 $createdQuiz->setTimeUnit($form->get('timeUnit')->getData());
                 $createdQuiz->setAssigneeGroup($form->get('assigneeGroup')->getData());
                 $createdQuiz->setQuestionsNo($form->get('questionsNo')->getData());
+                if ($form->get('practiceQuiz')->getData() == 'Yes') {
+                    $createdQuiz->setPracticeQuiz(true);
+                } else {
+                    $createdQuiz->setPracticeQuiz(false);
+                }
 
 //                first scenario
 //                only for manually selected questions
@@ -433,6 +438,13 @@ class QuizController extends AbstractController
             $supportedQuiz->setQuiz($quiz);
 
             $supportedQuizRepository->save($supportedQuiz, true);
+        } elseif (
+            $supportedQuiz->getObtainedGrade() != null
+            && !$requiredQuiz->getPracticeQuiz()
+        ) {
+            return $this->render('quiz/start_quiz.html.twig', [
+                'practiceQuiz' => false
+            ]);
         }
 
 
@@ -662,6 +674,10 @@ class QuizController extends AbstractController
                 'requiredQuiz' => $requiredQuiz,
                 'submittedQuizzes' => $submittedQuizzes,
                 'groups' => $groups,
+            ]);
+        } else {
+            return $this->render('quiz/show_all_quiz_results.html.twig',[
+                'submittedQuiz' => $submittedQuizzes,
             ]);
         }
     }
