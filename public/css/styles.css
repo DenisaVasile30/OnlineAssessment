@@ -214,3 +214,15 @@ th, td {
     padding-right: 5px!important; /* optional, adjust to your liking */
     border-radius: 5px!important; /* optional, if you want rounded corners */
 }
+
+.menu-item {
+    color: black!important;
+    text-decoration: none!important;
+    padding: 10px 15px!important;
+    border-radius: 5px!important;
+}
+
+.menu-item:hover {
+    background-color: #333!important;
+    color: #fff!important;
+}
