@@ -1,46 +1,47 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="box" style="width: 100%">
-        <div class="label-elem" style="width: 30%">Assessments:</div>
-        <div class="list-elem">
-            {% if is_granted('ROLE_TEACHER') %}
-                <a href="{{ path('app_add_subject') }}">
-                    Add new subject
+    <div class="container">
+        <div class="box" style="width: 100%">
+            <div class="label-elem" style="width: 30%">Assessments:</div>
+            <div class="list-elem">
+                {% if is_granted('ROLE_TEACHER') %}
+                    <a href="{{ path('app_add_subject') }}" class="list-elem-item">
+                        Add new subject
+                    </a>
+                    <a href="{{ path('app_show_subject') }}" class="list-elem-item">
+                        Show all subjects
+                    </a>
+                    <a href="{{ path('app_schedule_assessment') }}" class="list-elem-item">
+                        Schedule assessment
+                    </a>
+                {% endif %}
+                <a href="{{ path('app_show_assessments') }}" class="list-elem-item">
+                    Show Assessments
                 </a>
-                <a href="{{ path('app_show_subject') }}">
-                    Show all subjects
+            </div>
+        </div>
+
+        </br><br>
+
+        <div class="box" style="width: 100%">
+            <div class="label-elem" style="width: 30%">Quizzes:</div>
+            <div class="list-elem">
+                {% if is_granted('ROLE_TEACHER') %}
+                    <a href="{{ path('app_quiz_questions') }}" class="list-elem-item">
+                        Load quiz questions
+                    </a>
+                    <a href="{{ path('app_quiz_questions_show') }}" class="list-elem-item">
+                        Show all questions
+                    </a>
+                    <a href="{{ path('app_quiz_create') }}" class="list-elem-item">
+                        Create quiz
+                    </a>
+                {% endif %}
+                <a href="{{ path('app_show_quizzes') }}" class="list-elem-item">
+                    Show quizzes
                 </a>
-                <a href="{{ path('app_schedule_assessment') }}">
-                    Schedule assessment
-                </a>
-            {% endif %}
-            <a href="{{ path('app_show_assessments') }}">
-                Show Assessments
-            </a>
+            </div>
         </div>
     </div>
-
-    </br><br>
-
-    <div class="box" style="width: 100%">
-        <div class="label-elem" style="width: 30%">Quizzes:</div>
-        <div class="list-elem">
-            {% if is_granted('ROLE_TEACHER') %}
-                <a href="{{ path('app_quiz_questions') }}">
-                    Load quiz questions
-                </a>
-                <a href="{{ path('app_quiz_questions_show') }}">
-                    Show all questions
-                </a>
-                <a href="{{ path('app_quiz_create') }}">
-                    Create quiz
-                </a>
-            {% endif %}
-            <a href="{{ path('app_show_quizzes') }}">
-                Show quizzes
-            </a>
-        </div>
-    </div>
-
 {% endblock %}
