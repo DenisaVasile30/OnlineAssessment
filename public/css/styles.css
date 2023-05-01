@@ -440,21 +440,45 @@ a{color:inherit;text-decoration:none}
     justify-content: space-between;
 }
 
+/*.main-body {*/
+/*    background-color: #F5DEB3;*/
+/*    backdrop-filter: blur(10px);*/
+/*    color: #2d3748;*/
+/*    width: 100%;*/
+/*    !*margin: auto;*!*/
+/*    height: 100%;*/
+/*    !*position: relative;*!*/
+/*    background-image: url("/../images/login-background.jpg");*/
+/*    background-repeat: repeat;*/
+/*    background-size: cover;*/
+/*    background-position: center center;*/
+/*    object-fit: cover;*/
+/*    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19);*/
+/*    image-rendering: optimizeQuality; !* or image-rendering: pixelated; *!*/
+/*}*/
+
 .main-body {
     background-color: #F5DEB3;
-    backdrop-filter: blur(10px);
     color: #2d3748;
     width: 100%;
-    /*margin: auto;*/
     height: 100%;
-    /*position: relative;*/
+    position: relative;
+    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19);
+}
+
+.main-body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url("/../images/login-background.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
-    object-fit: cover;
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19);
-    image-rendering: optimizeQuality; /* or image-rendering: pixelated; */
+    filter: blur(10px);
+    z-index: -1;
 }
 
 .main-body-white {
