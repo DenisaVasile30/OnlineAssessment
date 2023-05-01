@@ -1,28 +1,29 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-        <label class="label-elem">
-            Existing questions:
+    <div class="container">
+        <label class="label" style="margin-left: 30px">
+            Questions List:
         </label><br><br>
         <table style="width: 100%; table-layout: auto;">
             <thead>
             <tr>
-                <th>Id</th>
-                <th>Category</th>
-                <th>Optional description</th>
+                <th style="width: 15px!important;">Id</th>
+                <th style="width: 35px!important;">Category</th>
+                <th style="width: 35px!important;">Optional description</th>
                 <th>Content</th>
-{#                <th>Choice A</th>#}
-{#                <th>Choice B</th>#}
-{#                <th>Choice C</th>#}
-{#                <th>Choice D</th>#}
-                <th>Correct answer</th>
-                <th>Issued by</th>
-                <th>Created At</th>
+                {#                <th>Choice A</th>#}
+                {#                <th>Choice B</th>#}
+                {#                <th>Choice C</th>#}
+                {#                <th>Choice D</th>#}
+                <th style="width: 35px!important;">Correct answer</th>
+                <th style="width: 35px!important;">Issued by</th>
+                <th style="width: 45px!important;">Created At</th>
                 <th>Actions</th>
             </tr>
             <tr>
                 <form action="{{ path('app_quiz_questions_filter') }}" method="post" name="filter-form">
-                    <button type="submit" id="filter-btn">
+                    <button type="submit" id="filter-btn" style="margin-left: 30px">
                         {% if  app.request.uri ends with 'filter' %}
                             <div class="general-button">Reset Filters</div>
                         {% else %}
@@ -32,38 +33,26 @@
                     <br>
                     <br>
                     <input type="hidden" name="action" id="action" value="{{ app.request.uri }}">
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="id">
+                    <th style="width: 15px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 15px!important;" name="id">
                     </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="category">
+                    <th style="width: 35px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 35px!important;" name="category">
                     </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="optionalDescription">
+                    <th style="width: 35px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 35px!important;" name="optionalDescription">
                     </th>
                     <th>
                         <input type="text" placeholder="'Filter" style="color:black" name="questionContent">
                     </th>
-{#                    <th>#}
-{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceA">#}
-{#                    </th>#}
-{#                    <th>#}
-{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceB">#}
-{#                    </th>#}
-{#                    <th>#}
-{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceC">#}
-{#                    </th>#}
-{#                    <th>#}
-{#                        <input type="text" placeholder="'Filter" style="color:black" name="choiceD">#}
-{#                    </th>#}
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="correctAnswer">
+                    <th style="width: 35px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 35px!important;" name="correctAnswer">
                     </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="issuedBy">
+                    <th style="width: 35px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 35px!important;" name="issuedBy">
                     </th>
-                    <th>
-                        <input type="text" placeholder="'Filter" style="color:black" name="createdAt">
+                    <th style="width: 45px!important;">
+                        <input type="text" placeholder="'Filter" style="color:black;width: 45px!important;" name="createdAt">
                     </th>
                 </form>
             </tr>
@@ -92,20 +81,17 @@
                                 <br>
                             </div>
                         </td>
-
-{#                        <td>{{ question.choiceA }}</td>#}
-{#                        <td>{{ question.choiceB }}</td>#}
-{#                        <td>{{ question.choiceC }}</td>#}
-{#                        <td>{{ question.choiceD }}</td>#}
                         <td>{{ question.correctAnswer }}</td>
                         <td>{{ question.issuedBy.user.email }}</td>
                         <td>{{ question.createdAt|date('Y-m-d H:i:s') }}</td>
                         <td>
                             <a href="{{ path('app_edit_question', { questionId: question.id}) }}">
-                                Edit
+{#                                Edit#}
+                                <img src="/../images/edit_icon.png" alt="Edit" width="24" height="24" style="display: inline-block" />
                             </a>
                             <a href="{{ path('app_delete_question', { questionId: question.id}) }}">
-                                Delete
+{#                                Delete#}
+                                <img src="/../images/delete_icon.png" alt="Edit" width="24" height="24" style="display: inline-block" />
                             </a>
                         </td>
                     </tr>
@@ -113,6 +99,7 @@
             {% endfor %}
             </tbody>
         </table>
+    </div>
 {% endblock %}
 
 {% block javascripts %}

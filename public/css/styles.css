@@ -17,7 +17,7 @@ td {
 
 .general-button {
    /*background-color: #1516a2;*/
-   background-color: gray;
+   background-color: #978270;
    border: 0;
    border-radius: 45px;
    color: #fff;
@@ -39,7 +39,7 @@ td {
 
 .general-button:hover {
     background-color: initial;
-    background-image: linear-gradient(#fff 0, rgba(255, 255, 255, 0) 100%);
+    background-image: linear-gradient(#8f7b50 0, rgba(255, 255, 255, 0) 100%);
     border-radius: 45px;
     /*content: "";*/
     /*height: 50%;*/

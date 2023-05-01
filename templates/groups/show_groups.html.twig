@@ -8,12 +8,13 @@
                 Create new group
             </a>
         </button><br><br>
-        <label class="label-elem">
-            Existing groups:
-        </label><br><br>
+        <div class="container">
+            <div class="label" style="margin-left: 30px">
+                Groups List:
+            </div><br><br>
 
-        <table>
-            <thead>
+            <table>
+                <thead>
                 <tr>
                     <th>Unique identifier</th>
                     <th>Group no</th>
@@ -23,8 +24,8 @@
                     <th>Assigned</th>
                     <th>Actions</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 {% for group in groups %}
                     <tr>
                         <td>{{ group.id }}</td>
@@ -49,13 +50,14 @@
                                     Assign to yourself
                                 </a>
                             {% endif%}
-                                <a href="{{ path('app_group_show_students', { groupId: group.id}) }}">
-                                    Show students
-                                </a>
+                            <a href="{{ path('app_group_show_students', { groupId: group.id}) }}">
+                                Show students
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 {% endblock %}

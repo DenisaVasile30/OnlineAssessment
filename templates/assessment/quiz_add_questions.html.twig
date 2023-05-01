@@ -2,35 +2,36 @@
 
 {% block body %}
     {% if is_granted('ROLE_TEACHER') %}
-        {% if quizQuestionsFromFileForm is defined %}
+        <div class="container">
+            {% if quizQuestionsFromFileForm is defined %}
+                <div class="box">
+                    {{ form_start(quizQuestionsFromFileForm) }}
+                    <label class="label" style="margin-left: 30px">
+                        Load quiz questions from file:
+                    </label><br>
+                    <div class="box">
+                        {{ form_label(quizQuestionsFromFileForm.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                        {{ form_widget(quizQuestionsFromFileForm.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                        {{ form_errors(quizQuestionsFromFileForm.category) }}
+
+                        {{ form_row(quizQuestionsFromFileForm.contentFile) }}
+                        {{ form_errors(quizQuestionsFromFileForm.contentFile) }}
+
+                        <button type="submit" class="save-button">
+                            Save
+                        </button>
+
+                        {{ form_end(quizQuestionsFromFileForm) }}
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="box">
-                {{ form_start(quizQuestionsFromFileForm) }}
-                <label class="label-elem">
-                    Load quiz questions from file:
+                {{ form_start(quizQuestions) }}
+                <label class="label" style="margin-left: 30px">
+                    Add/Edit question content:
                 </label><br>
                 <div class="box">
-                    {{ form_label(quizQuestionsFromFileForm.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-                    {{ form_widget(quizQuestionsFromFileForm.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-                    {{ form_errors(quizQuestionsFromFileForm.category) }}
-
-                    {{ form_row(quizQuestionsFromFileForm.contentFile) }}
-                    {{ form_errors(quizQuestionsFromFileForm.contentFile) }}
-
-                    <button type="submit" class="save-button">
-                        Save
-                    </button>
-
-                    {{ form_end(quizQuestionsFromFileForm) }}
-                </div>
-            </div>
-        {% endif %}
-
-        <div class="box">
-            {{ form_start(quizQuestions) }}
-            <label class="label-elem">
-                Add question content:
-            </label><br>
-            <div class="box">
                     {{ form_label(quizQuestions.category, 'Category', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
                     {{ form_widget(quizQuestions.category, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
                     {{ form_errors(quizQuestions.category) }}
@@ -72,6 +73,6 @@
 
             </div>
             {{ form_end(quizQuestions) }}
-        </div>
     {% endif %}
+    </div>
 {% endblock %}

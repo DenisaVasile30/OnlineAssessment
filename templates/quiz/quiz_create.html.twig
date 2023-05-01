@@ -2,11 +2,12 @@
 
 {% block body %}
     {% if is_granted('ROLE_TEACHER') %}
-    <div>
-        <label class="label-elem">
+    <div class="container">
+        <label class="label" style="margin-left: 30px">
             Create new quiz:
         </label><br><br>
-        {{ form_start(createQuiz) }}
+        <div class="box">
+            {{ form_start(createQuiz) }}
             {{ form_label(createQuiz.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
             {{ form_widget(createQuiz.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
             {{ form_errors(createQuiz.description) }}
@@ -59,7 +60,8 @@
 
             {{ form_widget(createQuiz.save, {'attr': {'class': 'save-button'}}) }}
 
-        {{ form_end(createQuiz) }}
+            {{ form_end(createQuiz) }}
+        </div>
     </div>
     {% endif %}
 {% endblock %}

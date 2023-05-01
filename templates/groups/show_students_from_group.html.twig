@@ -2,82 +2,84 @@
 
 {% block body %}
     {% if is_granted('ROLE_TEACHER') %}
-        <br>
-        <div class="box">
-            <label class="label-elem">
-                Group id: {{ group.id }}
-            </label><br>
-            <label class="label-elem">
-                Group no: {{ group.groupNo }}
-            </label><br>
-            <label class="label-elem">
-                Created at: {{ group.createdDate|date('Y-m-d') }}
-            </label><br>
-            <label class="label-elem"
-            >Faculty: {{ group.faculty }}
-            </label>
+        <div class="container">
             <br>
-        </div>
-        <br>
-        <div class="box">
-            <label class="label-elem">
-                Add from existing students
-            </label><br><br>
-            <label for="all-students-list" class="label-elem" style="margin-right: 25px; margin-left: 40px">
-                Select email to add:
-            </label>
-            <select style="color: black" id="all-students-list">
-                {% for stud in allStudents %}
-                    <option value="{{ stud.user.id }}">{{ stud.user.email }}</option>
-                {% endfor %}
-            </select>
-            <br><br>
-            <button class="save-button">
-                <a href="#" id="add-existing-student-btn">
-                    Add selected student to group {{ group.groupNo }}
-                </a>
-            </button>
-        </div>
-        <br>
-
-        <div class="box">
-            <button id="create-student-account-btn">
-                Create students account
-            </button>
-            <div id="students-form-div" style="color: black">
+            <div class="box">
+                <label class="label-elem">
+                    Group id: {{ group.id }}
+                </label><br>
+                <label class="label-elem">
+                    Group no: {{ group.groupNo }}
+                </label><br>
+                <label class="label-elem">
+                    Created at: {{ group.createdDate|date('Y-m-d') }}
+                </label><br>
+                <label class="label-elem"
+                >Faculty: {{ group.faculty }}
+                </label>
+                <br>
             </div>
-            <button id="save-students-btn" class="save-button">
-                Save
-            </button>
-        </div>
+            <br>
+            <div class="box">
+                <label class="label-elem">
+                    Add from existing students
+                </label><br><br>
+                <label for="all-students-list" class="label-elem" style="margin-right: 25px; margin-left: 40px">
+                    Select email to add:
+                </label>
+                <select style="color: black" id="all-students-list">
+                    {% for stud in allStudents %}
+                        <option value="{{ stud.user.id }}">{{ stud.user.email }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <button class="save-button">
+                    <a href="#" id="add-existing-student-btn">
+                        Add selected student to group {{ group.groupNo }}
+                    </a>
+                </button>
+            </div>
+            <br>
 
-        <label class="label-elem">
-            Assigned group students:
-        </label><br>
-        <table>
-            <thead>
+            <div class="box">
+                <button id="create-student-account-btn">
+                    Create students account
+                </button>
+                <div id="students-form-div" style="color: black">
+                </div>
+                <button id="save-students-btn" class="save-button">
+                    Save
+                </button>
+            </div>
+            <br>
+            <div class="label" style="margin-left: 30px">
+                Assigned group students list:
+            </div><br>
+            <table>
+                <thead>
                 <tr>
                     <th>Unique identifier</th>
                     <th>Email</th>
                     <th>Enrollment date</th>
                     <th>Actions</th>
                 </tr>
-            </thead>
-            <tbody>
-            {% for student in studentsList %}
-                <tr>
-                    <td>{{ student.id }}</td>
-                    <td>{{ student.user.email }}</td>
-                    <td>{{ student.enrollmentDate|date('Y-m-d') }}</td>
-                    <td>
-                        <a href="{{ path('app_group_remove_student', { groupId: group.id, studentId: student.id}) }}">
-                            Remove from group
-                        </a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for student in studentsList %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.user.email }}</td>
+                        <td>{{ student.enrollmentDate|date('Y-m-d') }}</td>
+                        <td>
+                            <a href="{{ path('app_group_remove_student', { groupId: group.id, studentId: student.id}) }}">
+                                Remove from group
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 {% endblock %}
 

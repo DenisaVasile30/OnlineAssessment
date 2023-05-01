@@ -3,134 +3,140 @@
 {% block body %}
     <br>
     {% if submittedQuiz == null %}
-        <div class="label-elem"> No results found</div>
-        <div class="label-elem"> Attempt the quiz and come back later!</div>
-    {% else %}
         <div class="box">
-            <label class="label-elem">
-                Quiz details:
-            </label><br>
+            <div class="label"> No results found</div>
+            <div class="label"> Attempt the quiz and come back later!</div>
+        </div>
+    {% else %}
+        <div class="container">
             <div class="box">
+                <div class="label" style="margin-left: 30px">
+                    Quiz details:
+                </div><br>
+                <div class="box">
                 <span class="label-elem">
                     {{ requiredQuiz.description }}
                 </span>
-                </br>
-                <span class="label-elem">
+                    </br>
+                    <span class="label-elem">
                     Started at: {{ submittedQuiz.startedAt|date("Y-m-d H:i:s") }}
                 </span>
-                <span class="label-elem" style="margin-left: 120px; text-align: right">
+                    <span class="label-elem" style="margin-left: 120px; text-align: right">
                     Ended at: {{ submittedQuiz.endedAt|date("Y-m-d H:i:s") }}
                 </span>
-                </br>
-                <span class="label-elem">
+                    </br>
+                    <span class="label-elem">
                     Spent time: {{ submittedQuiz.totalTimeSpent| date('i:s') }}
                 </span>
-                </br>
-                <span class="label-elem">
+                    </br>
+                    <span class="label-elem">
                     Grade: {{ submittedQuiz.obtainedGrade }} / {{ submittedQuiz.maxGrade }}
                 </span>
-                <br>
-                <span class="label-elem">
+                    <br>
+                    <span class="label-elem">
                     Points: {{ score }} / 100
                 </span>
-                </br>
-            </div>
-            <br>
-            <label class="label-elem">Submitted answers:</label><br>
-            <div class="box">
-                {% set index = 1 %}
-                {% for question in submittedQuestions %}
-                    {% for q in questions %}
-                        {% if q.id == question.questionId %}
-                            <div class="box">
-                                <label class="label-elem">
-                                    Points: {{ question.obtainedScore }} / {{ question.questionScore }}
-                                </label>
-                                </br>
-                                <label class="label-elem">{{ index~'. '~ q.questionContent }}</label>
-                                </br>
-                                <input type="radio" readonly value="{{ q.choiceA }}"
-                                        {% if q.choiceA == question.providedAnswer%}
-                                checked
-                                        {% endif %}>
-                                <label
-                                        {% if q.correctAnswer == q.choiceA and q.choiceA == question.providedAnswer %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer != question.providedAnswer and q.choiceA == question.providedAnswer %}
-                                            class="wrong-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer == q.choiceA %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                >
-                                    {{ q.choiceA }}
-                                </label>
-                                </br>
-                                <input type="radio" readonly value="{{ q.choiceB }}"
-                                        {% if q.choiceB == question.providedAnswer%}
-                                            checked
-                                        {% endif %}>
-                                <label
-                                        {% if q.correctAnswer == q.choiceB and q.choiceB == question.providedAnswer %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer != question.providedAnswer and q.choiceB == question.providedAnswer %}
-                                            class="wrong-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer == q.choiceB %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                >
-                                    {{ q.choiceB }}
-                                </label>
-                                </br>
-                                <input type="radio" readonly value="{{ q.choiceC }}"
-                                        {% if q.choiceC == question.providedAnswer%}
-                                checked
-                                        {% endif %}>
-                                <label
-                                        {% if q.correctAnswer == q.choiceC and q.choiceC == question.providedAnswer %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer != question.providedAnswer and q.choiceC == question.providedAnswer %}
-                                            class="wrong-answer-input"
-                                        {% endif %}
-                                        {% if q.correctAnswer == q.choiceC %}
-                                            class="correct-answer-input"
-                                        {% endif %}
-                                >
-                                    {{ q.choiceC }}
-                                </label>
-                                </br>
-                                {% if q.choiceD is defined and q.choiceD != ' ' %}
-                                    <input type="radio" readonly value="{{ q.choiceD }}"
-                                            {% if q.choiceD == question.providedAnswer%}
+                    </br>
+                </div>
+                <br>
+                <div class="label" style="margin-left: 30px">
+                    Submitted answers:
+                </div><br>
+                <div class="box">
+                    {% set index = 1 %}
+                    {% for question in submittedQuestions %}
+                        {% for q in questions %}
+                            {% if q.id == question.questionId %}
+                                <div class="box">
+                                    <label class="label">
+                                        Points: {{ question.obtainedScore }} / {{ question.questionScore }}
+                                    </label>
+                                    </br><br>
+                                    <label class="label">{{ index~'. '~ q.questionContent }}</label>
+                                    </br>
+                                    <input type="radio" readonly value="{{ q.choiceA }}"
+                                            {% if q.choiceA == question.providedAnswer%}
                                     checked
                                             {% endif %}>
-                                    <label
-                                            {% if q.correctAnswer == q.choiceD and q.choiceD == question.providedAnswer %}
+                                    <label style="color: black!important;"
+                                            {% if q.correctAnswer == q.choiceA and q.choiceA == question.providedAnswer %}
                                                 class="correct-answer-input"
                                             {% endif %}
-                                            {% if q.correctAnswer != question.providedAnswer and q.choiceD == question.providedAnswer %}
+                                            {% if q.correctAnswer != question.providedAnswer and q.choiceA == question.providedAnswer %}
                                                 class="wrong-answer-input"
                                             {% endif %}
-                                            {% if q.correctAnswer == q.choiceD %}
+                                            {% if q.correctAnswer == q.choiceA %}
                                                 class="correct-answer-input"
                                             {% endif %}
                                     >
-                                        {{ q.choiceD }}
+                                        {{ q.choiceA }}
                                     </label>
                                     </br>
+                                    <input type="radio" readonly value="{{ q.choiceB }}"
+                                            {% if q.choiceB == question.providedAnswer%}
+                                    checked
+                                            {% endif %}>
+                                    <label style="color: black!important;"
+                                            {% if q.correctAnswer == q.choiceB and q.choiceB == question.providedAnswer %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer != question.providedAnswer and q.choiceB == question.providedAnswer %}
+                                                class="wrong-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer == q.choiceB %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                    >
+                                        {{ q.choiceB }}
+                                    </label>
+                                    </br>
+                                    <input type="radio" readonly value="{{ q.choiceC }}"
+                                            {% if q.choiceC == question.providedAnswer%}
+                                    checked
+                                            {% endif %}>
+                                    <label style="color: black!important;"
+                                            {% if q.correctAnswer == q.choiceC and q.choiceC == question.providedAnswer %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer != question.providedAnswer and q.choiceC == question.providedAnswer %}
+                                                class="wrong-answer-input"
+                                            {% endif %}
+                                            {% if q.correctAnswer == q.choiceC %}
+                                                class="correct-answer-input"
+                                            {% endif %}
+                                    >
+                                        {{ q.choiceC }}
+                                    </label>
+                                    </br>
+                                    {% if q.choiceD is defined and q.choiceD != ' ' %}
+                                        <input type="radio" readonly value="{{ q.choiceD }}"
+                                                {% if q.choiceD == question.providedAnswer%}
+                                        checked
+                                                {% endif %}>
+                                        <label style="color: black!important;"
+                                                {% if q.correctAnswer == q.choiceD and q.choiceD == question.providedAnswer %}
+                                                    class="correct-answer-input"
+                                                {% endif %}
+                                                {% if q.correctAnswer != question.providedAnswer and q.choiceD == question.providedAnswer %}
+                                                    class="wrong-answer-input"
+                                                {% endif %}
+                                                {% if q.correctAnswer == q.choiceD %}
+                                                    class="correct-answer-input"
+                                                {% endif %}
+                                        >
+                                            {{ q.choiceD }}
+                                        </label>
+                                        </br>
                                     {% endif %}
-{#                                </br>#}
-{#                                <label style="color: darkgreen">Correct answer: {{ q.correctAnswer }}</label>#}
-{#                                </br>#}
-                                {% set index = index + 1  %}
-                            </div>
-                        {% endif %}
+                                    {#                                </br>#}
+                                    {#                                <label style="color: darkgreen">Correct answer: {{ q.correctAnswer }}</label>#}
+                                    {#                                </br>#}
+                                    {% set index = index + 1  %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
+                </div>
             </div>
         </div>
     {% endif %}
