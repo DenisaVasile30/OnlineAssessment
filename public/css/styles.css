@@ -11,6 +11,10 @@ th, td {
     width: fit-content;
 }
 
+td {
+    text-decoration: none!important;
+}
+
 .general-button {
    /*background-color: #1516a2;*/
    background-color: gray;

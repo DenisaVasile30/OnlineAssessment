@@ -2,52 +2,46 @@
 
 {% block body %}
     {% if is_granted('ROLE_TEACHER') %}
-        {{ form_start(addSubjectForm) }}
-        <br>
-        <div class="label-elem">
-            Add/Edit subject
+        <div class="container">
+            {{ form_start(addSubjectForm) }}
+            <br>
+            <div class="label" style="margin-left: 30px">
+                Add/Edit subject
+            </div>
+            <br>
+            <div class="box">
+                <div>
+                    {{ form_label(addSubjectForm.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                    {{ form_widget(addSubjectForm.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                    {{ form_errors(addSubjectForm.description) }}
+                </div>
+                <div>
+                    {{ form_label(addSubjectForm.subject, 'Discipline', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                    {{ form_widget(addSubjectForm.subject, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                    {{ form_errors(addSubjectForm.subject) }}
+                </div>
+                <div>
+                    {{ form_row(addSubjectForm.contentFile,  {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                    {{ form_errors(addSubjectForm.contentFile) }}
+                </div><br>
+                <div>
+                    {{ form_label(addSubjectForm.subjectContent, 'Subject Content', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                    {{ form_widget(addSubjectForm.subjectContent, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                    {{ form_errors(addSubjectForm.subjectContent) }}
+                </div>
+                <div>
+                    {{ form_label(addSubjectForm.subjectRequirements, 'Optional requirements', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
+                    {{ form_widget(addSubjectForm.subjectRequirements, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
+                    {{ form_errors(addSubjectForm.subjectRequirements) }}
+                </div>
+                <div class="border-b border-gray-300"></div>
+{#                <div class="hr"></div>#}
+                <button type="submit" class="save-button">
+                    Save
+                </button>
+            </div>
+                {{ form_row(addSubjectForm.id) }} {# this field is hidden and will not be displayed #}
+            {{ form_end(addSubjectForm) }}
         </div>
-        <br><br>
-
-        <div>
-            {{ form_label(addSubjectForm.description, 'Description', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(addSubjectForm.description, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(addSubjectForm.description) }}
-        </div>
-
-        <div>
-            {{ form_label(addSubjectForm.subject, 'Discipline', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(addSubjectForm.subject, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(addSubjectForm.subject) }}
-        </div>
-
-        <div>
-            {{ form_row(addSubjectForm.contentFile,  {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_errors(addSubjectForm.contentFile) }}
-        </div><br>
-
-        <div>
-            {{ form_label(addSubjectForm.subjectContent, 'Subject Content', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(addSubjectForm.subjectContent, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(addSubjectForm.subjectContent) }}
-        </div>
-
-        <div>
-            {{ form_label(addSubjectForm.subjectRequirements, 'Optional requirements', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(addSubjectForm.subjectRequirements, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(addSubjectForm.subjectRequirements) }}
-        </div>
-
-        <div class="border-b border-gray-300"></div>
-
-        <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
-
-            <button type="submit" class="save-button">
-                Save
-            </button>
-        </div>
-        {{ form_row(addSubjectForm.id) }} {# this field is hidden and will not be displayed #}
-
-        {{ form_end(addSubjectForm) }}
     {% endif %}
 {% endblock %}
