@@ -2,61 +2,68 @@
 
 {% block body %}
     <br>
-    <div class="box">
-        <div class="label-elem">Submitted assessment:</div>
-        <br>
-
+    <div class="container">
         <div class="box">
-            <label>{{ requiredAssessment.id~' '~requiredAssessment.description }}</label>
-            <br>
-            <label>
-                Started at: {{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}
-                Ended at: {{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}
-            </label>
-            <br>
-            <label>
-                Maximum grade: {{ submittedAssessment.maxGrade }}
-                Time spent: {{ submittedAssessment.timeSpent|date('H:i:s') }}
-            </label>
-
-            <div class="box">
-                <label>
-                    Status:
-                    {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
-                        <br>
-                        <label>Compiled: Yes</label>
-                        <br>
-                        <label>Errors:</label><br>
-                        {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
-                            {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
-                                <label>{{ error }}</label><br>
-                            {% endfor %}
-                        {% else %}
-                            <label>No errors found</label><br>
-                        {% endif %}
-                    {% else %}
-                        <br>
-                        <label>Compiled: No</label>
-                        <br>
-                    {% endif %}
-                </label>
+            <div class="label" style="margin-left: 30px">
+                Submitted assessment:
             </div>
-        </div>
-        <br>
-        <div class="box">
-            <label class="label-elem">Requirements:</label><br><br>
-            <label>{{ structuredRequirements['baseRequirement'] }}</label><br><br>
-            {% for requirement in structuredRequirements['requirements'] %}
-                <label>{{ requirement['content'] }}</label><br>
-            {% endfor %}
-        </div>
-        <br>
-        <div class="box">
-            <label class="label-elem">Submitted code:</label>
             <br>
-            <label><pre>{{ submittedCode }}</pre></label>
-        </div>
+            <div class="box">
+                <label>{{ requiredAssessment.id~' '~requiredAssessment.description }}</label>
+                <br>
+                <label>
+                    Started at: {{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}
+                    Ended at: {{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}
+                </label>
+                <br>
+                <label>
+                    Maximum grade: {{ submittedAssessment.maxGrade }}
+                    Time spent: {{ submittedAssessment.timeSpent|date('H:i:s') }}
+                </label>
+
+                <div class="box">
+                    <label>
+                        Status:
+                        {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
+                            <br>
+                            <label>Compiled: Yes</label>
+                            <br>
+                            <label>Errors:</label><br>
+                            {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
+                                {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
+                                    <label>{{ error }}</label><br>
+                                {% endfor %}
+                            {% else %}
+                                <label>No errors found</label><br>
+                            {% endif %}
+                        {% else %}
+                            <br>
+                            <label>Compiled: No</label>
+                            <br>
+                        {% endif %}
+                    </label>
+                </div>
+            </div>
+            <br>
+            <div class="box">
+                <div class="label" style="margin-left: 30px">
+                    Requirements:
+                </div><br><br>
+                <label>{{ structuredRequirements['baseRequirement'] }}</label><br><br>
+                {% for requirement in structuredRequirements['requirements'] %}
+                    <label>{{ requirement['content'] }}</label><br>
+                {% endfor %}
+            </div>
+            <br>
+            <div class="label" style="margin-left: 30px">
+                Submitted code:
+            </div>
+            <div class="box">
+                <br>
+                <label><pre>{{ submittedCode }}</pre></label>
+            </div>
 
         </div>
+    </div>
     </div>
 {% endblock %}
