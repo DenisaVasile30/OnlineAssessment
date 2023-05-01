@@ -22,26 +22,31 @@
             }
         </script>
     </head>
-<body class="bg-white-100 text-gray-800 m-10 dark:bg-white-800 dark:text-black">
-    <div class="w-full md:w-2/3 mx-auto mb-4 flex justify-between items-center">
-        <div class="text-left">
-            <div class="text-sm text-gray-500 dark:text-black-400 flex">
+    <body class="
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            main-body
+        {% else %}
+            main-body-white
+        {% endif %}">
+    <div class="menu-container">
+        <div style="text-align: left">
+            <div class="menu-block">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    <div class="ml-2">
+                    <div class="menu-margin">
                         <a href="{{ path('app_home') }}" class="menu-item">
                             Home
                         </a>
                     </div>
-                    <div class="ml-2">
+                    <div class="menu-margin">
                         <a href="{{ path('app_support') }}" class="menu-item">
                             TalkSpot
                         </a>
                     </div>
-                    <div class="ml-2">
+                    <div class="menu-margin">
                         <a href="{{ path('app_assessment') }}" class="menu-item">Assessments</a>
                     </div>
                     {% if is_granted('ROLE_TEACHER') %}
-                        <div class="ml-2">
+                        <div class="menu-margin">
                             <a href="{{ path('app_show_groups') }}" class="menu-item">Manage Groups</a>
                         </div>
                     {% endif %}
@@ -49,19 +54,21 @@
             </div>
         </div>
 
-        <div class="text-right">
-            <div class="text-sm text-black-500 dark:text-black-400 flex">
+        <div style="text-align: right">
+            <div class="menu-block">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    <div class="ml-2">
-                        Welcome, {{ app.user.email }}!
+                    <div class="menu-margin">
+                        <a href="#" class="menu-item">
+                            Welcome, {{ app.user.email }}!
+                        </a>
                     </div>
-                    <div class="ml-2">
-                        <a href="{{ path('app_profile_settings') }}">
+                    <div class="menu-margin">
+                        <a href="{{ path('app_profile_settings') }}" class="menu-item">
                             Profile Settings
                         </a>
                     </div>
-                    <div class="ml-2">
-                        <a href="{{ path('app_logout') }}">Logout</a>
+                    <div class="menu-margin">
+                        <a href="{{ path('app_logout') }}" class="menu-item">Logout</a>
                     </div>
                 {% else %}
 {#                    <div>#}
@@ -76,7 +83,11 @@
             </div>
         </div>
     </div>
-
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <div class="main-image">
+            <img src="/../images/background-image.jpg" alt="Image description" class="img">
+        </div>
+    {% endif %}
     <div class="w-full md:w-2/3 mx-auto">
         {% for message in app.flashes('success') %}
             <div class="rounded-md p-2 border-green-300 bg-green-50 border dark:border-green-600 dark:bg-green-700 dark:text-black mb-4">{{ message }}</div>

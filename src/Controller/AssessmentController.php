@@ -175,6 +175,11 @@ class AssessmentController extends AbstractController
         if (in_array('ROLE_STUDENT', $this->getUser()->getRoles())) {
             $isStudent = true;
             $groupId = ($studentRepository->getGroupByUserId($userId))[0]->getGroupId();
+            if (!$groupId) {
+                return $this->render('assessment/assessments_list.html.twig', [
+                    'notAssignedToAGroup' => true
+                ]);
+            }
             $groupNo = $groupRepository->getGroupNo($groupId)[0]->getGroupNo();
             $assessments = $assessmentRepository->getAssessmentsByGroupNo($groupNo);
         } elseif (in_array('ROLE_TEACHER', $this->getUser()->getRoles())) {
