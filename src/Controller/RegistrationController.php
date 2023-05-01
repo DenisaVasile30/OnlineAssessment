@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Student;
 use App\Entity\User;
+use App\Entity\UserProfile;
 use App\Form\RegistrationFormType;
 use App\Repository\StudentRepository;
+use App\Repository\UserProfileRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,7 +35,8 @@ class RegistrationController extends AbstractController
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
-        StudentRepository $studentRepository
+        StudentRepository $studentRepository,
+        UserProfileRepository $profileRepository
     ): Response
     {
         $user = new User();
@@ -58,6 +61,12 @@ class RegistrationController extends AbstractController
 
             $studentRepository->save($student, true);
 
+            $userProfile = new UserProfile();
+            $userProfile->setUser($user);
+            $userProfile->setFirstName($form->get('firstName')->getData());
+            $userProfile->setLastName($form->get('lastName')->getData());
+
+            $profileRepository->save($userProfile, true);
 
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,

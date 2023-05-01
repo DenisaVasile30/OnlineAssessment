@@ -6,51 +6,99 @@
     {% endfor %}
 
     {{ form_start(registrationForm) }}
-    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
-        Enter your credentials
-    </div>
-
-    <div>
-        {{ form_label(registrationForm.email, 'Username (email)', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-        {{ form_widget(registrationForm.email, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-        {{ form_errors(registrationForm.email) }}
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(registrationForm.plainPassword.first) }}
+    <div class="register-wrap">
+        <div class="login-html">
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+            <label for="tab-1" class="tab">
+                Sign Up
+            </label>
+            <div class="login-form">
+                <div class="sign-in-htm">
+                    <div class="group">
+                        {{ form_label(registrationForm.firstName, 'First Name', {'label_attr': {'class': 'label'}}) }}
+                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'input'}})}}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+                    <div class="group">
+                        {{ form_label(registrationForm.lastName, 'Last Name', {'label_attr': {'class': 'label'}}) }}
+                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'input'}})}}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+                    <div class="group">
+                        {{ form_label(registrationForm.email, 'Username (email)', {'label_attr': {'class': 'label'}}) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'input'}})}}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+                    <div class="password-fields">
+                        <div class="group">
+                            {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'label'}}) }}
+                            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'input'}})}}
+                            {{ form_errors(registrationForm.plainPassword.first) }}
+                        </div>
+                        <div class="group">
+                            {{ form_label(registrationForm.plainPassword.second, 'Repeat Password', {'label_attr': {'class': 'label'}}) }}
+                            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'input'}})}}
+                            {{ form_errors(registrationForm.plainPassword.second) }}
+                        </div>
+                    </div>
+                    <div class="group">
+                        {{ form_label(registrationForm.agreeTerms, 'Agree to terms', {'label_attr': {'class': 'label'}}) }}
+                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': ''}}) }}
+                    </div>
+                    <div class="group">
+                        <input type="submit" class="button" value="Sign Up">
+                    </div>
+                    <div class="hr"></div>
+                    <div class="foot-lnk" style="color: white">
+                        Already have an account? <a href="{{ path('app_login') }}">Login here</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            {{ form_label(registrationForm.plainPassword.second, 'Repeat Password', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}
-            {{ form_errors(registrationForm.plainPassword.second) }}
-        </div>
     </div>
 
-    <div class="flex items-center mt-4 mb-4">
-        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'h-4 w-4 rounded border-gray border text-indigo-300 mr-2'}}) }}
-        {{ form_label(registrationForm.agreeTerms, 'Agree to terms', {'label_attr': {'class': 'text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}
-    </div>
 
-    <div class="border-b border-gray-300"></div>
+{#    <div>#}
+{#        {{ form_label(registrationForm.email, 'Username (email)', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}#}
+{#        {{ form_widget(registrationForm.email, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}#}
+{#        {{ form_errors(registrationForm.email) }}#}
+{#    </div>#}
 
-    <div class="text-xl mt-4">
-        Your Profile
-    </div>
-    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">
-        Enter more (optional) details about yourself. You can do it later. Here will go
-    </div>
+{#    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">#}
+{#        <div>#}
+{#            {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}#}
+{#            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}#}
+{#            {{ form_errors(registrationForm.plainPassword.first) }}#}
+{#        </div>#}
+{#        <div>#}
+{#            {{ form_label(registrationForm.plainPassword.second, 'Repeat Password', {'label_attr': {'class': 'block text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}#}
+{#            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'block w-full shadow-sm border-gray-300 dark:border-transparent dark:text-gray-800 rounded-md border p-2 mt-1 mb-2'}})}}#}
+{#            {{ form_errors(registrationForm.plainPassword.second) }}#}
+{#        </div>#}
+{#    </div>#}
+
+{#    <div class="flex items-center mt-4 mb-4">#}
+{#        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'h-4 w-4 rounded border-gray border text-indigo-300 mr-2'}}) }}#}
+{#        {{ form_label(registrationForm.agreeTerms, 'Agree to terms', {'label_attr': {'class': 'text-sm text-gray-700 dark:text-gray-300 font-medium'}}) }}#}
+{#    </div>#}
+
+{#    <div class="border-b border-gray-300"></div>#}
+
+{#    <div class="text-xl mt-4">#}
+{#        Your Profile#}
+{#    </div>#}
+{#    <div class="text-gray-500 mb-4 pb-4 border-b border-gray-300">#}
+{#        Enter more (optional) details about yourself. You can do it later. Here will go#}
+{#    </div>#}
 
 {#    {{ include ('/settings_profile/_profile_form.html.twig', { form: registrationForm.userProfile }) }}#}
 
-    <div>
-        <button type="submit" class="save-button">Register</button>
-    </div>
+{#    <div>#}
+{#        <button type="submit" class="save-button">Register</button>#}
+{#    </div>#}
     {{ form_end(registrationForm) }}
 
-    <div class="mt-2 text-center text-gray-600 dark:text-gray-400">
-        Already have an account? <a href="{{ path('app_login') }}">Login here</a>
-    </div>
+{#    <div class="mt-2 text-center text-gray-600 dark:text-gray-400">#}
+{#        Already have an account? <a href="{{ path('app_login') }}">Login here</a>#}
+{#    </div>#}
 {% endblock %}

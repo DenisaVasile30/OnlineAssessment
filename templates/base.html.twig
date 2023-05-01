@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark">
+<html>
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Assess Tracker{% endblock %}</title>
@@ -64,14 +64,14 @@
                         <a href="{{ path('app_logout') }}">Logout</a>
                     </div>
                 {% else %}
-                    <div>
-                        <a href="{{ path('app_login') }}">Login</a>
-                    </div>
-                    <div class="ml-2">
-                        <a href="{{ path('app_register') }}">
-                            Register
-                        </a>
-                    </div>
+{#                    <div>#}
+{#                        <a href="{{ path('app_login') }}">Login</a>#}
+{#                    </div>#}
+{#                    <div class="ml-2">#}
+{#                        <a href="{{ path('app_register') }}">#}
+{#                            Register#}
+{#                        </a>#}
+{#                    </div>#}
                 {% endif %}
             </div>
         </div>
