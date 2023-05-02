@@ -12,43 +12,43 @@
             <div class="box">
                 <div class="label" style="margin-left: 30px">
                     Quiz details:
-                </div><br>
-                <div class="box">
-                <span class="label-elem">
-                    {{ requiredQuiz.description }}
-                </span>
+                </div>
+                <div class="box" style="width: auto; color: black; font-weight: bolder; font-size: 14px">
+                    <span >
+                        {{ requiredQuiz.description }}
+                    </span>
+                        </br>
+                        <span >
+                        Started at: {{ submittedQuiz.startedAt|date("Y-m-d H:i:s") }}
+                    </span>
+                        <span >
+                        Ended at: {{ submittedQuiz.endedAt|date("Y-m-d H:i:s") }}
+                    </span>
                     </br>
-                    <span class="label-elem">
-                    Started at: {{ submittedQuiz.startedAt|date("Y-m-d H:i:s") }}
-                </span>
-                    <span class="label-elem" style="margin-left: 120px; text-align: right">
-                    Ended at: {{ submittedQuiz.endedAt|date("Y-m-d H:i:s") }}
-                </span>
+                    <span >
+                        Spent time: {{ submittedQuiz.totalTimeSpent| date('i:s') }}
+                    </span>
                     </br>
-                    <span class="label-elem">
-                    Spent time: {{ submittedQuiz.totalTimeSpent| date('i:s') }}
-                </span>
-                    </br>
-                    <span class="label-elem">
-                    Grade: {{ submittedQuiz.obtainedGrade }} / {{ submittedQuiz.maxGrade }}
-                </span>
-                    <br>
-                    <span class="label-elem">
-                    Points: {{ score }} / 100
-                </span>
+                    <span>
+                        Grade: {{ submittedQuiz.obtainedGrade }} / {{ submittedQuiz.maxGrade }}
+                    </span>
+                        <br>
+                    <span>
+                        Points: {{ score }} / 100
+                    </span>
                     </br>
                 </div>
                 <br>
                 <div class="label" style="margin-left: 30px">
                     Submitted answers:
-                </div><br>
+                </div>
                 <div class="box">
                     {% set index = 1 %}
                     {% for question in submittedQuestions %}
                         {% for q in questions %}
                             {% if q.id == question.questionId %}
                                 <div class="box">
-                                    <label class="label">
+                                    <label class="label" style="color: black; font-weight: bolder; font-size: 14px">
                                         Points: {{ question.obtainedScore }} / {{ question.questionScore }}
                                     </label>
                                     </br><br>

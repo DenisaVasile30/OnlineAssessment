@@ -1,74 +1,86 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container">
-        <br>
-        <label class="label" style="margin-left: 30px">
-            Quizzes List:
-        </label>
-        <br><br>
-        <div class="box">
-            <table style="width: 100%">
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Start At</th>
-                    <th>End At</th>
-                    <th>Questions no</th>
-                    <th>Time Limit</th>
-                    <th>Time Unit</th>
-                    {% if is_granted('ROLE_TEACHER') %}
-                        <th>Assignee Group</th>
-                        <th>Questions source</th>
-                        {#                    <th>Status</th>#}
-                    {% endif %}
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for quiz in quizzesList %}
-                    <div>
-                        <tr>
-                            <td>{{ quiz.id }}</td>
-                            <td>{{ quiz.description }}</td>
-                            <td>{{ quiz.category }}</td>
-                            <td>{{ quiz.startAt|date('d/m/Y') }}</td>
-                            <td>{{ quiz.endAt|date('d/m/Y') }}</td>
-                            <td>{{ quiz.questionsNo }}</td>
-                            <td>{{ quiz.timeLimit }}</td>
-                            <td>{{ quiz.timeUnit }}</td>
-                            {% if is_granted('ROLE_TEACHER') %}
-                                <td>{{ quiz.assigneeGroup|join(', ') }}</td>
-                                <td>{{ quiz.questionsSource }}</td>
-                                <td>
-                                    <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">
-                                        View quiz results
-                                    </a>
-                                </td>
-                                {#                            <td>{{ assessment.status }}</td>#}
-                                {#                        implement this#}
-                                {#                            <td>#}
-                                {#                                <a href="#">#}
-                                {#                                    Disable#}
-                                {#                                </a>#}
-                                {#                            </td>#}
-                            {% elseif is_granted('ROLE_STUDENT') %}
-                                <td>
-                                    <a href="{{ path('app_start_quiz', { quiz: quiz.id }) }}">
-                                        Start
-                                    </a>
-                                    <a href="{{ path('app_quiz_view_one_result', { quiz: quiz.id, user: app.user.id }) }}">
-                                        View results
-                                    </a>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    </div>
-                {% endfor %}
-                </tbody>
-            </table>
+    {% if is_granted('ROLE_STUDENT') and notAssignedToAGroup is defined and notAssignedToAGroup == true %}
+        <div class="label-elem box">
+            You do not belong to any group!
+            Please request access from a teacher!
         </div>
-    </div>
+        <div class="label-elem box">
+            You can access the
+            <a href="{{ path('app_support') }}"><strong> TalkSpot </strong></a>
+            section in order to contact the teacher!
+        </div>
+    {% else %}
+        <div class="container">
+            <br>
+            <label class="label" style="margin-left: 30px">
+                Quizzes List:
+            </label>
+            <br><br>
+            <div class="box">
+                <table style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Start At</th>
+                        <th>End At</th>
+                        <th>Questions no</th>
+                        <th>Time Limit</th>
+                        <th>Time Unit</th>
+                        {% if is_granted('ROLE_TEACHER') %}
+                            <th>Assignee Group</th>
+                            <th>Questions source</th>
+                            {#                    <th>Status</th>#}
+                        {% endif %}
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for quiz in quizzesList %}
+                        <div>
+                            <tr>
+                                <td>{{ quiz.id }}</td>
+                                <td>{{ quiz.description }}</td>
+                                <td>{{ quiz.category }}</td>
+                                <td>{{ quiz.startAt|date('d/m/Y') }}</td>
+                                <td>{{ quiz.endAt|date('d/m/Y') }}</td>
+                                <td>{{ quiz.questionsNo }}</td>
+                                <td>{{ quiz.timeLimit }}</td>
+                                <td>{{ quiz.timeUnit }}</td>
+                                {% if is_granted('ROLE_TEACHER') %}
+                                    <td>{{ quiz.assigneeGroup|join(', ') }}</td>
+                                    <td>{{ quiz.questionsSource }}</td>
+                                    <td>
+                                        <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">
+                                            View quiz results
+                                        </a>
+                                    </td>
+                                    {#                            <td>{{ assessment.status }}</td>#}
+                                    {#                        implement this#}
+                                    {#                            <td>#}
+                                    {#                                <a href="#">#}
+                                    {#                                    Disable#}
+                                    {#                                </a>#}
+                                    {#                            </td>#}
+                                {% elseif is_granted('ROLE_STUDENT') %}
+                                    <td>
+                                        <a href="{{ path('app_start_quiz', { quiz: quiz.id }) }}">
+                                            Start
+                                        </a>
+                                        <a href="{{ path('app_quiz_view_one_result', { quiz: quiz.id, user: app.user.id }) }}">
+                                            View results
+                                        </a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

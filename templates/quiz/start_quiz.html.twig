@@ -5,9 +5,10 @@
         <br>
         <div class="label-elem"> The quiz was already attempted!</div><br>
     {% else %}
-        {{ form_start(supportQuiz) }}
+        <div class="container">
+            {{ form_start(supportQuiz) }}
             {% if remainingTime is defined and remainingTime != null %}
-                <div>
+                <div class="box">
                     <label class="label-elem">Remaining Time: </label>
                     <span class="label-elem" id="remaining-time">{{ remainingTime | date('i:s') }}</span>
                     <input type="text" id="remainingTime" name="remainingTime" value="{{ remainingTime }}" style="visibility: hidden">
@@ -17,7 +18,7 @@
             {% endif %}
             <br>
             <fieldset class="box">
-                <label class="label-elem">{{ (index + 1)~'. '~question.questionContent }}</label><br>
+                <div class="label">{{ (index + 1)~'. '~question.questionContent }}</div><br>
                 <div>
                     <input type="radio" id="choiceA" name="answerOption" value="{{ question.choiceA }}" checked>
                     <label for="{{ question.choiceA }}">{{ 'a. '~question.choiceA }}</label>
@@ -42,7 +43,8 @@
                 {{ form_widget(supportQuiz.submit, { 'label': 'Submit', 'attr': {'class': 'general-button' }}) }}
             </fieldset>
 
-        {{ form_end(supportQuiz) }}
+            {{ form_end(supportQuiz) }}
+        </div>
     {% endif %}
 
     <script>

@@ -465,6 +465,11 @@ class QuizController extends AbstractController
         if (in_array('ROLE_STUDENT', $this->getUser()->getRoles())) {
             $isStudent = true;
             $groupId = ($studentRepository->getGroupByUserId($userId))[0]->getGroupId();
+            if (!$groupId) {
+                return $this->render('quiz/created_quiz_show.html.twig', [
+                    'notAssignedToAGroup' => true
+                ]);
+            }
             $groupNo = $groupRepository->getGroupNo($groupId)[0]->getGroupNo();
 
             $quizzes = $createdQuizRepository->getQuizzesByGroupNo($groupNo);
@@ -526,7 +531,9 @@ class QuizController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-//            dd('here');
+            /**@var User $user*/
+            $user = $this->getUser();
+
             if ($form->get('next')->isClicked()) {
                 $question = new SupportedQuizDetails();
                 if ($remainingTime) {
@@ -547,8 +554,6 @@ class QuizController extends AbstractController
                 } else {
                     $question->setObtainedScore(0);
                 }
-                /**@var User $user*/
-                $user = $this->getUser();
 
                 $question->setSupportedByStudent($user);
                 $detailsRepository->save($question, true);
