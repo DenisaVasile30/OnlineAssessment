@@ -9,14 +9,15 @@
             {{ form_start(supportQuiz) }}
             {% if remainingTime is defined and remainingTime != null %}
                 <div class="box">
-                    <label class="label-elem">Remaining Time: </label>
-                    <span class="label-elem" id="remaining-time">{{ remainingTime | date('i:s') }}</span>
+                    <div class="label">
+                        Remaining Time:
+                        <span class="label" id="remaining-time">{{ remainingTime | date('i:s') }}</span>
+                    </div>
                     <input type="text" id="remainingTime" name="remainingTime" value="{{ remainingTime }}" style="visibility: hidden">
                     <input type="text" id="started-time" name="started-time" value="{{ remainingTime }}" style="visibility: hidden">
                     <input type="text" id="seconds-spent" name="seconds-spent" value="" style="visibility: hidden">
                 </div>
             {% endif %}
-            <br>
             <fieldset class="box">
                 <div class="label">{{ (index + 1)~'. '~question.questionContent }}</div><br>
                 <div>
