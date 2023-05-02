@@ -538,3 +538,21 @@ html, body {
     padding-bottom: 50px;
     border-radius: 20px;
 }
+
+#student-form-input-email {
+    margin-left: 30px;
+    margin-bottom: 15px;
+    margin-right: 15px;
+}
+
+#student-form-input-password {
+    margin-left: 30px;
+    margin-bottom: 15px;
+    margin-right: 15px!important;
+}
+
+.students-form-add-container {
+    /*display: flex!important;*/
+    align-items: center!important;
+    gap: 10px!important; /* space between email and password inputs */
+}

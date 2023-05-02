@@ -5,26 +5,27 @@
         <div class="container">
             <br>
             <div class="box">
-                <label class="label-elem">
+                <label class="label" style="margin-left: 30px">
                     Group id: {{ group.id }}
                 </label><br>
-                <label class="label-elem">
-                    Group no: {{ group.groupNo }}
-                </label><br>
-                <label class="label-elem">
-                    Created at: {{ group.createdDate|date('Y-m-d') }}
-                </label><br>
-                <label class="label-elem"
-                >Faculty: {{ group.faculty }}
-                </label>
-                <br>
+                <div  style="font-size: 14px; margin-left: 30px">
+                    <label class="label">
+                        Group no: {{ group.groupNo }}
+                    </label><br>
+                    <label>
+                        Created at: {{ group.createdDate|date('Y-m-d') }}
+                    </label><br>
+                    <label>
+                        Faculty: {{ group.faculty }}
+                    </label>
+                </div>
             </div>
             <br>
             <div class="box">
-                <label class="label-elem">
+                <label class="label" style="margin-left: 30px">
                     Add from existing students
                 </label><br><br>
-                <label for="all-students-list" class="label-elem" style="margin-right: 25px; margin-left: 40px">
+                <label for="all-students-list" class="label" style="margin-right: 25px; margin-left: 40px">
                     Select email to add:
                 </label>
                 <select style="color: black" id="all-students-list">
@@ -41,11 +42,12 @@
             </div>
             <br>
 
-            <div class="box">
-                <button id="create-student-account-btn">
+            <div class="box label" style="margin-left: 30px">
+                <button id="create-student-account-btn" style="margin-left: 30px">
                     Create students account
                 </button>
-                <div id="students-form-div" style="color: black">
+                <br>
+                <div class="students-form-add" id="students-form-div" style="color: black">
                 </div>
                 <button id="save-students-btn" class="save-button">
                     Save
@@ -139,11 +141,13 @@
                 newStudentEmail.type = "email";
                 newStudentEmail.name = "email";
                 newStudentEmail.placeholder = "Email";
+                newStudentEmail.id = "student-form-input-email"
 
                 var newStudentPassword = document.createElement("input");
                 newStudentPassword.type = "password";
                 newStudentPassword.name = "password";
                 newStudentPassword.placeholder = "Password";
+                newStudentPassword.id = "student-form-input-password"
 
                 emailInputs.push(newStudentEmail);
                 passwordInputs.push(newStudentPassword);

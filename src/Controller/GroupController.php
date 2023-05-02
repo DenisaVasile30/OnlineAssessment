@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\Student;
 use App\Entity\User;
+use App\Entity\UserProfile;
 use App\Form\AddGroupFormType;
 use App\Repository\GroupRepository;
 use App\Repository\StudentRepository;
 use App\Repository\TeacherRepository;
+use App\Repository\UserProfileRepository;
 use App\Repository\UserRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -204,6 +206,7 @@ class GroupController extends AbstractController
         StudentRepository $studentRepository,
         UserRepository $userRepository,
         UserPasswordHasherInterface $userPasswordHasher,
+        UserProfileRepository $profileRepository
     ): Response
     {
         $group = $groupRepository->find($groupId);
@@ -233,6 +236,20 @@ class GroupController extends AbstractController
                         $student->setGroup($group);
 
                         $studentRepository->save($student, true);
+
+                        $atPosition = strpos($email, "@");
+                        $parts = explode(".", substr($email, 0, $atPosition));
+                        if (isset($parts) && count($parts) == 2) {
+                            $firstName = $parts[0];
+                            $lastName = $parts[1];
+
+                            $userProfile = new UserProfile();
+                            $userProfile->setUser($user);
+                            $userProfile->setFirstName(ucfirst($firstName));
+                            $userProfile->setLastName(ucfirst($lastName));
+
+                            $profileRepository->save($userProfile, true);
+                        }
                     }
                 }
             }
