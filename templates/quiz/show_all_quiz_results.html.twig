@@ -15,37 +15,37 @@
                         Quiz Id:  {{ requiredQuiz.id }}
                     </span>
                     <br>
-                    <span class="label-elem">
+                    <span>
                         Questions category:  {{ requiredQuiz.category }}
                     </span>
-                    <span class="label-elem" style="margin-left: 120px; text-align: right">
+                    <span>
                         Description:  {{ requiredQuiz.description }}
                     </span>
                     <br>
-                    <div style="display: inline-block">
-                         <span class="label-elem" style="margin-left: 20px; text-align: left">
+                    <div>
+                         <span>
                         Start at:  {{ requiredQuiz.startAt|date('d/m/Y') }}
                     </span>
-                        <span class="label-elem" style="margin-left: 165px; text-align: right">
+                        <span>
                         End at:  {{ requiredQuiz.endAt|date('d/m/Y') }}
                     </span>
                     </div>
                     <br>
-                    <span class="label-elem">
+                    <span>
                         Duration:  {{ requiredQuiz.timeLimit~' '~requiredQuiz.timeUnit }}
                     </span>
-                    <span class="label-elem" style="margin-left: 140px; text-align: right">
+                    <span>
                         Assigned Groups:
                         {% for group in requiredQuiz.assigneeGroup %}
                             {{ group~' ' }}
                         {% endfor %}
                     </span>
                     <br>
-                    <span class="label-elem">
+                    <span>
                         Number of questions:  {{ requiredQuiz.questionsNo }}
                     </span>
                     <br>
-                    <span class="label-elem">
+                    <span>
                         Maximum grade:  {{ requiredQuiz.maxGrade~' ('~requiredQuiz.maxPoints~' points)' }}
                     </span>
                     {#         to do: add reports data#}
