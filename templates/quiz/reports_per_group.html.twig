@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if submittedQuizzes is defined and submittedQuizzes is null %}
+        <div class="box">
+            No report to show!
+        </div>
+    {% else %}
+        <div class="reports-bg">
+            <br>
+            <label class="label" style="margin-left: 30px">
+                Quiz Report Per Group:
+            </label>
+            <br><br>
+            <div class="box">
+                <table style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Start At</th>
+                        <th>End At</th>
+                        <th>Questions no</th>
+                        <th>Time Limit</th>
+                        <th>Time Unit</th>
+                        <th>Assignee Group</th>
+                        {% if groupData is defined and groupData is not null %}
+                            <th>Attempted No</th>
+                            <th>Grade Average</th>
+                            <th>Time Spent Average</th>
+                        {% endif %}
+                        {#                    <th>Status</th>#}
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in groupData %}
+                            <div>
+                                <tr>
+                                    <td>{{ requiredQuiz.id }}</td>
+                                    <td>{{ requiredQuiz.description }}</td>
+                                    <td>{{ requiredQuiz.category }}</td>
+                                    <td>{{ requiredQuiz.startAt|date('d/m/Y') }}</td>
+                                    <td>{{ requiredQuiz.endAt|date('d/m/Y') }}</td>
+                                    <td>{{ requiredQuiz.questionsNo }}</td>
+                                    <td>{{ requiredQuiz.timeLimit }}</td>
+                                    <td>{{ requiredQuiz.timeUnit }}</td>
+                                    {% if groupData is defined and groupData is not null %}
+                                        {% if group.groupNo in  requiredQuiz.assigneeGroup %}
+                                            <td>{{ group.groupNo }}</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                        <td>{{ group.submittedNo }}</td>
+                                        <td>{{ group.gradeAverage }}</td>
+                                        <td>{{ group.timeSpentAverage//60 }}:{{ group.timeSpentAverage%60|format('%02d') }} </td>
+                                    {% endif %}
+                                    <td>
+{#                                        <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">#}
+{#                                            View quiz results#}
+{#                                        </a>#}
+{#                                        <a href="{{ path('app_quiz_group_report', { quiz: quiz.id }) }}">#}
+{#                                            View Group Report#}
+{#                                        </a>#}
+                                    </td>
+
+                                </tr>
+                            </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{#{% block javascripts %}#}
+{#    {{ parent() }}#}
+{#    <script>#}
+{#        const body = document.querySelector('body');#}
+{#        body.classList.add('reports-bg');#}
+{#    </script>#}
+{#{% endblock %}#}

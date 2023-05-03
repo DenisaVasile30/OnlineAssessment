@@ -556,3 +556,14 @@ html, body {
     align-items: center!important;
     gap: 10px!important; /* space between email and password inputs */
 }
+
+.reports-bg {
+    width: 1200px!important;
+    /*max-width: calc(2/3 * 100%);*/
+    height: 100%!important;
+    background-color: antiquewhite;
+    margin-top: 20px;
+    padding-top: 40px!important;
+    padding-bottom: 50px;
+    border-radius: 20px;
+}

@@ -3,8 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\CreatedQuiz;
+use App\Entity\Student;
+use App\Entity\SupportedQuiz;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<CreatedQuiz>
@@ -88,5 +91,40 @@ class CreatedQuizRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
             ;
+    }
+
+    public function getQuizzesResults($quizzesIds, string $status = 'Active'): array
+    {
+        $results = $this->createQueryBuilder('c')
+            ->select('c') // select both tables
+            ->leftJoin(SupportedQuiz::class, 'sq', Query\Expr\Join::WITH, 'c.id = sq.quiz')
+            ->addSelect('sq AS supportedQuiz')
+            ->andWhere('c.id IN (:quizzesIds)')
+            ->setParameter('quizzesIds', $quizzesIds)
+            ->orderBy('c.startAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $createdQuizzes = [];
+//        dd($results);
+        foreach ($results as $k => $result) {
+            if (is_array($result)) {
+                $key = key($result);
+                if ($result[$key] instanceof CreatedQuiz) {
+                    $createdQuizzes[] = $result;
+                } elseif ($key == 'supportedQuiz') {
+                    foreach ($createdQuizzes as $createdQuiz) {
+//                        dd($result);
+                        $key2 = key($createdQuiz);
+                        if ($createdQuiz[$key2]->getId() == $result[$key]->getQuiz()) {
+                            $createdQuizzes[$key2]['supportedQuiz'][] = ($result[$key]);
+//                            dd($createdQuizzes);
+                        }
+                    }
+                }
+            }
+        }
+//        dd($createdQuizzes);
+        return $createdQuizzes;
     }
 }

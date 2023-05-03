@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="reports-bg">
+        <br>
+        <label class="label" style="margin-left: 30px">
+            Quizzes Report:
+        </label>
+        <br><br>
+        <div class="box">
+            <table style="width: 100%">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Start At</th>
+                    <th>End At</th>
+                    <th>Questions no</th>
+                    <th>Time Limit</th>
+                    <th>Time Unit</th>
+                    <th>Assignee Group</th>
+                    <th>Attempted No</th>
+                    <th>Grade Average</th>
+                    <th>Time Spent Average</th>
+                        {#                    <th>Status</th>#}
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for quiz in quizzesList %}
+                    <div>
+                        <tr>
+                            <td>{{ quiz.id }}</td>
+                            <td>{{ quiz.description }}</td>
+                            <td>{{ quiz.category }}</td>
+                            <td>{{ quiz.startAt|date('d/m/Y') }}</td>
+                            <td>{{ quiz.endAt|date('d/m/Y') }}</td>
+                            <td>{{ quiz.questionsNo }}</td>
+                            <td>{{ quiz.timeLimit }}</td>
+                            <td>{{ quiz.timeUnit }}</td>
+                            <td>{{ quiz.assigneeGroup|join(', ') }}</td>
+                            <td>{{ quizzesExtraData[quiz.id].submittedNo }}</td>
+                            <td>{{ quizzesExtraData[quiz.id].gradeAverage }}</td>
+                            <td>{{ quizzesExtraData[quiz.id].timeSpentAverage//60 }}:{{ quizzesExtraData[quiz.id].timeSpentAverage%60|format('%02d') }}</td>
+                            <td>
+                                <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">
+                                    View quiz results
+                                </a>
+                                <a href="{{ path('app_quiz_group_report', { quiz: quiz.id }) }}">
+                                    View Group Report
+                                </a>
+                            </td>
+
+                        </tr>
+                    </div>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{#{% block javascripts %}#}
+{#    {{ parent() }}#}
+{#    <script>#}
+{#        const body = document.querySelector('body');#}
+{#        body.classList.add('reports-bg');#}
+{#    </script>#}
+{#{% endblock %}#}

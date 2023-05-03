@@ -55,6 +55,19 @@ class SupportedQuizRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getSupportedQuizzesListById(array $quizzes) {
+        return $this->createQueryBuilder('s')
+//            ->join(User::class, 'u',  Query\Expr\Join::WITH, 's.supportedBy = u.id')
+//            ->select('u')
+            ->leftJoin('s.supportedBy', 'u')
+            ->addSelect('u')
+            ->andwhere('s.quiz IN (:quiz)')
+            ->setParameter('quiz', implode(',', $quizzes))
+            ->getQuery()
+            ->getResult();
+        ;
+    }
+
 //    /**
 //     * @return SupportedQuiz[] Returns an array of SupportedQuiz objects
 //     */

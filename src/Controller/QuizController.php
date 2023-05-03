@@ -860,4 +860,136 @@ class QuizController extends AbstractController
 
         return $randomIds;
     }
+
+    #[Route('/home/assessments/quiz/reports', name: 'app_quiz_reports')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
+    public function showQuizReports(
+        Request $request,
+        QuizQuestionRepository $quizQuestionRepository,
+        CreatedQuizRepository $createdQuizRepository,
+        StudentRepository $studentRepository,
+        TeacherRepository $teacherRepository,
+        GroupRepository $groupRepository,
+        SupportedQuizRepository $supportedQuizRepository
+    ): Response
+    {
+        $userId = $this->getUser()->getIdentifierId();
+        $teacher = $teacherRepository->getGroupByUserId($userId)[0];
+        $groupId = $teacher->getAssignedGroups();
+        $quizzes = $createdQuizRepository->getCreatedQuizzesByIssuerId($teacher->getId());
+        $quizzesIds = [];
+        foreach ($quizzes as $item) {
+            $quizzesIds[] = $item->getId();
+        }
+
+        $submittedQuizzes = $supportedQuizRepository->findAll();
+        $quizzesExtraData = $this->processQuizzes($quizzes, $submittedQuizzes);
+//        dd($quizzesExtraData);
+
+        return $this->render('quiz/quiz_reports_show_all.html.twig', [
+            'quizzesList' => $quizzes,
+            'quizzesExtraData' => $quizzesExtraData
+        ]);
+    }
+
+    #[Route('/home/assessments/quiz/reports/{quiz}/perGroup', name: 'app_quiz_group_report')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
+    public function showQuizReportPerGroup(
+        Request $request,
+        int $quiz,
+        CreatedQuizRepository $createdQuizRepository,
+        SupportedQuizRepository $supportedQuizRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quiz);
+        $assignedGroups = $requiredQuiz->getAssigneeGroup();
+        $submittedQuizzes = $supportedQuizRepository->getSupportedQuizzesById($quiz);
+
+        if ($submittedQuizzes != null && $assignedGroups !=  null) {
+            $groupData = $this->processSubmittedQuizzes($quiz, $submittedQuizzes, $assignedGroups);
+            return $this->render('quiz/reports_per_group.html.twig',[
+                'requiredQuiz' => $requiredQuiz,
+                'submittedQuizzes' => $submittedQuizzes,
+                'groupData' => $groupData,
+            ]);
+        } else {
+            return $this->render('quiz/reports_per_group.html.twig',[
+                'requiredQuiz' => $requiredQuiz,
+                'submittedQuizzes' => $submittedQuizzes,
+            ]);
+        }
+    }
+
+    private function processQuizzes(array $quizzes, array $submittedQuizzes): array
+    {
+        $quizExtraData = [];
+        foreach ($quizzes as $key => $quiz) {
+            $submittedNo = 0;
+            $totalGrades = 0;
+            $totalSpentTime = 0;
+            foreach ($submittedQuizzes as $k => $submittedQuiz) {
+                if ($quiz->getId() == $submittedQuiz->getQuiz()) {
+                    $submittedNo++;
+                    $totalGrades += $submittedQuiz->getObtainedGrade();
+                    $totalSpentTime += $submittedQuiz->getTotalTimeSpent();
+                }
+            }
+
+            if ($submittedNo > 0) {
+                $gradeAverage = (float)$totalGrades / $submittedNo;
+                $timeSpentAverage = (float)$totalSpentTime / $submittedNo;
+            } else {
+                $gradeAverage = 0;
+                $timeSpentAverage = 0;
+            }
+
+            $quizExtraData[$quiz->getId()] = [
+                'submittedNo' => $submittedNo,
+                'gradeAverage' => $gradeAverage,
+                'timeSpentAverage' => $timeSpentAverage
+            ];
+        }
+
+        return $quizExtraData;
+    }
+
+    private function processSubmittedQuizzes(int $quiz, mixed $submittedQuizzes, array $assignedGroups)
+    {
+        $quizData = [];
+        foreach ($assignedGroups as $k => $group) {
+            $submittedNo = 0;
+            $totalGrades = 0;
+            $totalSpentTime = 0;
+            foreach ($submittedQuizzes as $key => $submittedQuiz) {
+                $studentGroup = $submittedQuiz->getSupportedBy()->getStudent()->getGroup()->getGroupNo();
+                if (
+                    $quiz == $submittedQuiz->getQuiz()
+                    && $studentGroup == $group
+                ) {
+                    $submittedNo++;
+                    $totalGrades += $submittedQuiz->getObtainedGrade();
+                    $totalSpentTime += $submittedQuiz->getTotalTimeSpent();
+                }
+            }
+
+            if ($submittedNo > 0) {
+                $gradeAverage = (float)$totalGrades / $submittedNo;
+                $timeSpentAverage = (float)$totalSpentTime / $submittedNo;
+            } else {
+                $gradeAverage = 0;
+                $timeSpentAverage = 0;
+            }
+
+            $quizData[$group] = [
+                'groupNo' => $group,
+                'submittedNo' => $submittedNo,
+                'gradeAverage' => $gradeAverage,
+                'timeSpentAverage' => $timeSpentAverage
+            ];
+        }
+
+        return $quizData;
+    }
 }
