@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -825,6 +826,77 @@ class QuizController extends AbstractController
         );
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', 'text/plain');
+
+        return $response;
+    }
+
+    #[Route('/home/assessments/quiz/{quizId}/download/submitted/group/{groupNo}/report', name: 'app_quiz_download_submitted_quiz_report_group')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_STUDENT')]
+    public function downloadSubmittedQuizGroupReport(
+        Request $request,
+        int $quizId,
+        int $groupNo,
+        CreatedQuizRepository $createdQuizRepository,
+        QuizQuestionRepository $quizQuestionRepository,
+        SupportedQuizDetailsRepository $detailsRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        GroupRepository $groupRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quizId);
+        $submittedQuizzes = $supportedQuizRepository->getSupportedQuizzesByGroupNo($quizId, $groupNo);
+
+        $headers = array(
+            'Unique identifier',
+            'Student id',
+            'Group',
+            'Email',
+            'Name',
+            'Started at',
+            'Ended at',
+            'Grade',
+            'Spent time'
+        );
+
+        $stream = fopen('php://memory', 'w');
+        fputcsv($stream, $headers);
+
+        foreach ($submittedQuizzes as $key => $submittedQuiz) {
+            $name = '';
+            if ($submittedQuiz->getSupportedBy() !== null) {
+                $userProfile = $submittedQuiz->getSupportedBy()->getUserProfile();
+
+                if ($userProfile !== null && $userProfile->getFirstName() !== null) {
+                    $name = $userProfile->getFirstName() . ' ' . $userProfile->getLastName();
+                }
+            }
+            $timeSpent = (intval($submittedQuiz->getTotalTimeSpent() / 60)) . ':'
+                . ($submittedQuiz->getTotalTimeSpent() % 60);
+
+            $rowData = array(
+                $submittedQuiz->getId(),
+                $submittedQuiz->getSupportedBy()->getId(),
+                $groupNo,
+                $submittedQuiz->getSupportedBy()->getEmail(),
+                $name,
+                ($submittedQuiz->getStartedAt())->format('Y-m-d h:i:s'),
+                ($submittedQuiz->getEndedAt())->format('Y-m-d h:i:s'),
+                $submittedQuiz->getObtainedGrade(),
+                $timeSpent
+            );
+            fputcsv($stream, $rowData);
+        }
+
+        rewind($stream);
+
+        $fileName = 'Quiz-' . $quizId . '-' . $requiredQuiz->getDescription() . '-report.csv';
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($stream) {
+            fpassthru($stream);
+        });
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '";');
 
         return $response;
     }
