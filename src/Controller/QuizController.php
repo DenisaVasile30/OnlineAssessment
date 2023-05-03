@@ -909,10 +909,13 @@ class QuizController extends AbstractController
 
         if ($submittedQuizzes != null && $assignedGroups !=  null) {
             $groupData = $this->processSubmittedQuizzes($quiz, $submittedQuizzes, $assignedGroups);
+            $groupResultComparative = $this->getComparativeResult($groupData);
+
             return $this->render('quiz/reports_per_group.html.twig',[
                 'requiredQuiz' => $requiredQuiz,
                 'submittedQuizzes' => $submittedQuizzes,
                 'groupData' => $groupData,
+                'groupResultComparative' => $groupResultComparative
             ]);
         } else {
             return $this->render('quiz/reports_per_group.html.twig',[
@@ -991,5 +994,56 @@ class QuizController extends AbstractController
         }
 
         return $quizData;
+    }
+
+    private function getComparativeResult(array $groupData)
+    {
+        if ($groupData != null && count($groupData) > 1) {
+            $baseGroup = [];
+            $comparativeData = [];
+            $differencePoints = 0;
+            $percentageDifference = 0;
+            $timeDifference = 0;
+            foreach ($groupData as $groupNo => $value) {
+                if (count($baseGroup) == 0) {
+                    $baseGroup = $groupData[$groupNo];
+                }
+                if ($groupNo != $baseGroup['groupNo']) {
+                    $differencePoints = $baseGroup['gradeAverage'] - $value['gradeAverage'];
+                    if ($differencePoints < 0) {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . abs($differencePoints)
+                            . ' more points than group no ' . $baseGroup['groupNo'] . '.';
+                    } else {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . abs($differencePoints)
+                            . ' less points than group no ' . $baseGroup['groupNo'] . '.';
+                    }
+                    $percentageDifference = (
+                        ($value['gradeAverage'] - $baseGroup['gradeAverage']) / $baseGroup['gradeAverage']
+                        ) * 100;
+                    if ($percentageDifference > 0) {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . round($percentageDifference, 2)
+                            . '% more than group no ' . $baseGroup['groupNo'] .'.';
+                    } else {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . round($percentageDifference, 2)
+                            . '% less than group no ' . $baseGroup['groupNo'] . '.';
+                    }
+                    $timeDifference = $baseGroup['timeSpentAverage'] - $value['timeSpentAverage'];
+                    $seconds = (strlen(abs($timeDifference%60)) == 1) ? '0' . abs($timeDifference%60) : abs($timeDifference%60);
+                    if ($timeDifference < 0) {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' spent with ' . abs(intval($timeDifference/60))
+                            . ':' . $seconds . ' minutes'
+                            . ' more time than group no ' . $baseGroup['groupNo'] . '.';
+                    } else {
+                        $comparativeData[] = 'Group no ' . $groupNo . ' spent with ' . abs(intval($timeDifference/60))
+                            . ':' . $seconds . ' minutes'
+                            . ' less time than group no ' . $baseGroup['groupNo'] . '.';
+                    }
+                }
+            }
+
+            return $comparativeData;
+        }
+
+        return null;
     }
 }
