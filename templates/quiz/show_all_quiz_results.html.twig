@@ -72,6 +72,7 @@
                             <th>Student id</th>
                             <th>Group</th>
                             <th>Email</th>
+                            <th>Name</th>
                             <th>Started at</th>
                             <th>Ended at</th>
                             <th>Grade</th>
@@ -91,6 +92,12 @@
                                         {% endif %}
                                     {% endfor %}
                                     <td>{{ submittedQuiz.supportedBy.email }}</td>
+                                    {% if submittedQuiz.supportedBy.userProfile is defined and submittedQuiz.supportedBy.userProfile is not null %}
+                                        <td>{{ submittedQuiz.supportedBy.userProfile.firstName ~ ' ' ~ submittedQuiz.supportedBy.userProfile.lastName }}</td>
+                                    {% else %}
+                                        <td>
+                                        </td>
+                                    {% endif %}
                                     <td>{{ submittedQuiz.startedAt|date('Y-m-d H:i:s') }}</td>
                                     <td>{{ submittedQuiz.endedAt|date('Y-m-d H:i:s') }}</td>
                                     <td>{{ submittedQuiz.obtainedGrade~' / '~requiredQuiz.maxGrade }}</td>

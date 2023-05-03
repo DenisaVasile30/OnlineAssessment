@@ -751,6 +751,35 @@ class QuizController extends AbstractController
         }
     }
 
+    #[Route('/home/assessments/quiz/show/students-results/{quiz}/group/{groupNo}', name: 'app_quiz_students_results_per_group')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_TEACHER')]
+    public function showAllQuizResultsByGroup(
+        Request $request,
+        int $quiz,
+        int $groupNo,
+        CreatedQuizRepository $createdQuizRepository,
+        SupportedQuizRepository $supportedQuizRepository,
+        GroupRepository $groupRepository
+    ): Response
+    {
+        $requiredQuiz = $createdQuizRepository->find($quiz);
+        $submittedQuizzes = $supportedQuizRepository->getSupportedQuizzesByGroupNo($quiz, $groupNo);
+        $groups = $groupRepository->findAll();
+//        dd($submittedQuizzes);
+        if ($submittedQuizzes != null) {
+            return $this->render('quiz/show_all_quiz_results.html.twig',[
+                'requiredQuiz' => $requiredQuiz,
+                'submittedQuizzes' => $submittedQuizzes,
+                'groups' => $groups,
+            ]);
+        } else {
+            return $this->render('quiz/show_all_quiz_results.html.twig',[
+                'submittedQuiz' => $submittedQuizzes,
+            ]);
+        }
+    }
+
     #[Route('/home/assessments/quiz/{quizId}/download/timeSpentReport/', name: 'app_quiz_download_time_spent_report')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[IsGranted('ROLE_STUDENT')]

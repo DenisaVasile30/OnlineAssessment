@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Group;
 use App\Entity\Student;
 use App\Entity\SupportedQuiz;
 use App\Entity\User;
@@ -50,6 +51,21 @@ class SupportedQuizRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->andwhere('s.quiz = :quiz')
             ->setParameter('quiz',  $quiz)
+            ->getQuery()
+            ->getResult();
+        ;
+    }
+
+    public function getSupportedQuizzesByGroupNo($quiz, $groupNo) {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.supportedBy', 'u')
+            ->addSelect('u')
+            ->leftJoin(Student::class, 'st',  Query\Expr\Join::WITH, 's.supportedBy = st.user')
+            ->leftJoin(Group::class, 'gr',  Query\Expr\Join::WITH, 'st.groupId = gr.id')
+            ->andwhere('s.quiz = :quiz')
+            ->setParameter('quiz',  $quiz)
+            ->andwhere('gr.groupNo = :groupNo')
+            ->setParameter('groupNo',  $groupNo)
             ->getQuery()
             ->getResult();
         ;
