@@ -20,6 +20,7 @@ use App\Repository\SupportedQuizRepository;
 use App\Repository\TeacherRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -76,17 +77,28 @@ class QuizController extends AbstractController
 
                 $content = file_get_contents($questionsFile->getPathname());
                 try {
-                    $arrayContent = explode("\r\n\r\n", $content);
-                    if (
-                        $this->processFile(
-                            $arrayContent, $newFilename, $teacherRepository, $questionsCategory, $questionRepository)
-                    ) {
+                    $questions = $this->processAikenFormat($questionsFile);
+                    if (count($questions) > 0) {
+                        $this->saveAikenQuestions($questions, $questionsCategory, $questionRepository, $teacherRepository);
                         $this->addFlash(
                             'success',
                             'Saved successfully!'
                         );
                         return $this->redirectToRoute('app_quiz_questions');
-                    };
+                    } else {
+                        $arrayContent = explode("\r\n\r\n", $content);
+                        if (
+                            $this->processFile(
+                                $arrayContent, $newFilename, $teacherRepository, $questionsCategory, $questionRepository)
+                        ) {
+                            $this->addFlash(
+                                'success',
+                                'Saved successfully!'
+                            );
+                            return $this->redirectToRoute('app_quiz_questions');
+                        };
+                    }
+
                 } catch (\Exception $exception) {
                     $this->addFlash(
                         'error',
@@ -1164,5 +1176,111 @@ class QuizController extends AbstractController
         }
 
         return $passPercentage;
+    }
+
+    private function processAikenFormat(UploadedFile $file)
+    {
+        $file_path = $file->getPathname();
+        $file = fopen($file_path, "r") or die("Unable to open file!");
+        $questions = [];
+
+        $foundChoices = 0;
+        $foundCorrectAnswer = 0;
+        while(($line = fgets($file)) !== false) {
+//            suppose we have the question
+            $question = trim($line);
+
+            while (!feof($file) && ($foundChoices < 1 || $foundCorrectAnswer < 1)) {
+                $line = fgets($file);
+                if (preg_match('/^[A-Z][).]\s/', $line)) {
+                    // this is an answer choice
+                    $answerChoices[] = trim($line);
+                    $foundChoices++;
+                } elseif (preg_match('/^ANSWER: [A-Z]/', $line)) {
+                    // this is an answer line
+                    $correctAnswer = trim($line);
+                    $foundCorrectAnswer++;
+//
+                    if ($foundChoices >= 2) {
+                        $correctLetter = explode('ANSWER: ', trim($correctAnswer))[1];
+                        $questions[] = [
+                            "question" => $question,
+                            "answerChoices" => $answerChoices,
+                            "correctAnswer" => $correctAnswer,
+                        ];
+//                        dd($answerChoices);
+//                        if (!in_array($correctLetter, $answerChoices)) {
+//                            dd($correctLetter);
+//                            throw new \Exception("Invalid AIKEN format!");
+//                        }
+                        $found = false;
+                        foreach ($answerChoices as $k => $choice) {
+                            if (str_contains($choice, $correctLetter . '.') || str_contains($choice, $correctLetter . ')')) {
+                                $found = true;
+                                break;
+                            } else {
+                                $found = false;
+                            }
+                        }
+                        if (!$found) {
+                            throw new \Exception("Invalid AIKEN format!");
+                        }
+                    }
+                    $answerChoices = [];
+                    $correctAnswer = '';
+                    $foundChoices = 0;
+                    $foundCorrectAnswer = 0;
+                }
+            }
+            if (count($questions) == 0) {
+                throw new \Exception("Invalid AIKEN format!");
+            }
+        }
+
+        fclose($file);
+        return $questions;
+    }
+
+    private function saveAikenQuestions(
+        array $questions,
+        string $category,
+        QuizQuestionRepository $questionRepository,
+        TeacherRepository $teacherRepository
+    )
+    {
+//        dd($questions);
+        foreach ($questions as $key => $questionData) {
+            $question = new QuizQuestion();
+            $question->setCategory($category);
+            $question->setQuestionContent($questionData['question']);
+            $choicesNo = count($questionData['answerChoices']);
+            $choices = $questionData['answerChoices'];
+            $correctAnswer = explode("ANSWER: ", $questionData['correctAnswer'])[1];
+            if ($choicesNo == 2) {
+                $question->setChoiceA($choices[0]);
+                $question->setChoiceB($choices[1]);
+                $question->setChoiceC('');
+                $question->setChoiceD('');
+            } elseif ($choicesNo == 3) {
+                $question->setChoiceA($choices[0]);
+                $question->setChoiceB($choices[1]);
+                $question->setChoiceC($choices[2]);
+                $question->setChoiceD('');
+            } elseif ($choicesNo == 4) {
+                $question->setChoiceA($choices[0]);
+                $question->setChoiceB($choices[1]);
+                $question->setChoiceC($choices[2]);
+                $question->setChoiceD($choices[3]);
+            }
+            $answerIndex = ord($correctAnswer) - ord('A');
+            $correctAnswerChoice = $questionData['answerChoices'][$answerIndex];
+            $question->setCorrectAnswer($correctAnswerChoice);
+            $userId = $this->getUser()->getIdentifierId();
+            $teacher = $teacherRepository->getTeacher($userId);
+            $question->setIssuedBy($teacher[0]);
+            $question->setCreatedAt(new \DateTime());
+
+            $questionRepository->save($question, true);
+        }
     }
 }

@@ -119,7 +119,8 @@
                                     <td>{{ submittedQuiz.totalTimeSpent|date('i:s') }}</td>
                                     <td>
                                         <a href="{{ path('app_quiz_view_one_result', { quiz: requiredQuiz.id, user: submittedQuiz.supportedBy.id }) }}">
-                                            View detailed
+{#                                            View detailed#}
+                                            <img src="/../images/view_detailed.png" alt="View detailed" title="View submitted quiz" width="24" height="24" style="display: inline-block" />
                                         </a>
                                     </td>
                                 </tr>

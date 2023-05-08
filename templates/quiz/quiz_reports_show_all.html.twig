@@ -45,10 +45,12 @@
                             <td>{{ quizzesExtraData[quiz.id].timeSpentAverage//60 }}:{{ quizzesExtraData[quiz.id].timeSpentAverage%60|format('%02d') }}</td>
                             <td>
                                 <a href="{{ path('app_quiz_all_results', { quiz: quiz.id }) }}">
-                                    View quiz results
+{#                                    View quiz results#}
+                                    <img src="/../images/view_quiz_results.png" alt="View all quiz result" title="View all quiz result" width="24" height="24" style="display: inline-block" />
                                 </a>
                                 <a href="{{ path('app_quiz_group_report', { quiz: quiz.id }) }}">
-                                    View Group Report
+{#                                    View Group Report#}
+                                    <img src="/../images/view_group_report.png" alt="View group report" title="View group report" width="24" height="24" style="display: inline-block" />
                                 </a>
                             </td>
                         </tr>
