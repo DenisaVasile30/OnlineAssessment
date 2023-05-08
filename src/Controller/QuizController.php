@@ -1011,12 +1011,14 @@ class QuizController extends AbstractController
         if ($submittedQuizzes != null && $assignedGroups !=  null) {
             $groupData = $this->processSubmittedQuizzes($quiz, $submittedQuizzes, $assignedGroups);
             $groupResultComparative = $this->getComparativeResult($groupData);
+            $groupPassPercent = $this->getPassPercent($groupData, $requiredQuiz->getMaxGrade());
 
             return $this->render('quiz/reports_per_group.html.twig',[
                 'requiredQuiz' => $requiredQuiz,
                 'submittedQuizzes' => $submittedQuizzes,
                 'groupData' => $groupData,
-                'groupResultComparative' => $groupResultComparative
+                'groupResultComparative' => $groupResultComparative,
+                'groupPassPercent' => $groupPassPercent
             ]);
         } else {
             return $this->render('quiz/reports_per_group.html.twig',[
@@ -1089,7 +1091,7 @@ class QuizController extends AbstractController
             $quizData[$group] = [
                 'groupNo' => $group,
                 'submittedNo' => $submittedNo,
-                'gradeAverage' => $gradeAverage,
+                'gradeAverage' => round($gradeAverage, 2),
                 'timeSpentAverage' => $timeSpentAverage
             ];
         }
@@ -1110,7 +1112,7 @@ class QuizController extends AbstractController
                     $baseGroup = $groupData[$groupNo];
                 }
                 if ($groupNo != $baseGroup['groupNo']) {
-                    $differencePoints = $baseGroup['gradeAverage'] - $value['gradeAverage'];
+                    $differencePoints = round($baseGroup['gradeAverage'] - $value['gradeAverage'], 2);
                     if ($differencePoints < 0) {
                         $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . abs($differencePoints)
                             . ' more points than group no ' . $baseGroup['groupNo'] . '.';
@@ -1121,6 +1123,7 @@ class QuizController extends AbstractController
                     $percentageDifference = (
                         ($value['gradeAverage'] - $baseGroup['gradeAverage']) / $baseGroup['gradeAverage']
                         ) * 100;
+                    $percentageDifference = round($percentageDifference, 2);
                     if ($percentageDifference > 0) {
                         $comparativeData[] = 'Group no ' . $groupNo . ' obtained ' . round($percentageDifference, 2)
                             . '% more than group no ' . $baseGroup['groupNo'] .'.';
@@ -1146,5 +1149,20 @@ class QuizController extends AbstractController
         }
 
         return null;
+    }
+
+    private function getPassPercent(array $groupData, int $maxGrade): array
+    {
+        $passPercentage = [];
+        $passGrade = 4.5;
+
+        foreach ($groupData as $key => $value) {
+            $passPercent = ($value['gradeAverage'] - $passGrade) / ($maxGrade - $passGrade) * 100;
+            $passPercent = round($passPercent, 2);
+
+            $passPercentage[$key] = "Group no " .  $key . ": " . $passPercent . "%";
+        }
+
+        return $passPercentage;
     }
 }

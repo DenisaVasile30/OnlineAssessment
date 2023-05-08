@@ -17,11 +17,26 @@
                     <div class="label" style="margin-left: 30px">
                         Overview:
                     </div>
-                    {% for comparativeResult in groupResultComparative %}
-                        <div class="label" style="font-size: 14px; color: black">
-                            {{ comparativeResult }}
-                        </div>
-                    {% endfor %}
+                    <div class="box">
+                        <label>
+                            Pass percentage
+                        </label><br><br>
+                        {% for groupPercent in groupPassPercent %}
+                            <div class="label" style="font-size: 14px; color: black">
+                                {{ groupPercent }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="box">
+                        <label>
+                            Comparative group results
+                        </label><br><br>
+                        {% for comparativeResult in groupResultComparative %}
+                            <div class="label" style="font-size: 14px; color: black">
+                                {{ comparativeResult }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
             <div class="box">
