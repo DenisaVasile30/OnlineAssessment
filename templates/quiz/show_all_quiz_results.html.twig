@@ -61,18 +61,18 @@
                 <br>
 
                 {% if groups is defined and groups is not null %}
-                    <div class="box">
+                    {% if app.request.attributes.get('_route_params').groupNo is defined %}
+                        <div class="box">
                         <button class="save-button">
-{#                           {% if app.request.attributes.get('_route_params').groupNo is defined %}#}
                               <a href="{{ path('app_quiz_download_submitted_quiz_report_group', {
                                 quizId: requiredQuiz.id,
                                 groupNo: app.request.attributes.get('_route_params').groupNo
                               }) }}">
                                 Download grades report
                               </a>
-{#                           {% endif %}#}
                         </button>
                     </div>
+                    {% endif %}
                 {% endif %}
 
                 <label class="label" style="margin-left: 30px">
