@@ -22,22 +22,22 @@
                 <div class="label">{{ (index + 1)~'. '~question.questionContent }}</div><br>
                 <div>
                     <input type="radio" id="choiceA" name="answerOption" value="{{ question.choiceA }}" checked>
-                    <label for="{{ question.choiceA }}">{{ 'a. '~question.choiceA }}</label>
+                    <label for="{{ question.choiceA }}">{{ question.choiceA }}</label>
                 </div>
                 <div>
                     <input type="radio" id="choiceB" name="answerOption" value="{{ question.choiceB }}">
-                    <label for="{{ question.choiceB }}">{{ 'b. '~question.choiceB }}</label>
+                    <label for="{{ question.choiceB }}">{{ question.choiceB }}</label>
                 </div>
                 <div>
                     <input type="radio" id="choiceC" name="answerOption" value="{{ question.choiceC }}">
-                    <label for="{{ question.choiceC }}">{{ 'c. '~question.choiceC }}</label>
+                    <label for="{{ question.choiceC }}">{{ question.choiceC }}</label>
                 </div>
-                {% if question.choiceD is defined and question.choiceD != ' ' %}
-                    <div>
-                        <input type="radio" id="choiceD" name="answerOption" value="{{ question.choiceD }}">
-                        <label for="{{ question.choiceD }}">{{ 'd. '~question.choiceD }}</label>
-                    </div>
-                {% endif %}
+{#                {% if question.choiceD is defined and question.choiceD != ' ' %}#}
+{#                    <div>#}
+{#                        <input type="radio" id="choiceD" name="answerOption" value="{{ question.choiceD }}">#}
+{#                        <label for="{{ question.choiceD }}">{{ 'd. '~question.choiceD }}</label>#}
+{#                    </div>#}
+{#                {% endif %}#}
                 <input type="text" id="index" name="index" value="{{ index }}" style="visibility: hidden">
                 <br>
                 {{ form_widget(supportQuiz.next, { 'label': 'Next', 'attr': {'class': 'general-button'} }) }}

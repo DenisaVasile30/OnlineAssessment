@@ -546,6 +546,7 @@ class QuizController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /**@var User $user*/
             $user = $this->getUser();
+            $index = $request->request->get('index');
 
             if ($form->get('next')->isClicked()) {
 //                dd($requiredQuiz);
@@ -558,6 +559,7 @@ class QuizController extends AbstractController
                 if (
                     $requiredQuiz->getPracticeQuiz() == false
                     && count($questionAlreadyExist) != 0) {
+//                    dd($questionAlreadyExist);
                     return $this->render('quiz/start_quiz.html.twig', [
                         'requiredQuiz' => $requiredQuiz,
                         'question' => $questions[$index],
@@ -570,7 +572,11 @@ class QuizController extends AbstractController
                 if ($remainingTime) {
                     $remainingTime = $request->request->get('remainingTime');
                     $secondsSpent = $request->request->get('seconds-spent');
-                    $question->setTimeSpent($secondsSpent);
+                    if (!is_int($secondsSpent)) {
+                        $question->setTimeSpent(1);
+                    } else {
+                        $question->setTimeSpent($secondsSpent);
+                    }
                 }
                 $index = $request->request->get('index');
                 $question->setQuizId($requiredQuiz->getId());
@@ -600,6 +606,7 @@ class QuizController extends AbstractController
                 } else {
                     $supportedQuiz = $supportedQuizRepository->findOneBy(['quiz' => $quiz, 'supportedBy' => $this->getUser()]);
                     if ($supportedQuiz != null) {
+
                         $supportedQuiz->setEndedAt(new \DateTime(''));
                         $startedAt = \DateTime::createFromFormat('Y-m-d H:i:s', $supportedQuiz->getStartedAt()->format('Y-m-d H:i:s'));
                         $endedAt = \DateTime::createFromFormat('Y-m-d H:i:s', $supportedQuiz->getEndedAt()->format('Y-m-d H:i:s'));
@@ -857,10 +864,10 @@ class QuizController extends AbstractController
                     $tmpQuestion = [];
                     $tmpQuestion['id'] = $question->getId();
                     $tmpQuestion['questionName'] = $question->getQuestionContent();
-                    $tmpQuestion['answerA'] = $question->getChoiceA();
-                    $tmpQuestion['answerB'] = $question->getChoiceB();
-                    $tmpQuestion['answerC'] = $question->getChoiceC();
-                    $tmpQuestion['correctAnswer'] = $question->getCorrectAnswer();
+                    $tmpQuestion['answerA'] = substr($question->getChoiceA(), 3);
+                    $tmpQuestion['answerB'] = substr($question->getChoiceB(), 3);
+                    $tmpQuestion['answerC'] = substr($question->getChoiceC(), 3);
+                    $tmpQuestion['correctAnswer'] = substr($question->getCorrectAnswer(), 3);
                     $tmpQuestion['timeSpent'] = $questionTimeSpent['averageTime'];
 
                     $arrayReport[] = $tmpQuestion;
