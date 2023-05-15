@@ -92,6 +92,14 @@
 
             // Start the countdown timer
             var intervalId = setInterval(updateTime, 1000);
+
+            // Disable back button for the current page
+            // history.pushState(null, null, location.href);
+            // window.onpopstate = function () {
+            //     history.go(1);
+            // };
+            window.history.forward();
+
         });
     </script>
 {% endblock %}

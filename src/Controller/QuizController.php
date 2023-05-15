@@ -548,6 +548,24 @@ class QuizController extends AbstractController
             $user = $this->getUser();
 
             if ($form->get('next')->isClicked()) {
+//                dd($requiredQuiz);
+                $questionAlreadyExist = $detailsRepository->findBy([
+                        'quizId' => $requiredQuiz->getId(),
+                        'supportedByStudent' => $user,
+                        'questionId' => $questions[$index]->getId()
+                    ]
+                );
+                if (
+                    $requiredQuiz->getPracticeQuiz() == false
+                    && count($questionAlreadyExist) != 0) {
+                    return $this->render('quiz/start_quiz.html.twig', [
+                        'requiredQuiz' => $requiredQuiz,
+                        'question' => $questions[$index],
+                        'index' => $index,
+                        'remainingTime' => $remainingTime,
+                        'supportQuiz' => $form->createView()
+                    ]);
+                }
                 $question = new SupportedQuizDetails();
                 if ($remainingTime) {
                     $remainingTime = $request->request->get('remainingTime');
@@ -610,6 +628,28 @@ class QuizController extends AbstractController
                 }
 
             } elseif ($form->get('submit')->isClicked()) {
+                $question = new SupportedQuizDetails();
+                if ($remainingTime) {
+                    $remainingTime = $request->request->get('remainingTime');
+                    $secondsSpent = $request->request->get('seconds-spent');
+                    $question->setTimeSpent($secondsSpent);
+                }
+                $index = $request->request->get('index');
+                $question->setQuizId($requiredQuiz->getId());
+                $question->setQuestionId($questions[$index]->getId());
+                $correctAnswer = $questions[$index]->getCorrectAnswer();
+                $question->setCorrectAnswer($correctAnswer);
+                $postedOption = $request->request->get('answerOption');
+                $question->setProvidedAnswer($postedOption);
+                $question->setQuestionScore((int)$requiredQuiz->getQuestionsList()[$questions[$index]->getId()]);
+                if ($postedOption == $correctAnswer) {
+                    $question->setObtainedScore($question->getQuestionScore());
+                } else {
+                    $question->setObtainedScore(0);
+                }
+
+                $question->setSupportedByStudent($user);
+                $detailsRepository->save($question, true);
                 $supportedQuiz = $supportedQuizRepository->findOneBy(['quiz' => $quiz, 'supportedBy' => $this->getUser()]);
                 if ($supportedQuiz != null) {
                     $supportedQuiz->setEndedAt(new \DateTime(''));
