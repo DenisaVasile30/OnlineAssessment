@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="75e86cba-4ec9-465e-9ad0-21ace7dcd445" name="154.49.142.131">
+        <fileTransfer rootFolder="/home/u526454481/domains/assess-tracker.online" accessType="SFTP" host="154.49.142.131" port="65002" sshConfigId="c78b0ef1-0f5a-478a-97e7-d5d22f927c12" sshConfig="u526454481@154.49.142.131:65002 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
