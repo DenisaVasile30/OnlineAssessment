@@ -83,7 +83,8 @@
         "symfony": {
             "allow-contrib": false,
             "require": "6.1.*"
-        }
+        },
+        "public-dir": "public_html/"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",

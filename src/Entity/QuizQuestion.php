@@ -131,7 +131,7 @@ class QuizQuestion
 
     public function getChoiceD(): ?string
     {
-        return $this->choiceD;
+        return $this->choiceD ?? '';
     }
 
     public function setChoiceD(?string $choiceD): self

@@ -18,7 +18,7 @@ use App\Form\SubmittedCodeFormType;
 use App\Helper\CompilerHelper;
 use App\Helper\FormatHelper\CodeCheckCLanguage;
 use App\Helper\ProgrammingLanguageHelper;
-use App\Helper\StructuredRequirements\StructuredRequirements;
+use App\Helper\SubmittedCodeCHelper\StructuredRequirements;
 use App\Repository\AssessmentRepository;
 use App\Repository\AssignedSubjectsRepository;
 use App\Repository\CreatedQuizRepository;
@@ -216,9 +216,6 @@ class AssessmentController extends AbstractController
         $reservedWordsList = ProgrammingLanguageHelper::getReservedWords('cpp');
         $filesContent = [];
 
-//        dd($requiredAssessment->getSubject()->getSubjectContent());
-
-
         $submittedAssessment = $supportedAssessmentRepository->findBy([
             'assessmentId' => $assessment,
             'submittedBy' => $this->getUser()]
@@ -235,7 +232,6 @@ class AssessmentController extends AbstractController
 
         if ($subjectContent->getContentFile() != null) {
             $filesContent[$subjectContent->getId()] = stream_get_contents($subjectContent->getContentFile());
-//            dd($filesContent);
         } else {
             $filesContent[$subjectContent->getId()] = 'Nothing to show';
         }
@@ -283,14 +279,12 @@ class AssessmentController extends AbstractController
 
                             $compiler = new CompilerHelper($submittedCode);
                             [$responseMessage, $compiledSuccessfully] = $compiler->makeApiCall();
-//                            dd($responseMessage);
                             if (!$compiledSuccessfully) {
                                 $submittedAssessment[0]->setResultedResponse([
                                     'compiledSuccessfully' => $compiledSuccessfully,
                                     'error'=> 'Program did not compile successfully!',
                                     'errorMessage' => $responseMessage
                                 ]);
-//                                dd($submittedAssessment);
                             } else {
                                 $content = $filesContent[$requiredAssessment->getSubject()->getId()];
                                 $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
@@ -299,7 +293,6 @@ class AssessmentController extends AbstractController
                                     $structuredRequirements['requirements'],
                                     $submittedCode
                                 );
-//                                dd($codeCheckResult[0][1][0]);
                                 $submittedAssessment[0]->setResultedResponse([
                                     'compiledSuccessfully' => $compiledSuccessfully,
                                     'error'=> '',
@@ -327,7 +320,6 @@ class AssessmentController extends AbstractController
                 ]);
             }
         }
-//        dd($requiredSubjects);
         return $this->render('assessment/start_assessment.html.twig', [
             'requiredAssessment' => $requiredAssessment,
 //            'requiredSubject' => $requiredSubject,
@@ -382,13 +374,17 @@ class AssessmentController extends AbstractController
         }
         $content = $filesContent[$requiredAssessment->getSubject()->getId()];
         $structuredRequirements = StructuredRequirements::getStructuredRequirements($content);
-//        dd($submittedAssessment);
+        if (isset($submittedAssessment[0])) {
+            $submittedFlag = true;
+        } else {
+            $submittedFlag = false;
+        }
 
         return $this->render('assessment/show_submitted.html.twig',[
             'requiredAssessment' => $requiredAssessment,
             'structuredRequirements' => $structuredRequirements,
-            'submittedAssessment' => $submittedAssessment[0],
-            'submittedCode' => stream_get_contents($submittedAssessment[0]->getContentFile())
+            'submittedAssessment' => $submittedAssessment[0] ?? null,
+            'submittedCode' => $submittedFlag ? stream_get_contents($submittedAssessment[0]->getContentFile()) : ''
         ]);
     }
 

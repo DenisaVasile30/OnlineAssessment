@@ -1,69 +1,75 @@
 {% extends 'base.html.twig' %}
-
 {% block body %}
-    <br>
-    <div class="container">
+    {% if submittedAssessment is defined and submittedAssessment is null %}
         <div class="box">
-            <div class="label" style="margin-left: 30px">
-                Submitted assessment:
-            </div>
-            <br>
-            <div class="box">
-                <label>{{ requiredAssessment.id~' '~requiredAssessment.description }}</label>
-                <br>
-                <label>
-                    Started at: {{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}
-                    Ended at: {{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}
-                </label>
-                <br>
-                <label>
-                    Maximum grade: {{ submittedAssessment.maxGrade }}
-                    Time spent: {{ submittedAssessment.timeSpent|date('H:i:s') }}
-                </label>
-
-                <div class="box">
-                    <label>
-                        Status:
-                        {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
-                            <br>
-                            <label>Compiled: Yes</label>
-                            <br>
-                            <label>Errors:</label><br>
-                            {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
-                                {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
-                                    <label>{{ error }}</label><br>
-                                {% endfor %}
-                            {% else %}
-                                <label>No errors found</label><br>
-                            {% endif %}
-                        {% else %}
-                            <br>
-                            <label>Compiled: No</label>
-                            <br>
-                        {% endif %}
-                    </label>
-                </div>
-            </div>
-            <br>
+            <div class="label"> No results found</div>
+            <div class="label"> Attempt the quiz and come back later!</div>
+        </div>
+    {% else %}
+        <br>
+        <div class="container">
             <div class="box">
                 <div class="label" style="margin-left: 30px">
-                    Requirements:
-                </div><br><br>
-                <label>{{ structuredRequirements['baseRequirement'] }}</label><br><br>
-                {% for requirement in structuredRequirements['requirements'] %}
-                    <label>{{ requirement['content'] }}</label><br>
-                {% endfor %}
-            </div>
-            <br>
-            <div class="label" style="margin-left: 30px">
-                Submitted code:
-            </div>
-            <div class="box">
+                    Submitted assessment:
+                </div>
                 <br>
-                <label><pre>{{ submittedCode }}</pre></label>
-            </div>
+                <div class="box">
+                    <label>{{ requiredAssessment.id~' '~requiredAssessment.description }}</label>
+                    <br>
+                    <label>
+                        Started at: {{ submittedAssessment.startedAt|date('Y-m-d H:i:s') }}
+                        Ended at: {{ submittedAssessment.endedAt|date('Y-m-d H:i:s') }}
+                    </label>
+                    <br>
+                    <label>
+                        Maximum grade: {{ submittedAssessment.maxGrade }}
+                        Time spent: {{ submittedAssessment.timeSpent|date('H:i:s') }}
+                    </label>
 
+                    <div class="box">
+                        <label>
+                            Status:
+                            {% if submittedAssessment.resultedResponse['compiledSuccessfully'] == true %}
+                                <br>
+                                <label>Compiled: Yes</label>
+                                <br>
+                                <label>Errors:</label><br>
+                                {% if submittedAssessment.resultedResponse['errorMessage']|length > 0 %}
+                                    {% for error in submittedAssessment.resultedResponse['errorMessage'] %}
+                                        <label>{{ error }}</label><br>
+                                    {% endfor %}
+                                {% else %}
+                                    <label>No errors found</label><br>
+                                {% endif %}
+                            {% else %}
+                                <br>
+                                <label>Compiled: No</label>
+                                <br>
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+                <br>
+                <div class="box">
+                    <div class="label" style="margin-left: 30px">
+                        Requirements:
+                    </div><br><br>
+                    <label>{{ structuredRequirements['baseRequirement'] }}</label><br><br>
+                    {% for requirement in structuredRequirements['requirements'] %}
+                        <label>{{ requirement['content'] }}</label><br>
+                    {% endfor %}
+                </div>
+                <br>
+                <div class="label" style="margin-left: 30px">
+                    Submitted code:
+                </div>
+                <div class="box">
+                    <br>
+                    <label><pre>{{ submittedCode }}</pre></label>
+                </div>
+
+            </div>
         </div>
-    </div>
-    </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -529,7 +529,6 @@ class QuizController extends AbstractController
             ]);
         }
 
-//        dd($requiredQuiz);
         //        get all questionsIds
         $questionsIds = implode(',', array_keys($requiredQuiz->getQuestionsList()));
         $questions = $quizQuestionRepository->getQuestionsByIds($questionsIds);
@@ -549,7 +548,6 @@ class QuizController extends AbstractController
             $index = $request->request->get('index');
 
             if ($form->get('next')->isClicked()) {
-//                dd($requiredQuiz);
                 $questionAlreadyExist = $detailsRepository->findBy([
                         'quizId' => $requiredQuiz->getId(),
                         'supportedByStudent' => $user,
@@ -572,13 +570,16 @@ class QuizController extends AbstractController
                 if ($remainingTime) {
                     $remainingTime = $request->request->get('remainingTime');
                     $secondsSpent = $request->request->get('seconds-spent');
-                    if (!is_int($secondsSpent)) {
+                    if (!is_numeric((int)$secondsSpent)) {
                         $question->setTimeSpent(1);
                     } else {
-                        $question->setTimeSpent($secondsSpent);
+                        $question->setTimeSpent((int)$secondsSpent);
                     }
                 }
                 $index = $request->request->get('index');
+                if ($questionAlreadyExist && $requiredQuiz->getPracticeQuiz() == 1) {
+                    $detailsRepository->remove($questionAlreadyExist[0], true);
+                }
                 $question->setQuizId($requiredQuiz->getId());
                 $question->setQuestionId($questions[$index]->getId());
                 $correctAnswer = $questions[$index]->getCorrectAnswer();
@@ -940,7 +941,7 @@ class QuizController extends AbstractController
                 $submittedQuiz->getSupportedBy()->getEmail(),
                 $name,
                 ($submittedQuiz->getStartedAt())->format('Y-m-d h:i:s'),
-                ($submittedQuiz->getEndedAt())->format('Y-m-d h:i:s'),
+                $submittedQuiz->getEndedAt() ? ($submittedQuiz->getEndedAt())->format('Y-m-d h:i:s') : '',
                 $submittedQuiz->getObtainedGrade(),
                 $timeSpent
             );
@@ -1081,8 +1082,8 @@ class QuizController extends AbstractController
             ]);
         } else {
             return $this->render('quiz/reports_per_group.html.twig',[
-                'requiredQuiz' => $requiredQuiz,
-                'submittedQuizzes' => $submittedQuizzes,
+                'requiredQuiz' => null,
+                'submittedQuizzes' => null,
             ]);
         }
     }
@@ -1225,6 +1226,9 @@ class QuizController extends AbstractController
         return $passPercentage;
     }
 
+    /**
+     * @throws Exception
+     */
     private function processAikenFormat(UploadedFile $file)
     {
         $file_path = $file->getPathname();
@@ -1236,33 +1240,47 @@ class QuizController extends AbstractController
         while(($line = fgets($file)) !== false) {
 //            suppose we have the question
             $question = trim($line);
-
-            while (!feof($file) && ($foundChoices < 1 || $foundCorrectAnswer < 1)) {
+            $lineIndex = 0;
+            $answerFlag = false;
+            while (
+                !feof($file)
+                && ($foundChoices < 1 || $foundCorrectAnswer < 1)
+                && $lineIndex <= 4
+            ) {
                 $line = fgets($file);
+                $lineIndex++;
                 if (preg_match('/^[A-Z][).]\s/', $line)) {
                     // this is an answer choice
                     $answerChoices[] = trim($line);
                     $foundChoices++;
+                    $answerFlag = true;
                 } elseif (preg_match('/^ANSWER: [A-Z]/', $line)) {
+                    if (!$answerFlag && $lineIndex == 1) {
+                        throw new \Exception("Invalid AIKEN format!");
+                    }
                     // this is an answer line
                     $correctAnswer = trim($line);
                     $foundCorrectAnswer++;
-//
                     if ($foundChoices >= 2) {
                         $correctLetter = explode('ANSWER: ', trim($correctAnswer))[1];
+                        $answerChoicesIndex = [];
+                        foreach ($answerChoices as $k => $value) {
+                            $answerChoicesIndex[] = substr($value, 0, 1);
+                        }
+                        if (!in_array($correctLetter, $answerChoicesIndex)) {
+                            throw new \Exception("Invalid AIKEN format!(line 1273)");
+                        }
                         $questions[] = [
                             "question" => $question,
                             "answerChoices" => $answerChoices,
                             "correctAnswer" => $correctAnswer,
                         ];
-//                        dd($answerChoices);
-//                        if (!in_array($correctLetter, $answerChoices)) {
-//                            dd($correctLetter);
-//                            throw new \Exception("Invalid AIKEN format!");
-//                        }
                         $found = false;
                         foreach ($answerChoices as $k => $choice) {
-                            if (str_contains($choice, $correctLetter . '.') || str_contains($choice, $correctLetter . ')')) {
+                            if (
+                                str_contains($choice, $correctLetter . '.')
+                                || str_contains($choice, $correctLetter . ')')
+                            ) {
                                 $found = true;
                                 break;
                             } else {
@@ -1270,7 +1288,7 @@ class QuizController extends AbstractController
                             }
                         }
                         if (!$found) {
-                            throw new \Exception("Invalid AIKEN format!");
+                            throw new \Exception("Invalid AIKEN format!(line 1294)");
                         }
                     }
                     $answerChoices = [];
@@ -1279,9 +1297,9 @@ class QuizController extends AbstractController
                     $foundCorrectAnswer = 0;
                 }
             }
-            if (count($questions) == 0) {
-                throw new \Exception("Invalid AIKEN format!");
-            }
+//            if (count($questions) == 0) {
+//                throw new \Exception("Invalid AIKEN format!(line 1303)");
+//            }
         }
 
         fclose($file);
@@ -1295,7 +1313,6 @@ class QuizController extends AbstractController
         TeacherRepository $teacherRepository
     )
     {
-//        dd($questions);
         foreach ($questions as $key => $questionData) {
             $question = new QuizQuestion();
             $question->setCategory($category);

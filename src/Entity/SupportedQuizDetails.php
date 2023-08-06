@@ -35,7 +35,7 @@ class SupportedQuizDetails
 
 //  TO DO: make nullable false
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $obtainedScore = null;
+    private ?float $obtainedScore = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'supportedQuizDetails')]
     #[ORM\JoinColumn(nullable: false)]
@@ -128,7 +128,7 @@ class SupportedQuizDetails
         return $this->obtainedScore;
     }
 
-    public function setObtainedScore(int $obtainedScore): self
+    public function setObtainedScore(float $obtainedScore): self
     {
         $this->obtainedScore = $obtainedScore;
 

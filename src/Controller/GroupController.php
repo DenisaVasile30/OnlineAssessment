@@ -29,7 +29,7 @@ class GroupController extends AbstractController
         StudentRepository $studentRepository
     ): Response
     {
-        $teacherAssignedGroups = $this->getUser()->getTeacher()->getAssignedGroups();
+        $teacherAssignedGroups = ($this->getUser()->getTeacher()->getAssignedGroups()) ?? 0;
 //        $studentAssigned = $studentRepository->getStudentAssignedByTeacherId($this->getUser(), $this->getUser()->getTeacher());
 //        dd($studentAssigned);
         $groups = $groupRepository->findAll();
@@ -60,6 +60,13 @@ class GroupController extends AbstractController
             $existingGroups = $teacher->getAssignedGroups();
             $existingGroups[] = (int)$groupNo;
 
+            $teacher->setAssignedGroups($existingGroups);
+
+            $teacherRepository->save($teacher, true);
+
+            return $this->redirectToRoute('app_show_groups');
+        } else {
+            $existingGroups[] = (int)$groupNo;
             $teacher->setAssignedGroups($existingGroups);
 
             $teacherRepository->save($teacher, true);
@@ -111,7 +118,7 @@ class GroupController extends AbstractController
             $groupNo = (int)$form->get('groupNo')->getData();
             $group->setGroupNo($groupNo);
 
-            $groupRepository->save($group);
+            $groupRepository->save($group, true);
 
             $this->redirectToRoute('app_show_groups');
         }
@@ -241,7 +248,7 @@ class GroupController extends AbstractController
                         $parts = explode(".", substr($email, 0, $atPosition));
                         if (isset($parts) && count($parts) == 2) {
                             $firstName = $parts[0];
-                            $lastName = $parts[1];
+                            $lastName = $parts[1] ?? '';
 
                             $userProfile = new UserProfile();
                             $userProfile->setUser($user);

@@ -35,6 +35,8 @@ class SupportController extends AbstractController
                 $ticketsAssignedToGroup = $ticketRepository->getTicketsWithMultipleAssignedTo($groupNo);
                 if (count($ownedTickets) > 0) {
                     $ownedTickets = array_merge($ownedTickets, $ticketsAssignedToGroup);
+                } else {
+                    $ownedTickets = $ticketsAssignedToGroup;
                 }
             }
         }

@@ -64,7 +64,7 @@ class Teacher
         return $this;
     }
 
-    public function getAssignedGroups(): array
+    public function getAssignedGroups(): ?array
     {
         return $this->assignedGroups;
     }

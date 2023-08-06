@@ -4,26 +4,26 @@
 {#    to do: timer for startAt and EndAt, if the time has passed stop assessment#}
     <br>
     <div class="box">
-        <div class="label-elem">
+        <div class="label">
             {{ requiredAssessment.description }}
         </div>
         <br>
         {#                     TO DO: add programming language in assessment#}
-        <label class="label-elem">Programming language to use: C </label><br>
+        <label class="label">Programming language to use: C </label><br>
         <div>
             <div class="box">
                 {% for requiredSubject in requiredSubjects %}
-                    <label class="label-elem">
+                    <label class="label">
                         {{ 'Discipline:    '~requiredSubject.subject }}
                     </label><br>
                     {% if requiredSubject.subjectRequirements is not null %}
-                        <label class="label-elem">Additional information:</label>
+                        <label class="label">Additional information:</label>
                         <span>{{ requiredSubject.subjectRequirements }}</span>
                     {% else %}
                         <label>No specific requirements</label><br><br>
                     {% endif %}
                     {% if requiredSubject.subjectContent is not null %}
-                        <label class="label-elem">Resolve the following:</label><br>
+                        <label class="label">Resolve the following:</label><br>
                         <div>
                             <span>{{ requiredSubject.subjectContent }}</span>
                         </div>
@@ -134,22 +134,19 @@
             var textareaCode = document.getElementById("submitted_code_form_codeArea");
 
             textareaCode.addEventListener("paste", function (e) {
-                // var clipboardData = e.clipboardData || window.clipboardData;
-                // var pastedData = clipboardData.getData("text/plain");
-                // console.log(clipboardData);
-                // console.log('pasted data');
-                // console.log(pastedData);
-                // var currentValue = textareaCode.value;
-                //
-                // // Check if the pasted data came from within the textarea
-                // if (currentValue.includes(pastedData)) {
-                //     // Allow the paste to proceed
-                //     console.log('Allow paste');
-                // } else {
-                //     // Prevent the paste
-                //     console.log('Deny paste');
-                //     e.preventDefault();
-                // }
+                var clipboardData = e.clipboardData || window.clipboardData;
+                var pastedData = clipboardData.getData("text/plain");
+                var currentValue = textareaCode.value;
+
+                // Check if the pasted data came from within the textarea
+                if (currentValue.includes(pastedData)) {
+                    // Allow the paste to proceed
+                    console.log('Allow paste');
+                } else {
+                    // Prevent the paste
+                    console.log('Deny paste');
+                    e.preventDefault();
+                }
             });
 
             textareaCode.addEventListener("keydown", handleKeyDown);

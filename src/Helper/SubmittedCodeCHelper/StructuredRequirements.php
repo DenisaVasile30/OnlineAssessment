@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper\StructuredRequirements;
+namespace App\Helper\SubmittedCodeCHelper;
 
 class StructuredRequirements
 {

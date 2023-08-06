@@ -28,7 +28,7 @@
         <div>
             {% if ticket.issuedBy.email == app.user.email %}
                 <label class="ticket-label-right">{{ ticket.issuedBy.email }} at {{ ticket.issuedAt|date('Y-m-d H:i:s') }}</label>
-                <textarea class="textarea-ticket ticket-owner" readonly>
+                <textarea class="textarea-ticket ticket-owner" readonly rows="10">
                             {{ ticket.ticketContent }}
                 </textarea>
             {% else %}
