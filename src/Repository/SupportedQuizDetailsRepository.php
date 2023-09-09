@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Group;
+use App\Entity\Student;
 use App\Entity\SupportedQuizDetails;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -87,13 +89,24 @@ class SupportedQuizDetailsRepository extends ServiceEntityRepository
     }
 
     public function getDetailedSupportedQuizByQuiz($quizId) {
+//        return $this->createQueryBuilder('q')
+//            ->select('q.quizId, q.questionId, AVG(q.timeSpent) as averageTime')
+//            ->where('q.quizId = :quizId')
+//            ->setParameter('quizId', $quizId)
+//            ->groupBy('q.quizId, q.questionId')
+//            ->getQuery()
+//            ->getResult();
+//        ;
+
         return $this->createQueryBuilder('q')
             ->select('q.quizId, q.questionId, AVG(q.timeSpent) as averageTime')
-            ->where('q.quizId = :quizId')
+            ->join(Student::class, 's', 'WITH', 's.user = q.supportedByStudent')
+            ->join(Group::class, 'g', 'WITH', 'g.id = s.groupId')
+            ->where('g.groupNo NOT IN (100,500)')
+            ->andWhere('q.quizId = :quizId')
             ->setParameter('quizId', $quizId)
             ->groupBy('q.quizId, q.questionId')
             ->getQuery()
             ->getResult();
-        ;
     }
 }

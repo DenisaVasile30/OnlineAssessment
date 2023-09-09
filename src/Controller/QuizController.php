@@ -876,6 +876,37 @@ class QuizController extends AbstractController
             }
         }
 
+//        generate csv report
+//        $headers = array(
+//            'Question Id',
+//            'Question',
+//            'Answer A',
+//            'Answer B',
+//            'Answer C',
+//            'Correct answer',
+//            'Time Spent',
+//        );
+//
+//        $stream = fopen('php://memory', 'w');
+//        fputcsv($stream, $headers);
+//
+//        foreach ($arrayReport as $key => $value) {
+//            $rowData = $value;
+//            fputcsv($stream, $rowData);
+//        }
+//
+//        rewind($stream);
+//
+//        $fileName = 'TimeSpentReport.csv';
+//        $response = new StreamedResponse();
+//        $response->setCallback(function () use ($stream) {
+//            fpassthru($stream);
+//        });
+//        $response->headers->set('Content-Type', 'text/csv');
+//        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '";');
+//
+//        return $response;
+
         $jsonReport = json_encode($arrayReport, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         $fileName = 'TimeSpentReport.txt';
         $fileContent = $jsonReport;
