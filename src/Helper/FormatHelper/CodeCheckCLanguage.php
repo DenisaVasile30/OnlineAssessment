@@ -37,7 +37,7 @@ class CodeCheckCLanguage
         $structName = '';
         $splitRequirement = explode(" ", $requirement['content']);
         foreach ($splitRequirement as $key => $value) {
-            if ($value == 'structura') {
+            if ($value == 'structure') {
                 $structName = $splitRequirement[$key + 1];
             }
         }
